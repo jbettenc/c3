@@ -145,7 +145,7 @@ function Button(props: ButtonProps) {
 
   const disabledLoading = () => {
     if (filled) {
-      return "disabled:border-primary-200 disabled:bg-primary-100 disabled:dark:bg-primary-300 disabled:cursor-not-allowed disabled:shadow-none";
+      return "disabled:border-primary-200 disabled:bg-primary-100 disabled:cursor-not-allowed disabled:shadow-none";
     } else {
       return "disabled:text-gray-300 disabled:cursor-not-allowed";
     }
