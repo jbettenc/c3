@@ -1,0 +1,11 @@
+.body-overflow::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+  background-color: #FFF;
+  border-radius: 2px;
+}
+
+.body-overflow::-webkit-scrollbar-thumb {
+  background: #000;
+  border-radius: 2px;
+}
