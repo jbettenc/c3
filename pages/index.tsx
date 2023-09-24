@@ -3,7 +3,7 @@ import Landing from "@/components/landing/Landing";
 import { setEthAlias, setEthAvatar } from "@/store/userSlice";
 import { useWeb3React } from "@web3-react/core";
 import Head from "next/head";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 export default function Home() {

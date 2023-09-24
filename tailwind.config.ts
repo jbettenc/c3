@@ -51,7 +51,7 @@ module.exports = {
         250: "#5B5858",
         300: "#D0D5DD",
         400: "#353535",
-        500: "#323232",
+        500: "#667085",
         520: "#2F2F2F",
         550: "#2C2C2C",
         600: "#272727",
@@ -70,13 +70,17 @@ module.exports = {
       pink: { ...colors.pink, 100: "#F7F0FF" },
       purple: {
         ...colors.purple,
-        100: "#F7F0FF"
+        100: "#F7F0FF",
+        300: "603FE0"
       },
       blue: { ...colors.blue, 200: "#EAF7FF", 300: "#6C66E9", 400: "#524AE7", 500: "#3E35E3" },
       orange: {
         ...colors.orange,
+        50: "#FDF7F3",
         400: "#FF4F00",
-        450: "#F8C110"
+        450: "#F8C110",
+        600: "#DD8D58",
+        700: "#D97D40"
       },
       black: colors.black,
       primary: {

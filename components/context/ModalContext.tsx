@@ -1,5 +1,5 @@
 import React, { useState, createContext, useContext, useRef, useEffect } from "react";
-import { ConfirmView, Custom, TransactionFlow, WalletSelect } from "../modals";
+import { ConfirmView, Custom, Share, TransactionFlow, WalletSelect } from "../modals";
 import Modal from "@/ui/modals/Modal";
 // import WalletSelect from "../modals/WalletConnect";
 
@@ -10,12 +10,14 @@ export enum MODAL_TYPE {
   VIEW_COLLECTION = "VIEW_COLLECTION",
   VIEW_OFFER = "VIEW_OFFER",
   WALLET_SELECT = "WALLET_SELECT",
+  SHARE = "SHARE",
   CUSTOM = "CUSTOM"
 }
 
 const MODAL_COMPONENTS: any = {
   [MODAL_TYPE.CONFIRM_VIEW]: ConfirmView,
   [MODAL_TYPE.TRANSACTION_FLOW]: TransactionFlow,
+  [MODAL_TYPE.SHARE]: Share,
   [MODAL_TYPE.WALLET_SELECT]: WalletSelect,
   [MODAL_TYPE.CUSTOM]: Custom
 };
