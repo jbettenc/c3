@@ -55,7 +55,7 @@ function Landing() {
         <div className="flex flex-col text-black w-full mb-16">
           <div className="w-full border-b border-gray-300">
             <div className="flex flex-col mx-6 my-2">
-              <div className="font-semibold font-medium text-lg">Start a petition</div>
+              <div className="font-semibold text-lg">Start a petition</div>
               <div>Start your petition</div>
             </div>
           </div>
@@ -69,7 +69,7 @@ function Landing() {
                       {step === 0 ? <Radio checked groupName="N/A" /> : <Image src={CheckIcon} alt="Complete" />}
                     </div>
                     <div className="flex flex-col">
-                      <div className="font-semibold font-medium text-lg">Add Petition Details</div>
+                      <div className="font-semibold text-lg">Add Petition Details</div>
                       <div>Start your petition by adding title and details</div>
                     </div>
                     {step !== 0 ? (
@@ -130,7 +130,7 @@ function Landing() {
                       {<Radio checked={step === 1} groupName="N/A2" disabled={step === 0} />}
                     </div>
                     <div className="flex flex-col">
-                      <div className="font-semibold font-medium text-lg">Add Images</div>
+                      <div className="font-semibold text-lg">Add Images</div>
                       <div>Add supporting images to your petition</div>
                     </div>
                     {step > 1 ? (
@@ -186,7 +186,7 @@ function Landing() {
       <div className="flex flex-col text-black w-full mb-16">
         <div className="w-full border-b border-gray-300">
           <div className="flex flex-col mx-6 my-2">
-            <div className="font-semibold font-medium text-lg">Preview Petition</div>
+            <div className="font-semibold text-lg">Preview Petition</div>
             <div>Preview your petition before sending it out</div>
           </div>
         </div>
