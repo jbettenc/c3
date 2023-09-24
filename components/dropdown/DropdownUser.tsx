@@ -75,7 +75,7 @@ function DropdownUser(props: DropdownUserProps) {
                 ) : (
                   <div className="p-2">
                     <Identicon
-                      string={account ? account : ""}
+                      string={account ? account.toLowerCase() : ""}
                       size={17}
                       palette={["#FFC32A", "#AEDFFB", "#6C66E9", "#FFDB80", "#CDCDCD", "#000000", "#C9AEFB", "#B9E5D4"]}
                     />

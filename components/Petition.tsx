@@ -17,6 +17,7 @@ import { Contract } from "ethers";
 import C3ABI from "../artifacts/C3.json";
 import { AbiCoder } from "ethers";
 import { MODAL_TYPE, useGlobalModalContext } from "./context/ModalContext";
+import Signer from "./Signer";
 
 interface PetitionProps {
   petition?: {
@@ -34,7 +35,7 @@ function Petition(props: PetitionProps) {
     address: string;
     title: string;
     description: string;
-    images: File[];
+    images: string[];
   }>();
   const [signers, handleSigners] = useState<any>([]);
   const GOAL = 100;
@@ -54,8 +55,8 @@ function Petition(props: PetitionProps) {
         handleIpfs(obj?.data ?? undefined);
         console.log(obj);
 
-        const obj2 = await loadPetitionSigners(bytesToString(fromHexString(petition.id.substring(2))));
-        handleSigners(obj2?.data ?? undefined);
+        const obj2 = await loadPetitionSigners(petition.id);
+        handleSigners(obj2 ?? undefined);
       }
     })();
   }, [petition]);
@@ -117,38 +118,7 @@ function Petition(props: PetitionProps) {
                     ? signers.map((signer: any) => (
                         <tr>
                           <td className="pl-4 py-2">
-                            <div className="flex">
-                              <div className="my-auto">
-                                {ethAvatar ? (
-                                  <Image className="w-9 h-9 rounded-full object-cover" src={ethAvatar} alt="" />
-                                ) : (
-                                  <div className="p-2">
-                                    <IdentIcon
-                                      string={signer.signer}
-                                      size={17}
-                                      palette={[
-                                        "#FFC32A",
-                                        "#AEDFFB",
-                                        "#6C66E9",
-                                        "#FFDB80",
-                                        "#CDCDCD",
-                                        "#000000",
-                                        "#C9AEFB",
-                                        "#B9E5D4"
-                                      ]}
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex flex-col">
-                                <div className="font-semibold">
-                                  {signer.signer.substring(0, 6) +
-                                    "..." +
-                                    signer.signer.substring(signer.signer.length - 6)}
-                                </div>
-                                <div>account2</div>
-                              </div>
-                            </div>
+                            <Signer address={signer.signer} />
                           </td>
                           <td className="pr-4 py-2">{new Date(signer.timestamp * 1000).toDateString()}</td>
                         </tr>
@@ -186,7 +156,6 @@ function Petition(props: PetitionProps) {
                 proof: proof
               };
               try {
-                console.log(bytesToString(fromHexString(petition?.id.substring(2) ?? "") ?? ""), metadata);
                 await instance.signPetition(
                   bytesToString(fromHexString(petition?.id.substring(2) ?? "") ?? ""),
                   metadata

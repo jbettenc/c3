@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Landing from "@/components/landing/Landing";
 import { setEthAlias, setEthAvatar } from "@/store/userSlice";
 import { useWeb3React } from "@web3-react/core";
+import { JsonRpcProvider } from "ethers";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -14,13 +15,16 @@ export default function Home() {
     (async () => {
       if (!!account && !!library) {
         try {
-          const alias = await library.lookupAddress(account);
+          const provider = new JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/udrqNPSB6i5n5L6QSM31Ng72h_hFOrVT");
+          const alias = await provider.lookupAddress(account);
           if (alias) {
             dispatch(setEthAlias(alias));
 
-            const resolver = await library.getResolver(alias);
-            const avatar = await resolver.getText("avatar");
-            dispatch(setEthAvatar(avatar));
+            const resolver = await provider.getResolver(alias);
+            if (resolver) {
+              const avatar = await resolver.getText("avatar");
+              dispatch(setEthAvatar(avatar));
+            }
           } else {
             dispatch(setEthAvatar(null));
             dispatch(setEthAlias(null));
