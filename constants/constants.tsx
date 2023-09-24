@@ -10,7 +10,7 @@ const GRAPHQL_URL_POLYGON = "https://api.thegraph.com/subgraphs/id/QmS1654F5sTcj
 // const GRAPHQL_URL_MAINNET = "https://api.studio.thegraph.com/query/33336/deal-mainnet-staging/v0.1.9.2";
 const GRAPHQL_URL_TESTNET = "https://api.studio.thegraph.com/query/33336/deal-goerli/v0.1.9.2";
 
-export const INJECTED_SUPPORTED_CHAIN_IDS = production ? [1, 137] : [1, 5, 137];
+export const INJECTED_SUPPORTED_CHAIN_IDS = production ? [1, 137] : [1, 5, 137, 84531];
 export const DEAL_CONTRACT_ADDRESS = production ? DEAL_CONTRACT_ADDRESS_MAINNET : DEAL_CONTRACT_ADDRESS_TESTNET;
 
 export const GRAPHQL_URL = (chainId: string | number) => {

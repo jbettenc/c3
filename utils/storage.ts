@@ -17,7 +17,9 @@ export const getObj = async (cid: string): Promise<ResponseObject<Web3File>> => 
   })
     .then((res) => res.json())
     .then((result) => (res = result))
-    .catch((err) => (res = { success: false, errorMsg: err.toString() }));
+    .catch(
+      (err) => (res = { success: false, url: `https://w3s.link/ipfs/${cid}/metadata.json`, errorMsg: err.toString() })
+    );
 
   return { success: true, errorMsg: "ok", data: res };
 };

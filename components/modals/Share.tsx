@@ -5,6 +5,7 @@ import TelegramIcon from "../../assets/Telegram.svg";
 import LensIcon from "../../assets/Lens.svg";
 import XIcon from "../../assets/X.svg";
 import Button from "@/ui/forms/Button";
+import { copyStringToClipboard } from "@/utils/misc";
 
 interface ShareProps {
   url?: string;
@@ -33,8 +34,13 @@ function Share(props: ShareProps) {
           </div>
         </div>
         <div className="flex flex-row rounded-md bg-gray-50 border border-gray-100">
-          <div className="my-auto ml-2">{props.url}</div>
-          <Button className="bg-purple-300 ml-auto" onClick={() => {}}>
+          <div className="my-auto ml-2 truncate">{props.url}</div>
+          <Button
+            className="bg-purple-300 ml-auto"
+            onClick={() => {
+              copyStringToClipboard(props.url ?? "");
+            }}
+          >
             Copy
           </Button>
         </div>

@@ -16,6 +16,10 @@ import { useWeb3Storage } from "@/utils/storage";
 import { ethers } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 import { IDKitWidget } from "@worldcoin/idkit";
+import { Contract } from "ethers";
+import C3ABI from "../../artifacts/C3.json";
+import { getBase64, getProviderUrl, storeNotif } from "@/utils/misc";
+import { AbiCoder } from "ethers";
 
 function Landing() {
   const [title, handleTitle] = useState("");
@@ -23,12 +27,21 @@ function Landing() {
   const [step, handleStep] = useState(0);
   const [importState, handleImportState] = useState<File[]>([]);
   const [cid, handleCid] = useState("");
-  const [url, handleUrl] = useState("");
   const [hash, handleHash] = useState("");
   const { ethAlias, ethAvatar } = useSelector((state: RootState) => state.user);
-  const { account } = useWeb3React();
+  const { account, library } = useWeb3React();
   const { showModal } = useGlobalModalContext();
   const { storeObj } = useWeb3Storage();
+
+  useEffect(() => {
+    handleHash(ethers.hashMessage(uuidv4()));
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      console.log(await Promise.all(importState.map(async (f) => await getBase64(f))));
+    })();
+  }, [importState]);
 
   // useEffect(() => {
   //   if (step === 3) {
@@ -202,19 +215,33 @@ function Landing() {
           </Button>
           <IDKitWidget
             app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
-            action="createPetition" // or signPetition
+            action={`createPetition-${hash}`} // or signPetition
             signal={account ?? ""}
-            onSuccess={(e) => {
-              // todo interact with smart contract
-              console.log(e);
-              // e:
-              // {
-              //     "merkle_root": "0x1a04af3dffa970c55274470c23db1b628ac24136967b1f94366aaa57558e813c",
-              //     "nullifier_hash": "0x2b5e7ece7337317ccbcebb8a36dbac553e6a5fd167d428ada627ddb5e3f1f00c",
-              //     "proof": "0x0a883f59c05daaf64d4d7f45ee924670e29b2f43b16c670496d3cb287376213e188ef762a2d2af5bae256e31a672dc78cb383586c1da232805003414bfb10424274f938edf9dbad43cee532d88908fb5c6610067c62b3a33283541091dc7f08e0fb3bb1cc127d17337f17cef0fa069e7c81af874918b4e130bfead994dacfb642634da9fba431675474a158e0aa96d707a3b586b9a661602e843dbfca3a70f712f449db9ddb2afbc15ec76cf54a9d58ab3355287e9172a4ea59f7bb329dfaffa0f0f065e1a4547e2b7fbafdb4f64091a95fc73c5a864f103e6544e57615051591f05a5c7eac408bf8890b3225cda5a6265fe83ed8f008c14036cf088e2e342b5",
-              //     "credential_type": "orb"
-              // }
-              showModal(MODAL_TYPE.SHARE, { url });
+            onSuccess={async (e: {
+              merkle_root: string;
+              nullifier_hash: string;
+              proof: string;
+              credential_type: string;
+            }) => {
+              const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
+              // This address is only for Base
+              const contract = new Contract("0x36e3f7a8C88EE63740b50f7b87c069a74e461f85", C3ABI.abi, provider);
+              const instance = contract.connect(library.getSigner()) as Contract;
+              const proof = [...[...AbiCoder.defaultAbiCoder().decode(["uint256[8]"], e.proof)][0]];
+              const metadata = {
+                root: e.merkle_root,
+                nullifierHash: e.nullifier_hash,
+                proof: proof
+              };
+              try {
+                // @ts-ignore
+                await instance.callStatic.createPetition(hash, cid, metadata);
+                await instance.createPetition(hash, cid, metadata);
+              } catch (err: any) {
+                storeNotif("Error", err?.message ? err.message : err, "danger");
+              }
+
+              showModal(MODAL_TYPE.SHARE, { url: `${"VERCEL"}/${hash}` });
             }}
             enableTelemetry
           >
@@ -230,9 +257,8 @@ function Landing() {
                       address: account,
                       title,
                       description,
-                      images: importState.map((f) => f.toString())
+                      images: await Promise.all(importState.map(async (f) => await getBase64(f)))
                     });
-                    handleHash(ethers.hashMessage(uuidv4()));
                     handleCid(ret.data);
                     open();
                   }

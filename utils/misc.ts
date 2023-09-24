@@ -232,3 +232,50 @@ export function storeNotif(subject: string, message: string, type: NOTIFICATION_
     }
   });
 }
+
+export const getProviderUrl = async (library: any) => {
+  let chainId = 1;
+  if (library) {
+    chainId = (await library.getNetwork()).chainId;
+  }
+
+  switch (chainId) {
+    case 1:
+      return "https://eth-mainnet.alchemyapi.io/v2/xTrIufa8bBMhQmEc14yrjDOV0yKIka9r";
+    case 5:
+      return "https://goerli.infura.io/v3/59e38e7a0505462d810e0ac606665fd1";
+    case 420:
+      return "https://optimism-goerli.infura.io/v3/59e38e7a0505462d810e0ac606665fd1";
+    case 80001:
+      return "https://polygon-mumbai.infura.io/v3/59e38e7a0505462d810e0ac606665fd1";
+    case 84531:
+      return "https://base-goerli.g.alchemy.com/v2/C9AsPfiYm2YWRnCHy5QXWDlRD3FqktoH";
+  }
+};
+
+export const stringToBytesString = (str: string) => {
+  const arr = new TextEncoder().encode(str ?? "");
+  return Buffer.from(arr).toString("hex");
+};
+
+export const bytesToString = (arr: Uint8Array) => {
+  const dec = new TextDecoder().decode(arr);
+  return dec;
+};
+
+export const fromHexString = (hexString: string) =>
+  // @ts-ignore
+  Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+
+export async function getBase64(file: File) {
+  return new Promise((resolve) => {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      resolve(reader.result);
+    };
+    reader.onerror = function (error) {
+      console.log("Error: ", error);
+    };
+  });
+}

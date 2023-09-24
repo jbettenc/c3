@@ -21,8 +21,8 @@ export const walletConnect = new WalletConnectConnector({
 });
 
 export const walletLink = new WalletLinkConnector({
-  url: `https://eth-mainnet.alchemyapi.io/v2/xTrIufa8bBMhQmEc14yrjDOV0yKIka9r`,
-  appName: "mad"
+  url: "https://base-goerli.g.alchemy.com/v2/C9AsPfiYm2YWRnCHy5QXWDlRD3FqktoH", // `https://eth-mainnet.alchemyapi.io/v2/xTrIufa8bBMhQmEc14yrjDOV0yKIka9r`,
+  appName: "c3"
 });
 
 export const connectors = {
