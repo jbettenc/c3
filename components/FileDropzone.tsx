@@ -31,8 +31,8 @@ function FileDropzone(props: FileDropzoneProps) {
           <input {...getInputProps()} />
           {importState && importState.length > 0 ? (
             <div className="flex flex-wrap mx-4 gap-2 mb-4">
-              {importState.map((file) => (
-                <div className="">
+              {importState.map((file, idx) => (
+                <div className="" key={`importState-${idx}`}>
                   <img className="w-full h-auto" src={URL.createObjectURL(file)} alt="Image" />
                 </div>
               ))}

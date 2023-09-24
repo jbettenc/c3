@@ -196,8 +196,8 @@ function Landing() {
           {importState.length > 0 ? (
             <div className="w-full">
               <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
-                {importState.map((file) => (
-                  <div className="">
+                {importState.map((file, idx) => (
+                  <div className="" key={`landingimportstate-${idx}`}>
                     <img className="w-full h-auto" src={URL.createObjectURL(file)} alt="Image" />
                   </div>
                 ))}

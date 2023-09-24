@@ -75,8 +75,8 @@ function Petition(props: PetitionProps) {
               {ipfs?.images?.length && ipfs.images.length > 0 ? (
                 <div className="w-full">
                   <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
-                    {ipfs.images.map((file) => (
-                      <div className="">
+                    {ipfs.images.map((file, idx) => (
+                      <div className="" key={`ipfsimages-${idx}`}>
                         <img className="w-full h-auto" src={file} alt="Image" />
                       </div>
                     ))}
@@ -115,8 +115,8 @@ function Petition(props: PetitionProps) {
                 </thead>
                 <tbody>
                   {signers
-                    ? signers.map((signer: any) => (
-                        <tr>
+                    ? signers.map((signer: any, idx: number) => (
+                        <tr key={`signer-${idx}`}>
                           <td className="pl-4 py-2">
                             <Signer address={signer.signer} />
                           </td>
