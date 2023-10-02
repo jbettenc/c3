@@ -22,3 +22,21 @@ interface ResponseObject<T> {
   errorMsg?: string;
   data?: T;
 }
+
+export type StoragePayload = {
+  signature: string;
+  message: string;
+  data: string;
+  tags: { name: string; value: string }[];
+  shouldVerify?: boolean;
+  timestamp?: string;
+};
+
+export type StorageResponse = {
+  input?: unknown;
+  message: string;
+  transaction: {
+    message?: string;
+    itemId?: string;
+  };
+};

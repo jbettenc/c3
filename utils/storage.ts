@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 // @ts-ignore
 import { Web3Storage, Web3File } from "web3.storage/dist/bundle.esm.min.js";
-import { ResponseObject } from "@/types";
+import { ResponseObject, StoragePayload, StorageResponse } from "@/types";
+import { ETHSIGN_API_URL } from "@/constants/constants";
 
 export function makeStorageClient() {
   return new Web3Storage({
@@ -46,3 +47,33 @@ export function useWeb3Storage() {
     getObj
   };
 }
+
+export const postUploadToStorage = async (data: StoragePayload): Promise<StorageResponse | undefined> => {
+  let tx: any;
+  try {
+    await fetch(`${ETHSIGN_API_URL}/upload`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        tx = { message: "success", transaction: response };
+      })
+      .catch((err) => {
+        tx = {
+          message: "failed",
+          transaction: err as any
+        };
+      });
+  } catch (err) {
+    tx = {
+      message: "failed",
+      transaction: err as any
+    };
+  }
+
+  return tx as any;
+};

@@ -12,7 +12,7 @@ import { RootState } from "@/store/root";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { useWeb3React } from "@web3-react/core";
 import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
-import { useWeb3Storage } from "@/utils/storage";
+import { postUploadToStorage, useWeb3Storage } from "@/utils/storage";
 import { ethers } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 import { IDKitWidget } from "@worldcoin/idkit";
@@ -20,6 +20,9 @@ import { Contract } from "ethers";
 import C3ABI from "../../artifacts/C3.json";
 import { getBase64, getProviderUrl, storeNotif } from "@/utils/misc";
 import { AbiCoder } from "ethers";
+import { StoragePayload } from "@/types";
+import sha256 from "crypto-js/sha256";
+import { enc } from "crypto-js";
 
 function Landing() {
   const [title, handleTitle] = useState("");
@@ -253,14 +256,64 @@ function Landing() {
                 }
                 onClick={async () => {
                   if (step === 2) {
-                    const ret = await storeObj({
+                    // const ret = await storeObj({
+                    //   address: account,
+                    //   title,
+                    //   description,
+                    //   images: await Promise.all(importState.map(async (f) => await getBase64(f)))
+                    // });
+
+                    const tags = [{ name: "Application", value: "EthSignC3" }];
+                    // prepare message to sign before upload
+                    let payload = {
                       address: account,
                       title,
                       description,
                       images: await Promise.all(importState.map(async (f) => await getBase64(f)))
+                    };
+
+                    const messagePayload = {
+                      timestamp: new Date().toISOString(),
+                      version: "0.1",
+                      hash: sha256(
+                        JSON.stringify({
+                          data: {
+                            payload
+                          },
+                          tags
+                        })
+                      ).toString(enc.Hex)
+                    };
+
+                    // messages converted to string before sign with statement prefix
+                    const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
+                      messagePayload,
+                      null,
+                      2
+                    )}`;
+
+                    // sign signature with the messages in details
+                    const signature = await library.provider.request({
+                      method: "personal_sign",
+                      params: [message, account]
                     });
-                    handleCid(ret.data);
-                    open();
+
+                    // payload to upload arweave storage
+                    const storagePayload: StoragePayload = {
+                      signature,
+                      message,
+                      data: JSON.stringify({
+                        payload
+                      }),
+                      tags,
+                      shouldVerify: true
+                    };
+
+                    const storage = await postUploadToStorage(storagePayload);
+                    console.log(storage); // TODO: MAKE SURE THIS UPLOADS PROPERLY AND MAKE SURE WE CAN READ FROM IT
+
+                    // handleCid(ret.data);
+                    // open();
                   }
                   handleStep(step + 1);
                 }}
