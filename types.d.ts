@@ -40,3 +40,22 @@ export type StorageResponse = {
     itemId?: string;
   };
 };
+
+export interface IPetition {
+  id: string;
+  cid: string;
+  petitioner: string;
+  signatures: number;
+  timestamp: string;
+}
+
+export interface IPetitionMetadata {
+  address: string;
+  title: string;
+  description: string;
+  images: string[];
+}
+
+export type ArweavePayload = {
+  [key: string]: any;
+};

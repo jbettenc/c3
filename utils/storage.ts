@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 // @ts-ignore
 import { Web3Storage, Web3File } from "web3.storage/dist/bundle.esm.min.js";
-import { ResponseObject, StoragePayload, StorageResponse } from "@/types";
+import { ArweavePayload, ResponseObject, StoragePayload, StorageResponse } from "@/types";
 import { ETHSIGN_API_URL } from "@/constants/constants";
 
 export function makeStorageClient() {
@@ -84,23 +84,20 @@ export const postUploadToStorage = async (data: StoragePayload): Promise<Storage
  * @param id - Arweave ID for the file to retrieve.
  * @returns File.
  */
-export const getFileForUser = async (id: string): Promise<ArweavePayload> => {
-  let ret: any = [];
+export const getFileForUser = async (id: string): Promise<ArweavePayload | null> => {
+  let ret: any = null;
   try {
-    await fetch(`${ETHSIGN_API_URL}/transaction/`, {
-      method: "POST",
+    await fetch(`${ETHSIGN_API_URL}/transaction/${id}`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ id })
+      }
     })
       .then((res) => res.json())
       .then((response) => (ret = response ?? []));
   } catch (err) {
-    return [];
+    return null;
   }
-
-  console.log(ret);
 
   return ret?.transaction ? ret.transaction : ret;
 };

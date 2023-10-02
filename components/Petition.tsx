@@ -12,51 +12,39 @@ import { getFileForUser, getObj } from "@/utils/storage";
 import { loadPetitionSigners } from "@/utils/queries";
 import { IDKitWidget } from "@worldcoin/idkit";
 import { ethers } from "ethers";
-import { v4 as uuidv4 } from "uuid";
 import { Contract } from "ethers";
 import C3ABI from "../artifacts/C3.json";
 import { AbiCoder } from "ethers";
 import { MODAL_TYPE, useGlobalModalContext } from "./context/ModalContext";
 import Signer from "./Signer";
+import { IPetition, IPetitionMetadata } from "@/types";
 
 interface PetitionProps {
-  petition?: {
-    id: string;
-    cid: string;
-    petitioner: string;
-    signatures: number;
-    timestamp: string;
-  };
+  petition?: IPetition;
+  metadata?: IPetitionMetadata;
 }
 
 function Petition(props: PetitionProps) {
-  const { petition } = props;
-  const [metadata, handleMetadata] = useState<{
-    address: string;
-    title: string;
-    description: string;
-    images: string[];
-  }>();
+  const { petition, metadata } = props;
   const [signers, handleSigners] = useState<any>([]);
   const GOAL = 100;
   const { ethAvatar } = useSelector((state: RootState) => state.user);
   const { account, library } = useWeb3React();
-  const [hash, handleHash] = useState("");
   const { showModal } = useGlobalModalContext();
 
   useEffect(() => {
-    handleHash(ethers.hashMessage(uuidv4()));
-  }, []);
-
-  useEffect(() => {
     (async () => {
+      // console.log(petition);
       if (petition?.cid) {
-        const obj = await getFileForUser(bytesToString(fromHexString(petition.cid.substring(2))));
-        handleMetadata(obj?.data ?? undefined);
-        console.log(obj);
+        // console.log(bytesToString(fromHexString(petition.cid.substring(2))));
+        // const obj = await getFileForUser(bytesToString(fromHexString(petition.cid.substring(2))));
+        // handleMetadata(obj?.data ?? undefined);
+        // console.log(obj);
 
-        const obj2 = await loadPetitionSigners(petition.id);
-        handleSigners(obj2 ?? undefined);
+        const signers = await loadPetitionSigners(petition.id);
+        handleSigners(signers ?? undefined);
+      } else {
+        // storeNotif("Error", "Cannot locate petition.", "danger");
       }
     })();
   }, [petition]);

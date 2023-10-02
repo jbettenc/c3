@@ -1,7 +1,7 @@
-const GRAPHQL_ENDPOINT = "https://api.studio.thegraph.com/query/49892/c3-base-goerli/v0.0.8";
+const GRAPHQL_ENDPOINT = "https://api.studio.thegraph.com/query/49892/c3-base-goerli/v0.1.1";
 
 export const loadPetition = async (id: string) => {
-  let res: any = undefined;
+  let res: any = null;
   const query = `{
         petition(id: "${id}") {
             id
@@ -26,11 +26,11 @@ export const loadPetition = async (id: string) => {
       res = response?.data?.petition;
     });
 
-  return res;
+  return res ?? null;
 };
 
 export const loadPetitionSigners = async (id: string) => {
-  let res: any = undefined;
+  let res: any = null;
   const query = `{
     petitionSigneds(where: {petitionUuid: "${id}"}) {
       id
@@ -54,5 +54,5 @@ export const loadPetitionSigners = async (id: string) => {
       res = response?.data?.petitionSigneds;
     });
 
-  return res;
+  return res ?? null;
 };
