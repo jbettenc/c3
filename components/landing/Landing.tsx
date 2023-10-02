@@ -242,7 +242,7 @@ function Landing() {
                 storeNotif("Error", err?.message ? err.message : err, "danger");
               }
 
-              showModal(MODAL_TYPE.SHARE, { url: `${"VERCEL"}/${hash}` });
+              showModal(MODAL_TYPE.SHARE, { url: `${window.location.href}/${hash}` });
             }}
             enableTelemetry
           >

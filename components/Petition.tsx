@@ -166,7 +166,13 @@ function Petition(props: PetitionProps) {
               </Button>
             )}
           </IDKitWidget>
-          <Button className="ml-2" style="secondary" onClick={() => copyStringToClipboard(window.location.href)}>
+          <Button
+            className="ml-2"
+            style="secondary"
+            onClick={() => {
+              showModal(MODAL_TYPE.SHARE, { url: window.location.href });
+            }}
+          >
             Share Petition
           </Button>
         </div>
