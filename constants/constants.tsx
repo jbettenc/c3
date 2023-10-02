@@ -13,7 +13,7 @@ const GRAPHQL_URL_TESTNET = "https://api.studio.thegraph.com/query/33336/deal-go
 export const INJECTED_SUPPORTED_CHAIN_IDS = production ? [1, 137] : [1, 5, 137, 84531];
 export const DEAL_CONTRACT_ADDRESS = production ? DEAL_CONTRACT_ADDRESS_MAINNET : DEAL_CONTRACT_ADDRESS_TESTNET;
 
-export const ETHSIGN_API_URL = "https://arweave-staging.ethsign.xyz";
+export const ETHSIGN_API_URL = "https://arweave-gateway.ethsign.xyz";
 
 export const GRAPHQL_URL = (chainId: string | number) => {
   switch (chainId) {

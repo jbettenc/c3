@@ -60,7 +60,7 @@ export const postUploadToStorage = async (data: StoragePayload): Promise<Storage
     })
       .then((res) => res.json())
       .then((response) => {
-        tx = { message: "success", transaction: response };
+        tx = response;
       })
       .catch((err) => {
         tx = {
@@ -76,4 +76,31 @@ export const postUploadToStorage = async (data: StoragePayload): Promise<Storage
   }
 
   return tx as any;
+};
+
+/**
+ * Get file given an Arweave ID.
+ *
+ * @param id - Arweave ID for the file to retrieve.
+ * @returns File.
+ */
+export const getFileForUser = async (id: string): Promise<ArweavePayload> => {
+  let ret: any = [];
+  try {
+    await fetch(`${ETHSIGN_API_URL}/transaction/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id })
+    })
+      .then((res) => res.json())
+      .then((response) => (ret = response ?? []));
+  } catch (err) {
+    return [];
+  }
+
+  console.log(ret);
+
+  return ret?.transaction ? ret.transaction : ret;
 };

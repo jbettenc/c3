@@ -237,8 +237,6 @@ function Landing() {
                 proof: proof
               };
               try {
-                // @ts-ignore
-                await instance.callStatic.createPetition(hash, cid, metadata);
                 await instance.createPetition(hash, cid, metadata);
               } catch (err: any) {
                 storeNotif("Error", err?.message ? err.message : err, "danger");
@@ -256,13 +254,6 @@ function Landing() {
                 }
                 onClick={async () => {
                   if (step === 2) {
-                    // const ret = await storeObj({
-                    //   address: account,
-                    //   title,
-                    //   description,
-                    //   images: await Promise.all(importState.map(async (f) => await getBase64(f)))
-                    // });
-
                     const tags = [{ name: "Application", value: "EthSignC3" }];
                     // prepare message to sign before upload
                     let payload = {
@@ -273,16 +264,14 @@ function Landing() {
                     };
 
                     const messagePayload = {
+                      address: account,
                       timestamp: new Date().toISOString(),
-                      version: "0.1",
-                      hash: sha256(
+                      version: "4.1",
+                      hash: ethers.hashMessage(
                         JSON.stringify({
-                          data: {
-                            payload
-                          },
-                          tags
+                          data: payload
                         })
-                      ).toString(enc.Hex)
+                      )
                     };
 
                     // messages converted to string before sign with statement prefix
@@ -303,17 +292,21 @@ function Landing() {
                       signature,
                       message,
                       data: JSON.stringify({
-                        payload
+                        data: payload
                       }),
                       tags,
                       shouldVerify: true
                     };
 
+                    // Upload to our Arweave endpoint
                     const storage = await postUploadToStorage(storagePayload);
-                    console.log(storage); // TODO: MAKE SURE THIS UPLOADS PROPERLY AND MAKE SURE WE CAN READ FROM IT
+                    if (!storage?.message || storage.message !== "success") {
+                      storeNotif("Error", "Failed to upload petition metadata to Arweave. Please try again.", "danger");
+                      return;
+                    }
+                    handleCid(storage.transaction.itemId ?? "");
 
-                    // handleCid(ret.data);
-                    // open();
+                    open();
                   }
                   handleStep(step + 1);
                 }}

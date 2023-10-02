@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/root";
 import { bytesToString, copyStringToClipboard, fromHexString, getProviderUrl, storeNotif } from "@/utils/misc";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { getObj } from "@/utils/storage";
+import { getFileForUser, getObj } from "@/utils/storage";
 import { loadPetitionSigners } from "@/utils/queries";
 import { IDKitWidget } from "@worldcoin/idkit";
 import { ethers } from "ethers";
@@ -31,7 +31,7 @@ interface PetitionProps {
 
 function Petition(props: PetitionProps) {
   const { petition } = props;
-  const [ipfs, handleIpfs] = useState<{
+  const [metadata, handleMetadata] = useState<{
     address: string;
     title: string;
     description: string;
@@ -51,8 +51,8 @@ function Petition(props: PetitionProps) {
   useEffect(() => {
     (async () => {
       if (petition?.cid) {
-        const obj = await getObj(bytesToString(fromHexString(petition.cid.substring(2))));
-        handleIpfs(obj?.data ?? undefined);
+        const obj = await getFileForUser(bytesToString(fromHexString(petition.cid.substring(2))));
+        handleMetadata(obj?.data ?? undefined);
         console.log(obj);
 
         const obj2 = await loadPetitionSigners(petition.id);
@@ -67,15 +67,15 @@ function Petition(props: PetitionProps) {
         <div className="mt-4 flex max-w-7xl mx-auto w-full gap-4">
           <div className="flex flex-col max-w-5xl w-full gap-4">
             <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
-              <div className="font-semibold text-lg">{ipfs?.title}</div>
+              <div className="font-semibold text-lg">{metadata?.title}</div>
               <div>{petition?.petitioner}</div>
             </div>
             <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
-              <div>{ipfs?.description}</div>
-              {ipfs?.images?.length && ipfs.images.length > 0 ? (
+              <div>{metadata?.description}</div>
+              {metadata?.images?.length && metadata.images.length > 0 ? (
                 <div className="w-full">
                   <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
-                    {ipfs.images.map((file, idx) => (
+                    {metadata.images.map((file, idx) => (
                       <div className="" key={`ipfsimages-${idx}`}>
                         <img className="w-full h-auto" src={file} alt="Image" />
                       </div>
