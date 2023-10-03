@@ -1,31 +1,14 @@
-import { useEffect, useState } from "react";
 import IdentIcon from "./common/IdentIcon";
 import Image from "next/image";
-import { JsonRpcProvider } from "ethers";
+import { useENS } from "@/utils/hooks/useENS";
 
 interface SignerProps {
   address?: string;
 }
 
 function Signer(props: SignerProps) {
-  const [alias, handleAlias] = useState<any>();
-  const [avatar, handleAvatar] = useState<any>();
-  useEffect(() => {
-    if (!props.address) {
-      return;
-    }
+  const { avatar, alias } = useENS(props.address);
 
-    (async () => {
-      const provider = new JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/udrqNPSB6i5n5L6QSM31Ng72h_hFOrVT");
-      const alias = await provider.lookupAddress(props.address ?? "");
-      handleAlias(alias);
-      const resolver = await provider.getResolver(alias ?? "");
-      if (resolver) {
-        const avatar = await resolver.getText("avatar");
-        handleAvatar(avatar);
-      }
-    })();
-  }, [props.address]);
   return (
     <>
       <div className="flex">
@@ -44,7 +27,7 @@ function Signer(props: SignerProps) {
         </div>
         <div className="flex flex-col">
           {alias ? <div className="font-semibold">{alias}</div> : null}
-          <div>
+          <div className={`${!alias ? "my-auto" : ""}`}>
             {props.address
               ? props.address.substring(0, 6) + "..." + props.address.substring(props.address.length - 6)
               : "--"}

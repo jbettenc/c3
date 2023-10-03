@@ -1,0 +1,72 @@
+import { useState } from "react";
+import { IPetition } from "@/types";
+import Signer from "./Signer";
+import Pagination from "@/ui/pagination/Pagination";
+
+interface SignerCardProps {
+  petition?: IPetition;
+  signers?: any;
+}
+
+function SignerCard(props: SignerCardProps) {
+  const GOAL = 100;
+  const SIGNERS_PER_PAGE = 8;
+  const [currentPage, handleCurrentPage] = useState<number>(0);
+
+  const { petition, signers } = props;
+
+  return (
+    <>
+      <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md py-4">
+        <div className="flex px-4">
+          <div className="font-lg font-semibold mr-2">Signers</div>
+          <div className="bg-orange-50 text-orange-700 rounded-full px-3 text-sm my-auto">
+            {petition?.signatures ?? 0}/{GOAL} signatures
+          </div>
+        </div>
+        <div className="flex px-4">
+          <div className="my-auto mr-2 w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              className="bg-orange-600 h-2.5 rounded-full"
+              style={{ width: `${petition?.signatures ?? 0 / GOAL}%` }}
+            ></div>
+          </div>
+          <div className="whitespace-nowrap font-medium">{Math.floor(petition?.signatures ?? 0 / GOAL)}%</div>
+        </div>
+        <table>
+          <thead>
+            <tr className="bg-gray-50 text-gray-500 border-b border-t border-gray-300">
+              <th className="py-3 pl-4">
+                <div className="text-left font-medium">Name</div>
+              </th>
+              <th className="py-3 pr-4">
+                <div className="text-left font-medium">Sign Date</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {signers
+              ? signers
+                  .slice(SIGNERS_PER_PAGE * currentPage, SIGNERS_PER_PAGE * (1 + currentPage))
+                  .map((signer: any, idx: number) => (
+                    <tr key={`signer-${currentPage}-${idx}`} className="border-b border-gray-300">
+                      <td className="pl-4 py-2">
+                        <Signer address={signer.signer} />
+                      </td>
+                      <td className="pr-4 py-2">{new Date(signer.timestamp * 1000).toLocaleDateString()}</td>
+                    </tr>
+                  ))
+              : null}
+          </tbody>
+        </table>
+        <Pagination
+          total={Math.max(Math.floor(signers.length / SIGNERS_PER_PAGE), 1)}
+          currentPage={currentPage}
+          handleCurrentPage={handleCurrentPage}
+        />
+      </div>
+    </>
+  );
+}
+
+export default SignerCard;

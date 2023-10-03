@@ -18,17 +18,18 @@ import { AbiCoder } from "ethers";
 import { MODAL_TYPE, useGlobalModalContext } from "./context/ModalContext";
 import Signer from "./Signer";
 import { IPetition, IPetitionMetadata } from "@/types";
+import SignerCard from "./SignerCard";
+import { useENS } from "@/utils/hooks/useENS";
 
 interface PetitionProps {
   petition?: IPetition;
   metadata?: IPetitionMetadata;
+  creatorAlias?: string;
 }
 
 function Petition(props: PetitionProps) {
-  const { petition, metadata } = props;
+  const { petition, metadata, creatorAlias } = props;
   const [signers, handleSigners] = useState<any>([]);
-  const GOAL = 100;
-  const { ethAvatar } = useSelector((state: RootState) => state.user);
   const { account, library } = useWeb3React();
   const { showModal } = useGlobalModalContext();
 
@@ -56,9 +57,6 @@ function Petition(props: PetitionProps) {
           <div className="flex flex-col max-w-5xl w-full gap-4">
             <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
               <div className="font-semibold text-lg">{metadata?.title}</div>
-              <div>{petition?.petitioner}</div>
-            </div>
-            <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
               <div>{metadata?.description}</div>
               {metadata?.images?.length && metadata.images.length > 0 ? (
                 <div className="w-full">
@@ -71,50 +69,37 @@ function Petition(props: PetitionProps) {
                   </Carousel>
                 </div>
               ) : null}
+              <div className="font-medium">
+                Initiated by:{" "}
+                {creatorAlias
+                  ? creatorAlias +
+                    ` (${
+                      petition?.petitioner.substring(0, 6) +
+                      "..." +
+                      petition?.petitioner.substring(petition.petitioner.length - 4)
+                    })`
+                  : petition?.petitioner.substring(0, 6) +
+                    "..." +
+                    petition?.petitioner.substring(petition.petitioner.length - 4)}
+              </div>
             </div>
+            {/* <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
+              <div>{metadata?.description}</div>
+              {metadata?.images?.length && metadata.images.length > 0 ? (
+                <div className="w-full">
+                  <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
+                    {metadata.images.map((file, idx) => (
+                      <div className="" key={`ipfsimages-${idx}`}>
+                        <img className="w-full h-auto" src={file} alt="Image" />
+                      </div>
+                    ))}
+                  </Carousel>
+                </div>
+              ) : null}
+            </div> */}
           </div>
           <div className="flex flex-col max-w-lg w-full">
-            <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
-              <div className="flex">
-                <div className="font-lg font-semibold mr-2">Signers</div>
-                <div className="bg-orange-50 text-orange-700 rounded-full px-3 text-sm my-auto">
-                  {petition?.signatures ?? 0} signatures
-                </div>
-              </div>
-              <div className="flex">
-                <div className="my-auto mr-2 w-full bg-gray-200 rounded-full h-2.5">
-                  <div
-                    className="bg-orange-600 h-2.5 rounded-full"
-                    style={{ width: `${petition?.signatures ?? 0 / GOAL}%` }}
-                  ></div>
-                </div>
-                <div className="whitespace-nowrap">Goal: {GOAL}</div>
-              </div>
-              <table>
-                <thead>
-                  <tr className="bg-gray-50 text-gray-500">
-                    <th className="py-2 pl-4">
-                      <div className="text-left">Name</div>
-                    </th>
-                    <th className="py-2 pr-4">
-                      <div className="text-left">Sign Date</div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {signers
-                    ? signers.map((signer: any, idx: number) => (
-                        <tr key={`signer-${idx}`}>
-                          <td className="pl-4 py-2">
-                            <Signer address={signer.signer} />
-                          </td>
-                          <td className="pr-4 py-2">{new Date(signer.timestamp * 1000).toDateString()}</td>
-                        </tr>
-                      ))
-                    : null}
-                </tbody>
-              </table>
-            </div>
+            <SignerCard petition={petition} signers={signers} />
           </div>
         </div>
       </div>

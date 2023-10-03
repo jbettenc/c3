@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Petition from "@/components/Petition";
 import { IPetition, IPetitionMetadata } from "@/types";
+import { useENS } from "@/utils/hooks/useENS";
 import { bytesToString, fromHexString, stringToBytesString } from "@/utils/misc";
 import { loadPetition } from "@/utils/queries";
 import { getFileForUser } from "@/utils/storage";
@@ -18,6 +19,8 @@ function PetitionPage(props: PetitionPageProps) {
   const { petition, metadata } = props;
 
   const router = useRouter();
+
+  const { alias: creatorAlias } = useENS(petition?.petitioner);
 
   // useEffect(() => {
   //   const id = router.query.id;
@@ -59,7 +62,25 @@ function PetitionPage(props: PetitionPageProps) {
         <div className="h-16 bg-white">
           <Navbar fixed={true} />
         </div>
-        <Petition petition={petition} metadata={metadata} />
+        <div className="w-full border-b border-gray-300 text-black">
+          <div className="flex flex-col mx-6 my-2">
+            <div className="font-semibold text-lg">Sign petition</div>
+            <div>
+              Sign the petition initiated by{" "}
+              {creatorAlias
+                ? creatorAlias +
+                  ` (${
+                    petition?.petitioner.substring(0, 6) +
+                    "..." +
+                    petition?.petitioner.substring(petition.petitioner.length - 4)
+                  })`
+                : petition?.petitioner.substring(0, 6) +
+                  "..." +
+                  petition?.petitioner.substring(petition.petitioner.length - 4)}
+            </div>
+          </div>
+        </div>
+        <Petition petition={petition} metadata={metadata} creatorAlias={creatorAlias} />
       </main>
     </>
   );
