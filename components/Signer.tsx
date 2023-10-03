@@ -11,12 +11,15 @@ function Signer(props: SignerProps) {
   const [alias, handleAlias] = useState<any>();
   const [avatar, handleAvatar] = useState<any>();
   useEffect(() => {
+    if (!props.address) {
+      return;
+    }
+
     (async () => {
       const provider = new JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/udrqNPSB6i5n5L6QSM31Ng72h_hFOrVT");
       const alias = await provider.lookupAddress(props.address ?? "");
       handleAlias(alias);
       const resolver = await provider.getResolver(alias ?? "");
-      console.log(alias);
       if (resolver) {
         const avatar = await resolver.getText("avatar");
         handleAvatar(avatar);

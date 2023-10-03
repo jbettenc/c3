@@ -125,7 +125,7 @@ function Petition(props: PetitionProps) {
           </Button> */}
           <IDKitWidget
             app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
-            action={`signPetition-${bytesToString(fromHexString(petition?.id.substring(2) ?? "0x00") ?? "")}`}
+            action={`signPetition-${petition?.id ?? "0x00"}`}
             signal={account ?? ""}
             onSuccess={async (e: {
               merkle_root: string;
@@ -144,10 +144,7 @@ function Petition(props: PetitionProps) {
                 proof: proof
               };
               try {
-                await instance.signPetition(
-                  bytesToString(fromHexString(petition?.id.substring(2) ?? "") ?? ""),
-                  metadata
-                );
+                await instance.signPetition(petition?.id ?? "", metadata);
                 storeNotif("Success", "Petition signed.", "success");
               } catch (err: any) {
                 storeNotif("Error", err?.message ? err.message : err, "danger");

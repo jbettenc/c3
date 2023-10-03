@@ -76,11 +76,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   let metadata: IPetitionMetadata | null = null;
 
   try {
-    const arr = "0x" + stringToBytesString((id as string) ?? "");
+    const arr = id as string;
     petition = await loadPetition(arr);
 
     if (petition?.cid) {
-      const obj = await getFileForUser(bytesToString(fromHexString(petition.cid.substring(2))));
+      const obj = await getFileForUser(petition.cid);
       metadata = obj?.data ?? null;
     }
   } catch (err) {}

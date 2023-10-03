@@ -1,4 +1,4 @@
-const GRAPHQL_ENDPOINT = "https://api.studio.thegraph.com/query/49892/c3-base-goerli/v0.1.1";
+const GRAPHQL_ENDPOINT = "https://api.studio.thegraph.com/query/49892/c3-base-goerli/v0.1.6";
 
 export const loadPetition = async (id: string) => {
   let res: any = null;
