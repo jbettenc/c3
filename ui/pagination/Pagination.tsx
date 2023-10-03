@@ -1,3 +1,4 @@
+import { BackArrowIcon } from "@/components/icons/BackArrowIcon";
 import Button from "../forms/Button";
 
 interface PaginationProps {
@@ -20,9 +21,8 @@ function Pagination(props: PaginationProps) {
               }}
               style="secondary"
               disabled={currentPage === 0}
-            >
-              &lt;-
-            </Button>
+              icon={<BackArrowIcon />}
+            ></Button>
           </div>
           <div className="text-sm text-gray-700 text-center sm:text-left my-auto">
             Page <span className="font-medium">{total > 0 ? currentPage + 1 : 0}</span> of{" "}
@@ -35,9 +35,8 @@ function Pagination(props: PaginationProps) {
               }}
               style="secondary"
               disabled={currentPage + 1 >= total}
-            >
-              -&gt;
-            </Button>
+              icon={<BackArrowIcon className="rotate-180" />}
+            ></Button>
           </div>
         </div>
       </nav>

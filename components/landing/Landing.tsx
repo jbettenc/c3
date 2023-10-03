@@ -23,6 +23,8 @@ import { AbiCoder } from "ethers";
 import { StoragePayload } from "@/types";
 import sha256 from "crypto-js/sha256";
 import { enc } from "crypto-js";
+import { BackArrowIcon } from "../icons/BackArrowIcon";
+import Link from "next/link";
 
 function Landing() {
   const [title, handleTitle] = useState("");
@@ -57,19 +59,25 @@ function Landing() {
       <>
         <div className="flex flex-col text-black w-full mb-16">
           <div className="w-full border-b border-gray-300">
-            <div className="flex flex-col mx-6 my-2">
-              <div className="font-semibold text-lg">Start a petition</div>
-              <div>Start your petition</div>
+            <div className="mx-6">
+              <div className="flex flex-col mx-auto max-w-7xl w-full my-2">
+                <div className="font-semibold text-lg">Start a petition</div>
+                <div>Start your petition</div>
+              </div>
             </div>
           </div>
-          <div className="my-4 max-w-5xl mx-auto w-full flex flex-col gap-4">
+          <div className="my-4 max-w-5xl mx-auto w-full flex flex-col gap-4 p-6">
             <Card
               expanded={step === 0}
               header={
                 <>
                   <div className="flex flex-row">
                     <div className="my-auto mr-4">
-                      {step === 0 ? <Radio checked groupName="N/A" /> : <Image src={CheckIcon} alt="Complete" />}
+                      {step === 0 ? (
+                        <Radio checked groupName="N/A" />
+                      ) : (
+                        <Image src={CheckIcon} alt="Complete" className="w-4 h-4" />
+                      )}
                     </div>
                     <div className="flex flex-col">
                       <div className="font-semibold text-lg">Add Petition Details</div>
@@ -165,11 +173,23 @@ function Landing() {
           </div>
         </div>
 
-        <div className="h-16 bg-white text-black fixed bottom-0 w-full">
+        <div className="h-16 bg-white text-black fixed bottom-0 w-full shadow-bg-blur">
           <div className="flex w-full h-full px-6">
-            <Button className="my-auto" style="secondary" disabled={step === 0} onClick={() => handleStep(step - 1)}>
-              Back
-            </Button>
+            <Link href="/" className="my-auto">
+              <Button
+                style="secondary"
+                icon={<BackArrowIcon className="w-3 h-3" />}
+                onClick={(e) => {
+                  if (step > 0) {
+                    handleStep(step - 1);
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }
+                }}
+              >
+                Back
+              </Button>
+            </Link>
             <Button
               className="my-auto ml-auto"
               disabled={

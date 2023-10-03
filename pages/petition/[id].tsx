@@ -63,20 +63,22 @@ function PetitionPage(props: PetitionPageProps) {
           <Navbar fixed={true} />
         </div>
         <div className="w-full border-b border-gray-300 text-black">
-          <div className="flex flex-col mx-6 my-2">
-            <div className="font-semibold text-lg">Sign petition</div>
-            <div>
-              Sign the petition initiated by{" "}
-              {creatorAlias
-                ? creatorAlias +
-                  ` (${
-                    petition?.petitioner.substring(0, 6) +
+          <div className="mx-6">
+            <div className="flex flex-col max-w-7xl w-full mx-auto my-2">
+              <div className="font-semibold text-lg">Sign petition</div>
+              <div>
+                Sign the petition initiated by{" "}
+                {creatorAlias
+                  ? creatorAlias +
+                    ` (${
+                      petition?.petitioner.substring(0, 6) +
+                      "..." +
+                      petition?.petitioner.substring(petition.petitioner.length - 4)
+                    })`
+                  : petition?.petitioner.substring(0, 6) +
                     "..." +
-                    petition?.petitioner.substring(petition.petitioner.length - 4)
-                  })`
-                : petition?.petitioner.substring(0, 6) +
-                  "..." +
-                  petition?.petitioner.substring(petition.petitioner.length - 4)}
+                    petition?.petitioner.substring(petition.petitioner.length - 4)}
+              </div>
             </div>
           </div>
         </div>

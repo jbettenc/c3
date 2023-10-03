@@ -20,6 +20,8 @@ import Signer from "./Signer";
 import { IPetition, IPetitionMetadata } from "@/types";
 import SignerCard from "./SignerCard";
 import { useENS } from "@/utils/hooks/useENS";
+import Link from "next/link";
+import { BackArrowIcon } from "./icons/BackArrowIcon";
 
 interface PetitionProps {
   petition?: IPetition;
@@ -52,7 +54,7 @@ function Petition(props: PetitionProps) {
 
   return (
     <>
-      <div className="flex text-black w-full mb-16 px-4">
+      <div className="flex text-black w-full mb-16 px-6">
         <div className="mt-4 flex max-w-7xl mx-auto w-full gap-4">
           <div className="flex flex-col max-w-5xl w-full gap-4">
             <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
@@ -103,11 +105,13 @@ function Petition(props: PetitionProps) {
           </div>
         </div>
       </div>
-      <div className="h-16 bg-white text-black fixed bottom-0 w-full">
+      <div className="h-16 bg-white text-black fixed bottom-0 w-full z-10 shadow-bg-blur">
         <div className="flex w-full h-full px-6">
-          {/* <Button className="my-auto" style="secondary">
-            Back
-          </Button> */}
+          <Link href="/" className="my-auto">
+            <Button style="secondary" icon={<BackArrowIcon className="w-3 h-3" />}>
+              Back
+            </Button>
+          </Link>
           <IDKitWidget
             app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
             action={`signPetition-${petition?.id ?? "0x00"}`}
@@ -144,18 +148,18 @@ function Petition(props: PetitionProps) {
                   open();
                 }}
               >
-                Sign Petition
+                Sign
               </Button>
             )}
           </IDKitWidget>
           <Button
-            className="ml-2"
+            className="my-auto ml-2"
             style="secondary"
             onClick={() => {
               showModal(MODAL_TYPE.SHARE, { url: window.location.href });
             }}
           >
-            Share Petition
+            Share
           </Button>
         </div>
       </div>

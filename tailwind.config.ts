@@ -104,7 +104,8 @@ module.exports = {
         "dot-pattern": "url('/assets/dotPattern.svg')"
       },
       fontFamily: {
-        poppins: ["Poppins"]
+        poppins: ["Poppins"],
+        plex: ["IBM Plex Sans", "sans-serif"]
       },
       minWidth: {
         325: "325px",
@@ -194,6 +195,7 @@ module.exports = {
       "primary-modal": "10px 20px 0px #000000",
       "notification-item": "0 0 5px rgba(0, 0, 0, 0.4)",
       "notification-div": "1px 3px 4px rgb(0 0 0 / 20%)",
+      "bg-blur": "0 0 60px 10px rgba(29, 41, 57, 0.05)",
       none: "none"
     },
     fontSize: {

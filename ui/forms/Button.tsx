@@ -62,11 +62,14 @@ function Button(props: ButtonProps) {
         return "bg-orange-500 hover:bg-orange-500/90 dark:bg-primary-900 dark:hover:bg-primary-700 dark:active:bg-primary-900 border-transparent";
       case "secondary":
         if (disabled) {
+          return `bg-transparent`;
+        }
+        return "bg-white border-gray-300 dark:bg-transparent dark:border-gray-300 hover:bg-gray-700/5";
+      case "tertiary":
+        if (disabled) {
           return `bg-transparent border-transparent`;
         }
         return "bg-white border-gray-200 dark:bg-transparent dark:border-white/20";
-      case "tertiary":
-        return "bg-black/0 border-transparent hover:bg-black/5 active:bg-black/10";
       case "danger":
         return "bg-rose-500 hover:bg-rose-600 border-transparent";
       case "success":
@@ -151,9 +154,9 @@ function Button(props: ButtonProps) {
     }
   };
 
-  let classes = `select-none${
+  let classes = `font-plex select-none${
     !customFont ? " font-medium text-sm" : ""
-  } inline-flex items-center justify-center border-2 ${rounded ? "rounded-full" : "rounded-md"} leading-5${
+  } inline-flex items-center justify-center border ${rounded ? "rounded-full" : "rounded-md"} leading-5${
     shadow ? " shadow-sm " : ""
   }transition duration-150 ease-in-out`;
   classes += " " + bgAndBorderColor() + " " + textColor() + " " + padding() + " " + disabledLoading();
