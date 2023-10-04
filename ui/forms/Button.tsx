@@ -59,7 +59,7 @@ function Button(props: ButtonProps) {
         if (disabled) {
           return `bg-orange-200 border-transparent`;
         }
-        return "bg-orange-500 hover:bg-orange-500/90 dark:bg-primary-900 dark:hover:bg-primary-700 dark:active:bg-primary-900 border-transparent";
+        return "bg-primary-900 hover:bg-primary-700 dark:bg-primary-900 dark:hover:bg-primary-700 dark:active:bg-primary-900 border-transparent";
       case "secondary":
         if (disabled) {
           return `bg-transparent`;

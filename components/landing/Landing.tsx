@@ -86,7 +86,7 @@ function Landing() {
                     {step !== 0 ? (
                       <>
                         <Button
-                          className="text-orange-500 ml-auto"
+                          className="text-primary-700 ml-auto"
                           filled={false}
                           onClick={() => handleStep(0)}
                           shadow={false}
@@ -147,7 +147,7 @@ function Landing() {
                     {step > 1 ? (
                       <>
                         <Button
-                          className="text-orange-500 ml-auto"
+                          className="text-primary-700 ml-auto"
                           filled={false}
                           onClick={() => handleStep(0)}
                           shadow={false}
@@ -208,26 +208,37 @@ function Landing() {
     <>
       <div className="flex flex-col text-black w-full mb-16">
         <div className="w-full border-b border-gray-300">
-          <div className="flex flex-col mx-6 my-2">
-            <div className="font-semibold text-lg">Preview Petition</div>
-            <div>Preview your petition before sending it out</div>
+          <div className="mx-6">
+            <div className="flex flex-col mx-auto max-w-7xl w-full my-2">
+              <div className="font-semibold text-lg">Preview Petition</div>
+              <div>Preview your petition before sending it out</div>
+            </div>
           </div>
         </div>
-        <div className="my-4 max-w-5xl mx-auto w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
-          <div className="font-semibold font-lg">{title}</div>
-          <div>{description}</div>
-          {importState.length > 0 ? (
-            <div className="w-full">
-              <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
-                {importState.map((file, idx) => (
-                  <div className="" key={`landingimportstate-${idx}`}>
-                    <img className="w-full h-auto" src={URL.createObjectURL(file)} alt="Image" />
-                  </div>
-                ))}
-              </Carousel>
+        <div className="my-4 w-full px-6">
+          <div className="max-w-5xl mx-auto w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
+            <div className="font-semibold font-lg">{title}</div>
+            <div>{description}</div>
+            {importState.length > 0 ? (
+              <div className="w-full">
+                <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
+                  {importState.map((file, idx) => (
+                    <div className="" key={`landingimportstate-${idx}`}>
+                      <img className="w-full h-auto" src={URL.createObjectURL(file)} alt="Image" />
+                    </div>
+                  ))}
+                </Carousel>
+              </div>
+            ) : null}
+            <div className="font-medium">
+              Initiated by:{" "}
+              {ethAlias && account
+                ? ethAlias + ` (${account.substring(0, 6) + "..." + account.substring(account.length - 4)})`
+                : account
+                ? account.substring(0, 6) + "..." + account.substring(account.length - 4)
+                : "--"}
             </div>
-          ) : null}
-          <div>Initiated by {ethAlias ? ethAlias : account}</div>
+          </div>
         </div>
       </div>
 
