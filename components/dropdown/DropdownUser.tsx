@@ -14,19 +14,14 @@ import Button from "@/ui/forms/Button";
 import { AccountData } from "@/types";
 import UserDisplay from "../UserDisplay";
 import { RootState } from "@/store/root";
+import { useENS } from "@/utils/hooks/useENS";
 
-interface DropdownUserProps {
-  accountData: AccountData;
-}
-
-function DropdownUser(props: DropdownUserProps) {
-  const { accountData } = props;
-
-  const { ethAlias } = useSelector((state: RootState) => state.user);
+function DropdownUser() {
   const { active, account, deactivate } = useWeb3React();
   const connector: any = useWeb3React().connector;
   const dispatch = useDispatch();
   const router = useRouter();
+  const { alias, avatar } = useENS(account ?? "");
 
   if (!active) {
     return (
@@ -67,8 +62,8 @@ function DropdownUser(props: DropdownUserProps) {
               customSizing={true}
               shadow={false}
               icon={
-                accountData?.ethAvatar ? (
-                  <Image className="w-9 h-9 rounded-full object-cover" src={accountData.ethAvatar} alt="" />
+                avatar ? (
+                  <Image className="w-9 h-9 rounded-full object-cover" src={avatar} alt="" />
                 ) : (
                   <div className="py-1 pr-1">
                     <Identicon
@@ -81,7 +76,7 @@ function DropdownUser(props: DropdownUserProps) {
               }
             >
               <>
-                {ethAlias ? ethAlias : !!account && account.slice(0, 10) + "..."}
+                {alias ? alias : !!account && account.slice(0, 10) + "..."}
                 <span className="ml-2 mt-px">
                   <svg width="10" height="100%" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M7 9L0.0717975 3.51391e-07L13.9282 -8.59975e-07L7 9Z" fill="black" />
@@ -96,8 +91,8 @@ function DropdownUser(props: DropdownUserProps) {
         <>
           <div className="px-4 flex items-center justify-start w-max text-black">
             <div className="identicon cursor-pointer border-2 hover:bg-gray-50 active:bg-white mr-4 flex rounded-full">
-              {accountData?.ethAvatar ? (
-                <Image className="w-9 h-9 rounded-full object-cover" src={accountData.ethAvatar} alt="" />
+              {avatar ? (
+                <Image className="w-9 h-9 rounded-full object-cover" src={avatar} alt="" />
               ) : (
                 <div className="p-2">
                   <Identicon
@@ -108,7 +103,7 @@ function DropdownUser(props: DropdownUserProps) {
                 </div>
               )}
             </div>
-            <UserDisplay accountData={accountData} />
+            <UserDisplay accountData={{ ethAvatar: avatar, ethAlias: alias }} />
           </div>
           {!!connector?.torus && (
             <div className="flex justify-center my-4 gap-4">

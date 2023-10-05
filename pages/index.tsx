@@ -1,21 +1,12 @@
 import Navbar from "@/components/Navbar";
 import Landing from "@/components/landing/Landing";
-import { setEthAlias, setEthAvatar } from "@/store/userSlice";
-import { useENS } from "@/utils/hooks/useENS";
 import { useWeb3React } from "@web3-react/core";
 import Head from "next/head";
-import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 export default function Home() {
   const { account } = useWeb3React();
   const dispatch = useDispatch();
-  const { alias, avatar } = useENS(account ?? undefined);
-
-  useEffect(() => {
-    dispatch(setEthAlias(alias));
-    dispatch(setEthAvatar(avatar));
-  }, [alias, avatar, dispatch]);
 
   return (
     <>

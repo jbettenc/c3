@@ -23,6 +23,7 @@
     "@web3-react/walletconnect-connector": "^6.2.13",
     "@web3-react/walletlink-connector": "^6.2.14",
     "@worldcoin/idkit": "^0.5.1",
+    "async-mutex": "^0.4.0",
     "autoprefixer": "10.4.16",
     "crypto-js": "^4.1.1",
     "eslint": "8.50.0",

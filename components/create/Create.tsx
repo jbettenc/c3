@@ -7,9 +7,7 @@ import { useEffect, useState } from "react";
 import CheckIcon from "../../assets/check.svg";
 import FileDropzone from "../FileDropzone";
 import { Carousel } from "react-responsive-carousel";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/root";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useWeb3React } from "@web3-react/core";
 import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
 import { postUploadToStorage, useWeb3Storage } from "@/utils/storage";
@@ -24,6 +22,7 @@ import { StoragePayload } from "@/types";
 import { BackArrowIcon } from "../icons/BackArrowIcon";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useENS } from "@/utils/hooks/useENS";
 
 export function Create() {
   const [title, handleTitle] = useState("");
@@ -32,11 +31,11 @@ export function Create() {
   const [importState, handleImportState] = useState<File[]>([]);
   const [cid, handleCid] = useState("");
   const [hash, handleHash] = useState("");
-  const { ethAlias, ethAvatar } = useSelector((state: RootState) => state.user);
   const { account, library } = useWeb3React();
   const { showModal } = useGlobalModalContext();
   const { storeObj } = useWeb3Storage();
   const router = useRouter();
+  const { alias } = useENS(account ?? "");
 
   useEffect(() => {
     handleHash(ethers.hashMessage(uuidv4()));
@@ -226,8 +225,8 @@ export function Create() {
             ) : null}
             <div className="font-medium">
               Initiated by:{" "}
-              {ethAlias && account
-                ? ethAlias + ` (${account.substring(0, 6) + "..." + account.substring(account.length - 4)})`
+              {alias && account
+                ? alias + ` (${account.substring(0, 6) + "..." + account.substring(account.length - 4)})`
                 : account
                 ? account.substring(0, 6) + "..." + account.substring(account.length - 4)
                 : "--"}

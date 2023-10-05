@@ -6,9 +6,16 @@ export function loadState(): any | undefined {
     }
     const json = JSON.parse(serializedState);
 
-    // Clear "Back" button state
-    if (json?.navigation) {
-      json.navigation.previousEndpoint = undefined;
+    // We will cache ENS data for 1 day locally to prevent 429s.
+    if (json?.ens?.ensState) {
+      for (const key of Object.keys(json.ens.ensState)) {
+        if (json.ens[key].timestamp < Date.now() - 86400000) {
+          delete json.ens[key];
+        }
+      }
+    }
+    if (json?.ens?.ensMutex) {
+      json.ens.ensMutex = {};
     }
     return json;
   } catch (err) {

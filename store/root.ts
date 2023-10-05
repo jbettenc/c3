@@ -4,9 +4,11 @@ import { AnyAction, combineReducers, EmptyObject } from "redux";
 import logger from "redux-logger";
 import { userReducer, UserState } from "./userSlice";
 import { loadState, saveState } from "./localStorage";
+import { ensReducer } from "./ensSlice";
 
 const reducers = combineReducers({
-  user: userReducer
+  user: userReducer,
+  ens: ensReducer
 });
 
 const middlewareConfig = {

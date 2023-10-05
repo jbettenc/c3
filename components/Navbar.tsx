@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import DropdownUser from "./dropdown/DropdownUser";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useWeb3React } from "@web3-react/core";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/root";
+import Image from "next/image";
+import Logo from "../assets/logo.svg";
 
 interface NavbarProps {
   logoOnly?: boolean;
@@ -19,7 +18,6 @@ function Navbar(props: NavbarProps) {
   const [subMenuActive, handleSubMenuActive] = useState(-1);
   const [chainId, handleChainId] = useState(-1);
 
-  const { ethAlias, ethAvatar } = useSelector((state: RootState) => state.user);
   const { active, library } = useWeb3React();
 
   useEffect(() => {
@@ -73,12 +71,12 @@ function Navbar(props: NavbarProps) {
               <div className="flex flex-row h-full">
                 <div className="flex flex-col mr-4">
                   <Link href="/" className="h-full flex">
-                    <span className="text-black font-extrabold text-4xl leading-none italic my-auto">C3</span>
+                    <Image src={Logo} alt="Communities Creating Change" />
                   </Link>
                 </div>
                 {!logoOnly ? (
                   <div className="ml-auto flex my-auto">
-                    <DropdownUser accountData={{ ethAlias: ethAlias, ethAvatar: ethAvatar }} />
+                    <DropdownUser />
                   </div>
                 ) : null}
               </div>

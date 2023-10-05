@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useENS } from "@/utils/hooks/useENS";
 import Card from "../Card";
 import Image from "next/image";
@@ -11,8 +12,7 @@ interface TitleCardProps {
 
 function TitleCard(props: TitleCardProps) {
   const { alias, avatar } = useENS(props.petitioner);
-
-  const style = Math.floor(Math.random() * 3);
+  const [style, handleStyle] = useState(Math.floor(Math.random() * 3));
 
   return (
     <Card onClick={props.onClick}>
@@ -24,8 +24,8 @@ function TitleCard(props: TitleCardProps) {
         <div className="w-full h-full flex flex-col max-h-full">
           <div
             className={`${
-              style === 2 ? "text-black text-2xl" : "text-white"
-            } font-bold text-center my-auto break-words shrink overflow-hidden`}
+              style === 2 ? "text-black text-2xl" : style === 1 ? "text-white text-2xl" : "text-white"
+            } font-bold text-center my-auto break-words shrink overflow-hidden leading-tight`}
           >
             {props.title}
           </div>
