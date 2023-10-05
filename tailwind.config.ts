@@ -64,7 +64,7 @@ module.exports = {
         "notification-border": "#bd1120"
       },
       indigo: colors.indigo,
-      red: { ...colors.red, 50: "#FFF1F1", 100: "#F55252", 400: "#E12525" },
+      red: { ...colors.red, 50: "#FFF1F1", 75: "#FF4F52", 100: "#F55252", 400: "#E12525" },
       yellow: { ...colors.yellow, 100: "#FFFEF0", 200: "#C58D00" },
       green: { ...colors.green, 300: "#26A650", 400: "#449C1B" },
       pink: { ...colors.pink, 100: "#F7F0FF" },

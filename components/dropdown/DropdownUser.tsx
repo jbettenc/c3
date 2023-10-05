@@ -33,9 +33,7 @@ function DropdownUser(props: DropdownUserProps) {
       <>
         <Button
           style="secondary"
-          className="hidden md:flex w-full font-bold py-3 px-6 whitespace-nowrap border-2"
-          customFont={true}
-          customSizing={true}
+          className="hidden md:flex w-full whitespace-nowrap"
           icon={<WalletIcon />}
           onClick={() => dispatch(setOpenLoginModal(true))}
         >
@@ -43,10 +41,9 @@ function DropdownUser(props: DropdownUserProps) {
         </Button>
         <Button
           style="secondary"
-          className="block md:hidden w-full font-bold py-3 px-6 whitespace-nowrap border-2"
+          className="block md:hidden w-full font-bold whitespace-nowrap"
           rounded={true}
           customFont={true}
-          customSizing={true}
           icon={<WalletIcon />}
           onClick={() => dispatch(setOpenLoginModal(true))}
         ></Button>
@@ -65,7 +62,7 @@ function DropdownUser(props: DropdownUserProps) {
           <div id="account-button">
             <Button
               style="secondary"
-              className="w-full font-bold py-3 px-4 whitespace-nowrap border-2 hover:border-black"
+              className="w-full font-bold py-2 px-4 whitespace-nowrap border"
               stopPropagation={false}
               customSizing={true}
               shadow={false}
@@ -73,7 +70,7 @@ function DropdownUser(props: DropdownUserProps) {
                 accountData?.ethAvatar ? (
                   <Image className="w-9 h-9 rounded-full object-cover" src={accountData.ethAvatar} alt="" />
                 ) : (
-                  <div className="p-2">
+                  <div className="py-1 pr-1">
                     <Identicon
                       string={account ? account.toLowerCase() : ""}
                       size={17}
@@ -98,13 +95,13 @@ function DropdownUser(props: DropdownUserProps) {
       dropdownChildren={() => (
         <>
           <div className="px-4 flex items-center justify-start w-max text-black">
-            <div className="identicon cursor-pointer border-2 hover:border-black hover:bg-gray-21 active:bg-gray-23 mr-4 flex rounded-full">
+            <div className="identicon cursor-pointer border-2 hover:bg-gray-50 active:bg-white mr-4 flex rounded-full">
               {accountData?.ethAvatar ? (
                 <Image className="w-9 h-9 rounded-full object-cover" src={accountData.ethAvatar} alt="" />
               ) : (
                 <div className="p-2">
                   <Identicon
-                    string={account ? account : ""}
+                    string={account ? account.toLowerCase() : ""}
                     size={17}
                     palette={["#FFC32A", "#AEDFFB", "#6C66E9", "#FFDB80", "#CDCDCD", "#000000", "#C9AEFB", "#B9E5D4"]}
                   />
@@ -142,10 +139,10 @@ function DropdownUser(props: DropdownUserProps) {
             </div>
           )}
 
-          <div className="h-px bg-gray-400"></div>
+          <div className="h-px bg-gray-300"></div>
 
           <div
-            className={`justify-start px-6 flex cursor-pointer mx-auto py-4 bg-white hover:bg-gray-21 active:bg-gray-23 rounded-b-md`}
+            className={`justify-start px-6 flex cursor-pointer mx-auto py-4 bg-white hover:bg-gray-50 active:bg-white rounded-b-md`}
             role="menuitem"
             tabIndex={-1}
             onClick={async (e: any) => {
@@ -165,7 +162,7 @@ function DropdownUser(props: DropdownUserProps) {
           </div>
 
           <div
-            className={`justify-start px-6 flex cursor-pointer mx-auto py-4 bg-white hover:bg-gray-21 active:bg-gray-23 rounded-b-md`}
+            className={`justify-start px-6 flex cursor-pointer mx-auto py-4 bg-white hover:bg-gray-50 active:bg-white rounded-b-md`}
             role="menuitem"
             tabIndex={-1}
             onClick={async (e: any) => {

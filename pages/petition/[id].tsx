@@ -2,7 +2,6 @@ import Navbar from "@/components/Navbar";
 import Petition from "@/components/Petition";
 import { IPetition, IPetitionMetadata } from "@/types";
 import { useENS } from "@/utils/hooks/useENS";
-import { bytesToString, fromHexString, stringToBytesString } from "@/utils/misc";
 import { loadPetition } from "@/utils/queries";
 import { getFileForUser } from "@/utils/storage";
 import { GetServerSidePropsContext } from "next";
@@ -21,19 +20,6 @@ function PetitionPage(props: PetitionPageProps) {
   const router = useRouter();
 
   const { alias: creatorAlias } = useENS(petition?.petitioner);
-
-  // useEffect(() => {
-  //   const id = router.query.id;
-  //   if (!id) {
-  //     return;
-  //   }
-
-  //   const arr = "0x" + stringToBytesString((id as string) ?? "");
-
-  //   (async () => {
-  //     handlePetition(await loadPetition(arr));
-  //   })();
-  // }, [router]);
 
   return (
     <>
@@ -58,8 +44,8 @@ function PetitionPage(props: PetitionPageProps) {
           cardType: "summary"
         }}
       />
-      <main className="w-full">
-        <div className="h-16 bg-white">
+      <main className="w-full bg-white">
+        <div className="h-16">
           <Navbar fixed={true} />
         </div>
         <div className="w-full border-b border-gray-300 text-black">

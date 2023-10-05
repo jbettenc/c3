@@ -1,8 +1,6 @@
 import Image from "next/image";
-import CloseIcon from "../../assets/close.svg";
 import DiscordIcon from "../../assets/Discord.svg";
 import TelegramIcon from "../../assets/Telegram.svg";
-import LensIcon from "../../assets/Lens.svg";
 import XIcon from "../../assets/X.svg";
 import Button from "@/ui/forms/Button";
 import { copyStringToClipboard, storeNotif } from "@/utils/misc";
@@ -59,10 +57,11 @@ function Share(props: ShareProps) {
             <div className="mx-auto">Telegram</div>
           </div>
         </div>
-        <div className="flex flex-row rounded-md bg-gray-50 border border-gray-100">
-          <div className="my-auto ml-2 truncate">{props.url}</div>
+        <div className="flex flex-row rounded-md bg-gray-50 border border-gray-100 p-2">
+          <div className="my-auto mx-2 truncate">{props.url}</div>
           <Button
             className="bg-purple-300 ml-auto"
+            rounded
             onClick={() => {
               copyStringToClipboard(props.url ?? "");
               storeNotif("Copied", "", "info");

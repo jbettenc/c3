@@ -85,20 +85,6 @@ function Petition(props: PetitionProps) {
                     petition?.petitioner.substring(petition.petitioner.length - 4)}
               </div>
             </div>
-            {/* <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
-              <div>{metadata?.description}</div>
-              {metadata?.images?.length && metadata.images.length > 0 ? (
-                <div className="w-full">
-                  <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
-                    {metadata.images.map((file, idx) => (
-                      <div className="" key={`ipfsimages-${idx}`}>
-                        <img className="w-full h-auto" src={file} alt="Image" />
-                      </div>
-                    ))}
-                  </Carousel>
-                </div>
-              ) : null}
-            </div> */}
           </div>
           <div className="flex flex-col max-w-lg w-full">
             <SignerCard petition={petition} signers={signers} />
@@ -156,7 +142,11 @@ function Petition(props: PetitionProps) {
             className="my-auto ml-2"
             style="secondary"
             onClick={() => {
-              showModal(MODAL_TYPE.SHARE, { url: window.location.href });
+              showModal(
+                MODAL_TYPE.SHARE,
+                { url: window.location.href },
+                { title: "Share Petition", headerSeparator: false, border: false }
+              );
             }}
           >
             Share

@@ -56,3 +56,32 @@ export const loadPetitionSigners = async (id: string) => {
 
   return res ?? null;
 };
+
+export const getPetitions = async (count = 10) => {
+  let res: any = null;
+  const query = `{
+    petitions(orderBy: signatures, orderDirection: desc, first: ${count}) {
+      id
+      petitioner
+      signatures
+      cid
+      timestamp
+    }
+  }`;
+
+  await fetch(`${GRAPHQL_ENDPOINT}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      query: query
+    })
+  })
+    .then((res) => res.json())
+    .then((response) => {
+      res = response?.data?.petitions;
+    });
+
+  return res ?? null;
+};

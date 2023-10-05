@@ -1,7 +1,6 @@
 import React, { useState, createContext, useContext, useRef, useEffect } from "react";
 import { ConfirmView, Custom, Share, TransactionFlow, WalletSelect } from "../modals";
-import Modal from "@/ui/modals/Modal";
-// import WalletSelect from "../modals/WalletConnect";
+import Modal, { ModalProps } from "@/ui/modals/Modal";
 
 export enum MODAL_TYPE {
   CONFIRM_VIEW = "CONFIRM_VIEW",
@@ -40,15 +39,19 @@ const GlobalModalContext = createContext(initalState);
 export const useGlobalModalContext = () => useContext(GlobalModalContext);
 
 export const GlobalModal = ({ children }: any) => {
-  const [store, setStore] = useState({} as any);
+  const [store, setStore] = useState<{
+    modalType: MODAL_TYPE;
+    modalProps: any;
+    modalWrapperProps: Partial<ModalProps> & { preventModalClose?: boolean; modalType?: MODAL_TYPE };
+  }>({} as any);
   const openedModals = useRef([] as any[]);
   const { modalType, modalProps, modalWrapperProps } = store;
   const [shouldEnableScroll, handleShouldEnableScroll] = useState(false);
 
   const showModal = (
-    modalType: string,
+    modalType: MODAL_TYPE,
     modalProps: any = {},
-    modalWrapperProps: any = {},
+    modalWrapperProps: Partial<ModalProps & { preventModalClose?: boolean }> = {},
     hideOnPathnameChange: boolean = true
   ) => {
     openedModals.current.push({
@@ -115,7 +118,7 @@ export const GlobalModal = ({ children }: any) => {
       return null;
     }
     return (
-      <Modal {...modalWrapperProps}>
+      <Modal {...(modalWrapperProps as any)}>
         <ModalComponent id="global-modal" {...modalProps} />
       </Modal>
     );

@@ -1,5 +1,4 @@
 import { useDropzone } from "react-dropzone";
-import Button from "../ui/forms/Button";
 import UploadIcon from "../,./../assets/upload.svg";
 import { UploadIcon as UploadIconComponent } from "./icons/UploadIcon";
 import Image from "next/image";
@@ -45,10 +44,7 @@ function FileDropzone(props: FileDropzoneProps) {
               </div>
               {importState.map((file, idx) => (
                 <div className="relative" key={`importState-${idx}`}>
-                  <div
-                    className={`overflow-hidden relative w-36 h-36 rounded-lg flex border border-gray-300`}
-                    // style={props.style}
-                  >
+                  <div className={`overflow-hidden relative w-36 h-36 rounded-lg flex border border-gray-300`}>
                     <img className="w-full h-auto my-auto" src={URL.createObjectURL(file)} alt="Image" />
                   </div>
                   <div

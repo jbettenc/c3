@@ -64,7 +64,7 @@ function Button(props: ButtonProps) {
         if (disabled) {
           return `bg-transparent`;
         }
-        return "bg-white border-gray-300 dark:bg-transparent dark:border-gray-300 hover:bg-gray-700/5";
+        return "bg-white border-gray-300 dark:border-gray-300 hover:bg-gray-50";
       case "tertiary":
         if (disabled) {
           return `bg-transparent border-transparent`;

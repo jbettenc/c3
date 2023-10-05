@@ -1,9 +1,9 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import Transition from "@/utils/Transition";
 import { useGlobalModalContext } from "@/components/context/ModalContext";
 
-interface ModalProps {
+export interface ModalProps {
   children?: JSX.Element[];
   id?: string;
   title?: string;
@@ -50,7 +50,7 @@ function Modal({
     return () => {
       router.events.off("routeChangeComplete", handleRouteChange);
     };
-  }, [router, hideOnPathnameChange]);
+  }, [router, hideOnPathnameChange, hideModal]);
 
   // close on click outside
   useEffect(() => {
@@ -83,7 +83,7 @@ function Modal({
     <>
       {/* Modal backdrop */}
       <Transition
-        className="fixed inset-0 bg-slate-900 bg-opacity-30 z-50 transition-opacity"
+        className="fixed inset-0 bg-black bg-opacity-60 z-50 transition-opacity"
         show={modalOpen}
         appear={true}
         enter="transition ease-out duration-200"
@@ -120,10 +120,10 @@ function Modal({
           {showHeader ? (
             <div className={`${headerSeparator ? "p-6 border-b border-black border-opacity-10" : "pt-6 px-6"}`}>
               <div className="flex justify-between items-center">
-                <div className="font-semibold text-slate-800 mr-6">{title}</div>
+                <div className="text-2xl font-bold text-slate-800 mr-6">{title}</div>
                 {titleBar ? titleBar : null}
                 <button
-                  className="ml-auto text-gray-200 hover:text-gray-300 active:text-black"
+                  className="ml-auto text-slate-800 hover:text-black active:text-black"
                   onClick={(e) => {
                     e.stopPropagation();
                     if (onClose) {

@@ -2,6 +2,7 @@ import { useWeb3React } from "@web3-react/core";
 import React from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { AccountData } from "../types";
+import { storeNotif } from "@/utils/misc";
 
 interface UserDisplayProps {
   accountData: AccountData;
@@ -15,14 +16,18 @@ const UserDisplay = (props: UserDisplayProps) => {
   return (
     <div>
       <div className="flex justify-center my-4">
-        <div className="flex font-bold">
-          <div className="mr-2 flex-shrink-0">Address:</div>
+        <div className="flex font-medium">
           <div className="flex">
-            <div className="mr-1">
+            <div className="mr-2">
               {accountData ? accountData.ethAlias : null}
               {!accountData?.ethAlias && !!account && account.slice(0, 10) + "..."}
             </div>
-            <CopyToClipboard text={account ? account : ""}>
+            <CopyToClipboard
+              text={account ? account : ""}
+              onCopy={() => {
+                storeNotif("Address Copied", "", "info");
+              }}
+            >
               <div className="inline mb-1 cursor-pointer my-auto">
                 <svg width="15" height="17" viewBox="0 0 15 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
