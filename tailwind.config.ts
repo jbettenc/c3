@@ -71,7 +71,9 @@ module.exports = {
       purple: {
         ...colors.purple,
         100: "#F7F0FF",
-        300: "603FE0"
+        300: "603FE0",
+        500: "#9E77ED",
+        600: "#7F56D9"
       },
       blue: { ...colors.blue, 200: "#EAF7FF", 300: "#6C66E9", 400: "#524AE7", 500: "#3E35E3" },
       orange: {
@@ -88,6 +90,7 @@ module.exports = {
         color: "#000000",
         "modal-overlay": "rgba(0, 0, 0, 0.7)",
         300: "#ECBE9F",
+        600: "#DD8D58",
         700: "#D97D40",
         900: "#CF5C10"
       },
@@ -107,7 +110,8 @@ module.exports = {
       },
       fontFamily: {
         poppins: ["Poppins"],
-        plex: ["IBM Plex Sans", "sans-serif"]
+        plex: ["IBM Plex Sans", "sans-serif"],
+        anton: ["Anton", "sans-serif"]
       },
       minWidth: {
         325: "325px",

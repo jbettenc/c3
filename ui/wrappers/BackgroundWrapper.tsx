@@ -1,14 +1,12 @@
 import { MODAL_TYPE, useGlobalModalContext } from "@/components/context/ModalContext";
 import { RootState } from "@/store/root";
 import { setLoginType, setOpenLoginModal } from "@/store/userSlice";
-import { useWeb3React } from "@web3-react/core";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 function BackgroundAndWalletSelectWrapper(props: any) {
-  const { account } = useWeb3React();
   const { openLoginModal } = useSelector((state: RootState) => state.user);
-  const { showModal, hideModal, store } = useGlobalModalContext();
+  const { showModal, hideModal } = useGlobalModalContext();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -35,9 +33,7 @@ function BackgroundAndWalletSelectWrapper(props: any) {
         }
       );
     } else {
-      // if (store.modalType === MODAL_TYPE.WALLET_SELECT) {
       hideModal(true);
-      // }
     }
   }, [openLoginModal]);
 

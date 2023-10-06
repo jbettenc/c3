@@ -3,51 +3,62 @@ import { useENS } from "@/utils/hooks/useENS";
 import Card from "../Card";
 import Image from "next/image";
 import IdentIcon from "@/components/common/IdentIcon";
+import SignatureProgressBar from "@/components/SignatureProgressBar";
+import Button from "@/ui/forms/Button";
 
 interface TitleCardProps {
   title: string;
   petitioner: string;
+  verificationStatus?: number; // 0 = none, 1 = phone, 2 = orb
+  signatures: number;
   onClick?: (e: React.MouseEvent) => void;
 }
 
 function TitleCard(props: TitleCardProps) {
+  const { verificationStatus = 1, signatures } = props;
   const { alias, avatar } = useENS(props.petitioner);
-  const [style, handleStyle] = useState(Math.floor(Math.random() * 3));
 
   return (
-    <Card onClick={props.onClick}>
+    <Card>
       <div
         className={`w-full h-full ${
-          style === 2 ? "bg-[#FFD980] " : style === 1 ? "bg-[#262D33] " : "bg-[#6D75E7] "
-        } p-8`}
+          verificationStatus === 2 ? "bg-[#FFD980] " : verificationStatus === 1 ? "bg-[#262D33] " : "bg-[#6D75E7] "
+        } p-6`}
       >
         <div className="w-full h-full flex flex-col max-h-full">
           <div
-            className={`${
-              style === 2 ? "text-black text-2xl" : style === 1 ? "text-white text-2xl" : "text-white"
-            } font-bold text-center my-auto break-words shrink overflow-hidden leading-tight`}
+            className={`shrink-0 font-semibold text-start mb-2 text-xs ${
+              verificationStatus === 2 ? "text-primary-600" : "text-[#FFC4C9]"
+            }`}
           >
-            {props.title}
+            {alias
+              ? alias
+              : `${props.petitioner.substring(0, 6)}...${props.petitioner.substring(props.petitioner.length - 6)}`}
           </div>
-          <div className="shrink-0 flex flex-col">
-            <div className="text-center my-3 font-semibold text-xs">
-              {alias
-                ? alias
-                : `${props.petitioner.substring(0, 6)}...${props.petitioner.substring(props.petitioner.length - 6)}`}
-            </div>
-            <div className="mx-auto">
-              {avatar ? (
-                <Image className="w-9 h-9 rounded-full object-cover" src={avatar} alt="" />
-              ) : (
-                <div className="p-2">
-                  <IdentIcon
-                    string={props.petitioner}
-                    size={52}
-                    palette={["#FFC32A", "#AEDFFB", "#6C66E9", "#FFDB80", "#CDCDCD", "#000000", "#C9AEFB", "#B9E5D4"]}
-                  />
-                </div>
-              )}
-            </div>
+          <div
+            className={`${
+              verificationStatus === 2
+                ? "text-black text-4xl"
+                : verificationStatus === 1
+                ? "text-white text-4xl"
+                : "text-white"
+            } font-anton text-left mb-auto break-words shrink overflow-hidden leading-tight`}
+          >
+            {props.title.toUpperCase()}
+          </div>
+
+          <div className="shrink-0 flex flex-col mt-2">
+            <SignatureProgressBar
+              signatures={signatures ?? 0}
+              showCount
+              color="bg-gradient-to-r from-purple-600 to-purple-500"
+              customCountStyle={`${
+                verificationStatus === 2 ? "text-black" : "text-white"
+              } text-xs font-medium text-left mt-2`}
+            />
+            <Button style="secondary" onClick={props.onClick} className="w-full mt-2">
+              Sign Now
+            </Button>
           </div>
         </div>
       </div>

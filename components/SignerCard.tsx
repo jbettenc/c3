@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IPetition } from "@/types";
 import Signer from "./Signer";
 import Pagination from "@/ui/pagination/Pagination";
+import SignatureProgressBar, { GOAL_STEPS } from "./SignatureProgressBar";
 
 interface SignerCardProps {
   petition?: IPetition;
@@ -11,9 +12,19 @@ interface SignerCardProps {
 function SignerCard(props: SignerCardProps) {
   const GOAL = 100;
   const SIGNERS_PER_PAGE = 8;
-  const [currentPage, handleCurrentPage] = useState<number>(0);
-
   const { petition, signers } = props;
+
+  const [currentPage, handleCurrentPage] = useState<number>(0);
+  const [goal, handleGoal] = useState(5000000);
+
+  useEffect(() => {
+    for (const val of GOAL_STEPS) {
+      if (val > (petition?.signatures ?? 0)) {
+        handleGoal(val);
+        break;
+      }
+    }
+  }, [petition]);
 
   return (
     <>
@@ -21,17 +32,11 @@ function SignerCard(props: SignerCardProps) {
         <div className="flex px-4">
           <div className="font-lg font-semibold mr-2">Signers</div>
           <div className="bg-orange-50 text-orange-700 rounded-full px-3 text-sm my-auto">
-            {petition?.signatures ?? 0}/{GOAL} signatures
+            {petition?.signatures ?? 0}/{goal} signatures
           </div>
         </div>
         <div className="flex px-4">
-          <div className="my-auto mr-2 w-full bg-gray-200 rounded-full h-2.5">
-            <div
-              className="bg-orange-600 h-2.5 rounded-full"
-              style={{ width: `${petition?.signatures ?? 0 / GOAL}%` }}
-            ></div>
-          </div>
-          <div className="whitespace-nowrap font-medium">{Math.floor(petition?.signatures ?? 0 / GOAL)}%</div>
+          <SignatureProgressBar signatures={petition?.signatures ?? 0} showPercent />
         </div>
         <table>
           <thead>
