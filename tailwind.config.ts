@@ -70,9 +70,11 @@ module.exports = {
       pink: { ...colors.pink, 100: "#F7F0FF" },
       purple: {
         ...colors.purple,
+        25: "#F5F2F8",
         100: "#F7F0FF",
-        300: "603FE0",
+        300: "#603FE0",
         500: "#9E77ED",
+        501: "#8A66A6",
         600: "#7F56D9"
       },
       blue: { ...colors.blue, 200: "#EAF7FF", 300: "#6C66E9", 400: "#524AE7", 500: "#3E35E3" },
@@ -132,6 +134,9 @@ module.exports = {
       },
       zIndex: {
         0: 0,
+        5: 5,
+        8: 8,
+        9: 9,
         10: 10,
         20: 20,
         30: 30,

@@ -1,13 +1,16 @@
 import IdentIcon from "./common/IdentIcon";
 import Image from "next/image";
 import { useENS } from "@/utils/hooks/useENS";
+import { WorldCoinIcon } from "./icons/WorldCoinLogo";
 
 interface SignerProps {
   address?: string;
+  verificationType?: number;
 }
 
 function Signer(props: SignerProps) {
-  const { avatar, alias } = useENS(props.address);
+  const { address, verificationType = 0 } = props;
+  const { avatar, alias } = useENS(address);
 
   return (
     <>
@@ -26,11 +29,35 @@ function Signer(props: SignerProps) {
           )}
         </div>
         <div className="flex flex-col">
-          {alias ? <div className="font-semibold">{alias}</div> : null}
-          <div className={`${!alias ? "my-auto" : ""}`}>
+          {alias ? (
+            <div className="flex font-semibold flex-wrap gap-x-2">
+              {alias}
+              {verificationType > 0 ? (
+                <div
+                  className={`flex flex-nowrap shrink-0 font-medium ${
+                    verificationType === 2 ? "bg-orange-50 text-orange-700" : "bg-purple-25 text-purple-501"
+                  } rounded-full px-3 text-sm my-auto`}
+                >
+                  <WorldCoinIcon className="h-4 w-4 my-auto mr-2" />
+                  {verificationType === 2 ? "Orb" : "Phone"} Verified
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          <div className={`${!alias ? "my-auto flex flex-wrap gap-x-2" : ""}`}>
             {props.address
               ? props.address.substring(0, 6) + "..." + props.address.substring(props.address.length - 6)
               : "--"}
+            {!alias && verificationType > 0 ? (
+              <div
+                className={`flex flex-nowrap shrink-0 ml-2 font-medium ${
+                  verificationType === 2 ? "bg-orange-50 text-orange-700" : "bg-purple-25 text-purple-501"
+                } rounded-full px-3 text-sm my-auto`}
+              >
+                <WorldCoinIcon className="h-4 w-4 my-auto mr-2" />
+                {verificationType === 2 ? "Orb" : "Phone"} Verified
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

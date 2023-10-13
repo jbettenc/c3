@@ -1,6 +1,7 @@
 import React, { useState, createContext, useContext, useRef, useEffect } from "react";
 import { ConfirmView, Custom, Share, TransactionFlow, WalletSelect } from "../modals";
 import Modal, { ModalProps } from "@/ui/modals/Modal";
+import WorldIdVerify from "../modals/WorldIdVerify";
 
 export enum MODAL_TYPE {
   CONFIRM_VIEW = "CONFIRM_VIEW",
@@ -9,6 +10,7 @@ export enum MODAL_TYPE {
   VIEW_COLLECTION = "VIEW_COLLECTION",
   VIEW_OFFER = "VIEW_OFFER",
   WALLET_SELECT = "WALLET_SELECT",
+  WORLD_ID_VERIFY = "WORLD_ID_VERIFY",
   SHARE = "SHARE",
   CUSTOM = "CUSTOM"
 }
@@ -17,6 +19,7 @@ const MODAL_COMPONENTS: any = {
   [MODAL_TYPE.CONFIRM_VIEW]: ConfirmView,
   [MODAL_TYPE.TRANSACTION_FLOW]: TransactionFlow,
   [MODAL_TYPE.SHARE]: Share,
+  [MODAL_TYPE.WORLD_ID_VERIFY]: WorldIdVerify,
   [MODAL_TYPE.WALLET_SELECT]: WalletSelect,
   [MODAL_TYPE.CUSTOM]: Custom
 };

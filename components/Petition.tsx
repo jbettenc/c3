@@ -10,7 +10,7 @@ import { bytesToString, copyStringToClipboard, fromHexString, getProviderUrl, st
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { getFileForUser, getObj } from "@/utils/storage";
 import { loadPetitionSigners } from "@/utils/queries";
-import { IDKitWidget } from "@worldcoin/idkit";
+import { CredentialType, IDKitWidget } from "@worldcoin/idkit";
 import { ethers } from "ethers";
 import { Contract } from "ethers";
 import C3ABI from "../artifacts/C3.json";
@@ -91,7 +91,7 @@ function Petition(props: PetitionProps) {
           </div>
         </div>
       </div>
-      <div className="h-16 bg-white text-black fixed bottom-0 w-full z-10 shadow-bg-blur">
+      <div className="h-16 bg-white text-black fixed bottom-0 w-full z-5 shadow-bg-blur">
         <div className="flex w-full h-full px-6">
           <Link href="/" className="my-auto">
             <Button style="secondary" icon={<BackArrowIcon className="w-3 h-3" />}>
@@ -106,7 +106,7 @@ function Petition(props: PetitionProps) {
               merkle_root: string;
               nullifier_hash: string;
               proof: string;
-              credential_type: string;
+              credential_type: CredentialType;
             }) => {
               const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
               // This address is only for Base
@@ -144,7 +144,21 @@ function Petition(props: PetitionProps) {
             onClick={() => {
               showModal(
                 MODAL_TYPE.SHARE,
-                { url: window.location.href },
+                {
+                  url: window.location.href,
+                  title: metadata?.title,
+                  creator: creatorAlias
+                    ? creatorAlias +
+                      ` (${
+                        petition?.petitioner.substring(0, 6) +
+                        "..." +
+                        petition?.petitioner.substring(petition.petitioner.length - 4)
+                      })`
+                    : petition?.petitioner.substring(0, 6) +
+                      "..." +
+                      petition?.petitioner.substring(petition.petitioner.length - 4),
+                  images: metadata?.images
+                },
                 { title: "Share Petition", headerSeparator: false, border: false }
               );
             }}

@@ -83,7 +83,7 @@ function Modal({
     <>
       {/* Modal backdrop */}
       <Transition
-        className="fixed inset-0 bg-black bg-opacity-60 z-50 transition-opacity"
+        className="fixed inset-0 bg-black bg-opacity-60 z-9 transition-opacity"
         show={modalOpen}
         appear={true}
         enter="transition ease-out duration-200"
@@ -97,7 +97,7 @@ function Modal({
       {/* Modal dialog */}
       <Transition
         id={id}
-        className="fixed inset-0 z-50 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
+        className="fixed inset-0 z-9 overflow-hidden flex items-center my-4 justify-center px-4 sm:px-6"
         role="dialog"
         aria-modal="true"
         show={modalOpen}

@@ -31,7 +31,7 @@ function SignerCard(props: SignerCardProps) {
       <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md py-4">
         <div className="flex px-4">
           <div className="font-lg font-semibold mr-2">Signers</div>
-          <div className="bg-orange-50 text-orange-700 rounded-full px-3 text-sm my-auto">
+          <div className="font-medium bg-orange-50 text-orange-700 rounded-full px-3 text-sm my-auto">
             {petition?.signatures ?? 0}/{goal} signatures
           </div>
         </div>
@@ -56,7 +56,7 @@ function SignerCard(props: SignerCardProps) {
                   .map((signer: any, idx: number) => (
                     <tr key={`signer-${currentPage}-${idx}`} className="border-b border-gray-300">
                       <td className="pl-4 py-2">
-                        <Signer address={signer.signer} />
+                        <Signer address={signer.signer} verificationType={2} />
                       </td>
                       <td className="pr-4 py-2">{new Date(signer.timestamp * 1000).toLocaleDateString()}</td>
                     </tr>

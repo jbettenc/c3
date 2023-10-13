@@ -64,7 +64,7 @@ function Navbar(props: NavbarProps) {
           id="nav"
           className={`h-16 ${transparent ? "" : "border-b border-gray-300 bg-white "}flex flex-col lg:flex-row ${
             fixed ? "fixed " : ""
-          }z-10${!logoOnly ? " w-full" : ""}`}
+          }z-8${!logoOnly ? " w-full" : ""}`}
         >
           <div className={`w-full flex flex-col lg:flex-row mx-auto${applyMaxWidth ? " max-w-7xl" : ""}`}>
             <div id="nav-top" className="bg-transparent w-full px-4 lg:px-6">

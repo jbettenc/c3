@@ -10,10 +10,10 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useWeb3React } from "@web3-react/core";
 import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
-import { postUploadToStorage, useWeb3Storage } from "@/utils/storage";
+import { postUploadToStorage } from "@/utils/storage";
 import { ethers } from "ethers";
 import { v4 as uuidv4 } from "uuid";
-import { IDKitWidget } from "@worldcoin/idkit";
+import { CredentialType, IDKitWidget } from "@worldcoin/idkit";
 import { Contract } from "ethers";
 import C3ABI from "../../artifacts/C3.json";
 import { getBase64, getProviderUrl, storeNotif } from "@/utils/misc";
@@ -29,17 +29,80 @@ export function Create() {
   const [description, handleDescription] = useState("");
   const [step, handleStep] = useState(0);
   const [importState, handleImportState] = useState<File[]>([]);
-  const [cid, handleCid] = useState("");
+  const [metadata, handleMetadata] = useState<any>();
   const [hash, handleHash] = useState("");
   const { account, library } = useWeb3React();
-  const { showModal } = useGlobalModalContext();
-  const { storeObj } = useWeb3Storage();
+  const { showModal, hideModal } = useGlobalModalContext();
   const router = useRouter();
   const { alias } = useENS(account ?? "");
 
   useEffect(() => {
     handleHash(ethers.hashMessage(uuidv4()));
   }, []);
+
+  useEffect(() => {
+    if (!hash) {
+      return;
+    }
+    if (!metadata) {
+      showModal(
+        MODAL_TYPE.WORLD_ID_VERIFY,
+        {
+          idkitButton: (
+            <IDKitWidget
+              app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
+              action={`createPetition-${hash}`} // or signPetition
+              signal={account ?? ""}
+              handleVerify={async (e: {
+                merkle_root: string;
+                nullifier_hash: string;
+                proof: string;
+                credential_type: CredentialType;
+              }) => {
+                console.log(e);
+                // Only perform backend check if the credential type is phone. Orb performed on chain.
+                if (e.credential_type === CredentialType.Phone) {
+                  // const res = await fetch("backend/verify")
+                  // if(!res.success) {
+                  //   throw new Error(res.data);
+                  // }
+                }
+              }}
+              onSuccess={async (e: {
+                merkle_root: string;
+                nullifier_hash: string;
+                proof: string;
+                credential_type: string;
+              }) => {
+                const proof = [...[...AbiCoder.defaultAbiCoder().decode(["uint256[8]"], e.proof)][0]];
+                const md = {
+                  root: e.merkle_root,
+                  nullifierHash: e.nullifier_hash,
+                  proof: proof
+                };
+                handleMetadata(md);
+              }}
+              enableTelemetry
+            >
+              {({ open }) => (
+                <Button
+                  className="w-full sm:w-[49%]"
+                  onClick={async () => {
+                    open();
+                  }}
+                >
+                  Sign In with WorldCoin
+                </Button>
+              )}
+            </IDKitWidget>
+          )
+        },
+        { showHeader: false, border: false, hideOnPathnameChange: true, preventModalClose: true }
+      );
+    } else {
+      hideModal(true);
+    }
+  }, [metadata, hash]);
 
   useEffect(() => {
     (async () => {
@@ -240,114 +303,93 @@ export function Create() {
           <Button className="my-auto" style="secondary" disabled={step === 0} onClick={() => handleStep(step - 1)}>
             Back
           </Button>
-          <IDKitWidget
-            app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
-            action={`createPetition-${hash}`} // or signPetition
-            signal={account ?? ""}
-            onSuccess={async (e: {
-              merkle_root: string;
-              nullifier_hash: string;
-              proof: string;
-              credential_type: string;
-            }) => {
-              const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
-              // This address is only for Base
-              const contract = new Contract("0x36e3f7a8C88EE63740b50f7b87c069a74e461f85", C3ABI.abi, provider);
-              const instance = contract.connect(library.getSigner()) as Contract;
-              const proof = [...[...AbiCoder.defaultAbiCoder().decode(["uint256[8]"], e.proof)][0]];
-              const metadata = {
-                root: e.merkle_root,
-                nullifierHash: e.nullifier_hash,
-                proof: proof
-              };
-              try {
-                await instance.createPetition(hash, cid, metadata);
-              } catch (err: any) {
-                storeNotif("Error", err?.message ? err.message : err, "danger");
-              }
 
-              showModal(
-                MODAL_TYPE.SHARE,
-                { url: `${window.location.href.replace("create", "petition")}/${hash}` },
-                {
-                  title: "Share Petition",
-                  headerSeparator: false,
-                  border: false,
-                  onClose: () => router.push(`/petition/${hash}`)
+          <Button
+            className="my-auto ml-auto"
+            disabled={
+              step === 0 && (!title || title.trim().length === 0 || !description || description.trim().length === 0)
+            }
+            onClick={async () => {
+              if (step === 2) {
+                const tags = [{ name: "Application", value: "EthSignC3" }];
+                // prepare message to sign before upload
+                let payload = {
+                  address: account,
+                  title,
+                  description,
+                  images: await Promise.all(importState.map(async (f) => await getBase64(f)))
+                };
+
+                const messagePayload = {
+                  address: account,
+                  timestamp: new Date().toISOString(),
+                  version: "4.1",
+                  hash: ethers.hashMessage(
+                    JSON.stringify({
+                      data: payload
+                    })
+                  )
+                };
+
+                // messages converted to string before sign with statement prefix
+                const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
+                  messagePayload,
+                  null,
+                  2
+                )}`;
+
+                // sign signature with the messages in details
+                const signature = await library.provider.request({
+                  method: "personal_sign",
+                  params: [message, account]
+                });
+
+                // payload to upload arweave storage
+                const storagePayload: StoragePayload = {
+                  signature,
+                  message,
+                  data: JSON.stringify({
+                    data: payload
+                  }),
+                  tags,
+                  shouldVerify: true
+                };
+
+                // Upload to our Arweave endpoint
+                const storage = await postUploadToStorage(storagePayload);
+                if (!storage?.message || storage.message !== "success") {
+                  storeNotif("Error", "Failed to upload petition metadata to Arweave. Please try again.", "danger");
+                  return;
                 }
-              );
-            }}
-            enableTelemetry
-          >
-            {({ open }) => (
-              <Button
-                className="my-auto ml-auto"
-                disabled={
-                  step === 0 && (!title || title.trim().length === 0 || !description || description.trim().length === 0)
-                }
-                onClick={async () => {
-                  if (step === 2) {
-                    const tags = [{ name: "Application", value: "EthSignC3" }];
-                    // prepare message to sign before upload
-                    let payload = {
-                      address: account,
-                      title,
-                      description,
-                      images: await Promise.all(importState.map(async (f) => await getBase64(f)))
-                    };
+                const cid = storage.transaction.itemId ?? "";
 
-                    const messagePayload = {
-                      address: account,
-                      timestamp: new Date().toISOString(),
-                      version: "4.1",
-                      hash: ethers.hashMessage(
-                        JSON.stringify({
-                          data: payload
-                        })
-                      )
-                    };
-
-                    // messages converted to string before sign with statement prefix
-                    const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
-                      messagePayload,
-                      null,
-                      2
-                    )}`;
-
-                    // sign signature with the messages in details
-                    const signature = await library.provider.request({
-                      method: "personal_sign",
-                      params: [message, account]
-                    });
-
-                    // payload to upload arweave storage
-                    const storagePayload: StoragePayload = {
-                      signature,
-                      message,
-                      data: JSON.stringify({
-                        data: payload
-                      }),
-                      tags,
-                      shouldVerify: true
-                    };
-
-                    // Upload to our Arweave endpoint
-                    const storage = await postUploadToStorage(storagePayload);
-                    if (!storage?.message || storage.message !== "success") {
-                      storeNotif("Error", "Failed to upload petition metadata to Arweave. Please try again.", "danger");
-                      return;
+                // Trigger smart contract call
+                const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
+                // This address is only for Base
+                const contract = new Contract("0x36e3f7a8C88EE63740b50f7b87c069a74e461f85", C3ABI.abi, provider);
+                const instance = contract.connect(library.getSigner()) as Contract;
+                try {
+                  await instance.createPetition(hash, cid, metadata);
+                  showModal(
+                    MODAL_TYPE.SHARE,
+                    { url: `${window.location.href.replace("create", "petition")}/${hash}` },
+                    {
+                      title: "Share Petition",
+                      headerSeparator: false,
+                      border: false,
+                      onClose: () => router.push(`/petition/${hash}`)
                     }
-                    handleCid(storage.transaction.itemId ?? "");
-
-                    open();
-                  }
-                  handleStep(step + 1);
-                }}
-              >
-                {step === 0 ? "Next" : step === 1 ? "Preview Petition" : "Create and Share"}
-              </Button>
-            )}
-          </IDKitWidget>
+                  );
+                } catch (err: any) {
+                  storeNotif("Error", err?.message ? err.message : err, "danger");
+                }
+              } else {
+                handleStep(step + 1);
+              }
+            }}
+          >
+            {step === 0 ? "Next" : step === 1 ? "Preview Petition" : "Create and Share"}
+          </Button>
         </div>
       </div>
     </>

@@ -11,6 +11,15 @@ select {
     overflow: hidden;
 }
 
+/* Limits the height of the carousel images for the Share modal */
+.carousel-height-limit .carousel-wrapper,
+.carousel-height-limit .carousel,
+.carousel-height-limit .carousel > .slider-wrapper,
+.carousel-height-limit .carousel > .slider-wrapper > .slider img {
+  object-fit: cover;
+  max-height: 10rem;
+}
+
 
 /* Modal */
 .drawer {

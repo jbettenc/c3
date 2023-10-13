@@ -1,13 +1,8 @@
 import Navbar from "@/components/Navbar";
 import Landing from "@/components/landing/Landing";
-import { useWeb3React } from "@web3-react/core";
 import Head from "next/head";
-import { useDispatch } from "react-redux";
 
 export default function Home() {
-  const { account } = useWeb3React();
-  const dispatch = useDispatch();
-
   return (
     <>
       <Head>

@@ -21,6 +21,7 @@ interface ButtonProps {
   tabIndex?: number;
   type?: "button" | "submit" | "reset";
   stopPropagation?: boolean;
+  customColor?: string;
   id?: string;
 }
 
@@ -46,6 +47,7 @@ function Button(props: ButtonProps) {
     tabIndex = -1,
     type,
     stopPropagation = true,
+    customColor,
     id
   } = props;
 
@@ -159,7 +161,15 @@ function Button(props: ButtonProps) {
   } inline-flex items-center justify-center border ${rounded ? "rounded-full" : "rounded-md"} leading-5${
     shadow ? " shadow-sm " : ""
   }transition duration-150 ease-in-out`;
-  classes += " " + bgAndBorderColor() + " " + textColor() + " " + padding() + " " + disabledLoading();
+  classes +=
+    " " +
+    (customColor ? customColor : bgAndBorderColor()) +
+    " " +
+    textColor() +
+    " " +
+    padding() +
+    " " +
+    disabledLoading();
 
   if (grouped) {
     classes += " " + groupedStyles();
