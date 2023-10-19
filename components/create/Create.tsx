@@ -50,7 +50,7 @@ export function Create() {
         {
           idkitButton: (
             <IDKitWidget
-              app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
+              app_id="app_staging_0ff1142a912bb109636e597b70d6b978"
               action={`createPetition-${hash}`} // or signPetition
               signal={account ?? ""}
               handleVerify={async (e: {

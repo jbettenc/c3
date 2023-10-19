@@ -99,15 +99,24 @@ function Petition(props: PetitionProps) {
             </Button>
           </Link>
           <IDKitWidget
-            app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
-            action={`signPetition-${petition?.id ?? "0x00"}`}
+            app_id="app_staging_0ff1142a912bb109636e597b70d6b978"
+            action={`signPetition`}
+            action_description={`${petition?.id ?? "0x00"}`}
             signal={account ?? ""}
+            credential_types={[CredentialType.Phone]}
             onSuccess={async (e: {
               merkle_root: string;
               nullifier_hash: string;
               proof: string;
               credential_type: CredentialType;
             }) => {
+              console.log({
+                ...e,
+                petitionId: petition?.id ?? "",
+                action: "signPetition",
+                action_description: `${petition?.id ?? "0x00"}`,
+                signal: account ?? ""
+              });
               const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
               // This address is only for Base
               const contract = new Contract("0x36e3f7a8C88EE63740b50f7b87c069a74e461f85", C3ABI.abi, provider);
@@ -119,7 +128,7 @@ function Petition(props: PetitionProps) {
                 proof: proof
               };
               try {
-                await instance.signPetition(petition?.id ?? "", metadata);
+                instance.signPetition(petition?.id ?? "", metadata);
                 storeNotif("Success", "Petition signed.", "success");
               } catch (err: any) {
                 storeNotif("Error", err?.message ? err.message : err, "danger");
