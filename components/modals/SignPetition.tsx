@@ -182,13 +182,11 @@ function SignPetition(props: SignPetitionProps) {
                     "Content-Type": "application/json"
                   },
                   body: JSON.stringify({
-                    merkle_root: e.merkle_root,
-                    nullifier_hash: e.nullifier_hash,
-                    proof: e.proof,
-                    credential_type: "phone",
+                    ...e,
                     petitionId: petition?.id ?? "0x00",
                     action: "signPetition",
-                    action_description: petition?.id ?? "0x00"
+                    action_description: `${petition?.id ?? "0x00"}`,
+                    signal: account ?? ""
                   })
                 })
                   .then((res) => res.json())
