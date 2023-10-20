@@ -1,9 +1,5 @@
 import Image from "next/image";
-import DiscordIcon from "../../assets/Discord.svg";
-import TelegramIcon from "../../assets/Telegram.svg";
-import XIcon from "../../assets/X.svg";
 import Button from "@/ui/forms/Button";
-import { copyStringToClipboard, storeNotif } from "@/utils/misc";
 import WorldCoinLogo from "../../assets/WorldCoinLogo.svg";
 import Link from "next/link";
 

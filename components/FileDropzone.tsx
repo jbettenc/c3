@@ -31,8 +31,8 @@ function FileDropzone(props: FileDropzoneProps) {
         >
           <input {...getInputProps()} />
           {importState && importState.length > 0 ? (
-            <div className="flex flex-wrap mx-4 gap-2 mb-4 rounded-lg bg-transparent">
-              <div className="flex flex-col border border-gray-100 border-dashed rounded-md px-2 text-gray-500">
+            <div className="flex flex-wrap mx-4 gap-3 mb-4 rounded-lg bg-transparent">
+              <div className="flex flex-col border border-gray-100 border-dashed rounded-md px-2 text-gray-500 h-36 w-full xs:w-auto">
                 <div className="my-auto flex flex-col">
                   <UploadIconComponent className="mx-auto" />
                   <div className="mt-2 select-none mx-auto px-2">

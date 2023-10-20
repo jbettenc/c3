@@ -28,7 +28,7 @@ function Navbar(props: NavbarProps) {
     } else {
       handleChainId(-1);
     }
-  }, [chainId, library]);
+  }, [chainId, library, active]);
 
   useEffect(() => {
     let eventListener: any = null;

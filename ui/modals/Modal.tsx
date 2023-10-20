@@ -57,6 +57,7 @@ function Modal({
     const clickHandler = ({ target }: MouseEvent) => {
       if (!modalContent.current) return;
       if (!modalOpen || modalContent.current.contains(target as Node)) return;
+      if (getComputedStyle(target as HTMLElement).zIndex === "auto") return;
       if (onClose) {
         onClose();
       }

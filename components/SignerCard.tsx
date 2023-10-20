@@ -10,7 +10,6 @@ interface SignerCardProps {
 }
 
 function SignerCard(props: SignerCardProps) {
-  const GOAL = 100;
   const SIGNERS_PER_PAGE = 8;
   const { petition, signers } = props;
 

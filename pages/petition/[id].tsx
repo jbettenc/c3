@@ -92,6 +92,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       const obj = await getFileForUser(petition.cid);
       metadata = obj?.data ?? null;
     }
+
+    // TODO: Get signature counts (at least for tier 0 and 1 here)
+    // const signatures = await getSignaturesForPetition(arr);
   } catch (err) {}
 
   if (petition && metadata) {

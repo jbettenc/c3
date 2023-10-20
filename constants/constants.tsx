@@ -14,6 +14,7 @@ export const INJECTED_SUPPORTED_CHAIN_IDS = production ? [1, 137] : [1, 5, 137, 
 export const DEAL_CONTRACT_ADDRESS = production ? DEAL_CONTRACT_ADDRESS_MAINNET : DEAL_CONTRACT_ADDRESS_TESTNET;
 
 export const ETHSIGN_API_URL = "https://arweave-gateway.ethsign.xyz";
+export const ETHSIGN_PETITION_API_URL = "http://localhost:8000";
 
 export const GRAPHQL_URL = (chainId: string | number) => {
   switch (chainId) {

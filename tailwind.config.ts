@@ -91,9 +91,11 @@ module.exports = {
         "modal-bg": "#DAF2FF",
         color: "#000000",
         "modal-overlay": "rgba(0, 0, 0, 0.7)",
+        50: "#FDF7F3",
         300: "#ECBE9F",
         600: "#DD8D58",
         700: "#D97D40",
+        800: "#CD7134",
         900: "#CF5C10"
       },
       slate: colors.slate

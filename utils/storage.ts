@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 // @ts-ignore
 import { Web3Storage, Web3File } from "web3.storage/dist/bundle.esm.min.js";
 import { ArweavePayload, ResponseObject, StoragePayload, StorageResponse } from "@/types";
-import { ETHSIGN_API_URL } from "@/constants/constants";
+import { ETHSIGN_API_URL, ETHSIGN_PETITION_API_URL } from "@/constants/constants";
 
 export function makeStorageClient() {
   return new Web3Storage({
@@ -100,4 +100,30 @@ export const getFileForUser = async (id: string): Promise<ArweavePayload | null>
   }
 
   return ret?.transaction ? ret.transaction : ret;
+};
+
+/**
+ * Get the Tier 0 and 1 signature count from our backend.
+ *
+ * @param id - Petition ID.
+ * @returns Signature count or error message.
+ */
+export const getSignaturesForPetition = async (
+  id: string
+): Promise<{ error?: { message: string }; success?: boolean; message?: string } | null> => {
+  let ret: any = null;
+  try {
+    await fetch(`${ETHSIGN_PETITION_API_URL}/petition/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then((res) => res.json())
+      .then((response) => (ret = response ?? { error: { message: "No response" } }));
+  } catch (err: any) {
+    return { error: { message: err?.message ? err.message : err } };
+  }
+
+  return ret;
 };
