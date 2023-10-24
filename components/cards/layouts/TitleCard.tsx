@@ -10,12 +10,14 @@ interface TitleCardProps {
   title: string;
   petitioner: string;
   verificationStatus?: number; // 0 = none, 1 = phone, 2 = orb
-  signatures: number;
+  tier0Signatures?: number;
+  tier1Signatures?: number;
+  tier2Signatures?: number;
   onClick?: (e: React.MouseEvent) => void;
 }
 
 function TitleCard(props: TitleCardProps) {
-  const { verificationStatus = 1, signatures } = props;
+  const { verificationStatus = 1, tier0Signatures, tier1Signatures, tier2Signatures } = props;
   const { alias, avatar } = useENS(props.petitioner);
 
   return (
@@ -49,9 +51,13 @@ function TitleCard(props: TitleCardProps) {
 
           <div className="shrink-0 flex flex-col mt-2">
             <SignatureProgressBar
-              signatures={signatures ?? 0}
+              tier0Signatures={tier0Signatures ?? 0}
+              tier1Signatures={tier1Signatures ?? 0}
+              tier2Signatures={tier2Signatures ?? 0}
               showCount
-              color="bg-gradient-to-r from-purple-600 to-purple-500"
+              primaryColor="bg-purple-600"
+              secondaryColor="bg-purple-500"
+              tertiaryColor="bg-purple-400"
               customCountStyle={`${
                 verificationStatus === 2 ? "text-black" : "text-white"
               } text-xs font-medium text-left mt-2`}

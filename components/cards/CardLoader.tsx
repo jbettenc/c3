@@ -39,7 +39,9 @@ function CardLoader(props: CardLoaderProps) {
         image={metadata.images[0]}
         title={metadata.title}
         petitioner={props.petition.petitioner}
-        signatures={props.petition.signatures}
+        tier0Signatures={props.petition.tier0Signatures}
+        tier1Signatures={props.petition.tier1Signatures}
+        tier2Signatures={props.petition.tier2Signatures}
         onClick={() => router.push(`/petition/${props.petition.id}`)}
       />
     );
@@ -48,7 +50,9 @@ function CardLoader(props: CardLoaderProps) {
       <TitleCard
         title={metadata.title}
         petitioner={props.petition.petitioner}
-        signatures={props.petition.signatures}
+        tier0Signatures={props.petition.tier0Signatures}
+        tier1Signatures={props.petition.tier1Signatures}
+        tier2Signatures={props.petition.tier2Signatures}
         onClick={() => router.push(`/petition/${props.petition.id}`)}
       />
     );
