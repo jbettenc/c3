@@ -1,26 +1,17 @@
 import Button from "@/ui/forms/Button";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Carousel } from "react-responsive-carousel";
-import IdentIcon from "./common/IdentIcon";
 import { useWeb3React } from "@web3-react/core";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/root";
-import { bytesToString, copyStringToClipboard, fromHexString, getProviderUrl, storeNotif } from "@/utils/misc";
+import { useDispatch } from "react-redux";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { getFileForUser, getObj } from "@/utils/storage";
-import { loadPetitionSigners } from "@/utils/queries";
-import { CredentialType, IDKitWidget } from "@worldcoin/idkit";
-import { ethers } from "ethers";
-import { Contract } from "ethers";
-import C3ABI from "../artifacts/C3.json";
-import { AbiCoder } from "ethers";
+import { getUserSignedPetition, loadPetitionSigners } from "@/utils/queries";
 import { MODAL_TYPE, useGlobalModalContext } from "./context/ModalContext";
 import { IPetition, IPetitionMetadata } from "@/types";
 import SignerCard from "./SignerCard";
 import Link from "next/link";
 import { BackArrowIcon } from "./icons/BackArrowIcon";
-import { ETHSIGN_PETITION_API_URL } from "@/constants/constants";
+import { setOpenLoginModal } from "@/store/userSlice";
+import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 
 interface PetitionProps {
   petition?: IPetition;
@@ -30,21 +21,35 @@ interface PetitionProps {
 
 function Petition(props: PetitionProps) {
   const { petition, metadata, creatorAlias } = props;
-  const [testVal, handleTestVal] = useState("asdf");
   const [signers, handleSigners] = useState<any>([]);
-  const { account, library } = useWeb3React();
+  const [userSignedPetition, handleUserSignedPetition] = useState<boolean>();
+  // TODO: Load different signature types and display them
+  const { active, account, library } = useWeb3React();
   const { showModal } = useGlobalModalContext();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
-      if (petition?.cid) {
-        const signers = await loadPetitionSigners(petition.id);
+      if (petition?.id) {
+        const signers = await loadPetitionSigners(
+          active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID,
+          petition.id
+        );
         handleSigners(signers ?? undefined);
       } else {
         // storeNotif("Error", "Cannot locate petition.", "danger");
       }
     })();
   }, [petition]);
+
+  useEffect(() => {
+    (async () => {
+      if (petition?.id && account) {
+        const userSigned = await getUserSignedPetition(petition.id, account);
+        handleUserSignedPetition(userSigned);
+      }
+    })();
+  }, [petition, account]);
 
   return (
     <>
@@ -87,23 +92,28 @@ function Petition(props: PetitionProps) {
       </div>
       <div className="h-16 bg-white text-black fixed bottom-0 w-full z-5 shadow-bg-blur">
         <div className="flex w-full h-full px-6">
-          <Link href="/" className="my-auto">
+          <Link href="/" className="my-auto mr-auto">
             <Button style="secondary" icon={<BackArrowIcon className="w-3 h-3" />}>
               Back
             </Button>
           </Link>
-          <Button
-            className="my-auto ml-auto"
-            onClick={() => {
-              showModal(
-                MODAL_TYPE.SIGN_PETITION,
-                { petition: petition },
-                { showHeader: false, border: false, hideOnPathnameChange: true }
-              );
-            }}
-          >
-            Sign
-          </Button>
+          {!account || userSignedPetition === false ? (
+            <Button
+              className="my-auto"
+              onClick={() => {
+                if (!account) {
+                  dispatch(setOpenLoginModal(true));
+                }
+                showModal(
+                  MODAL_TYPE.SIGN_PETITION,
+                  { petition: petition },
+                  { showHeader: false, border: false, hideOnPathnameChange: true }
+                );
+              }}
+            >
+              Sign
+            </Button>
+          ) : null}
           <Button
             className="my-auto ml-2"
             style="secondary"

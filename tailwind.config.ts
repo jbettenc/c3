@@ -93,6 +93,7 @@ module.exports = {
         "modal-overlay": "rgba(0, 0, 0, 0.7)",
         50: "#FDF7F3",
         300: "#ECBE9F",
+        500: "#E29D70",
         600: "#DD8D58",
         700: "#D97D40",
         800: "#CD7134",

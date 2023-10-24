@@ -1,7 +1,8 @@
-const GRAPHQL_ENDPOINT = "https://api.studio.thegraph.com/query/49892/c3-base-goerli/v0.1.6";
+import { GRAPHQL_URL } from "@/constants/constants";
+import { IPetition } from "@/types";
 
-export const loadPetition = async (id: string) => {
-  let res: any = null;
+export const loadPetition = async (chainId: string | number, id: string): Promise<IPetition | null> => {
+  let res: IPetition | null = null;
   const query = `{
         petition(id: "${id}") {
             id
@@ -12,7 +13,7 @@ export const loadPetition = async (id: string) => {
           }
     }`;
 
-  await fetch(`${GRAPHQL_ENDPOINT}`, {
+  await fetch(`${GRAPHQL_URL(chainId)}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -23,24 +24,32 @@ export const loadPetition = async (id: string) => {
   })
     .then((res) => res.json())
     .then((response) => {
-      res = response?.data?.petition;
+      if (response?.data?.petition) {
+        res = {
+          id: response.data.petition.id,
+          cid: response.data.petition.cid,
+          petitioner: response.data.petition.petitioner,
+          tier2Signatures: response.data.petition.signatures,
+          timestamp: response.data.petition.timestamp
+        };
+      }
     });
 
   return res ?? null;
 };
 
-export const loadPetitionSigners = async (id: string) => {
+export const loadPetitionSigners = async (chainId: string | number, id: string) => {
   let res: any = null;
   const query = `{
     petitionSigneds(where: {petitionUuid: "${id}"}) {
       id
       petitionUuid
-      signer
+      conduit
       timestamp
     }
   }`;
 
-  await fetch(`${GRAPHQL_ENDPOINT}`, {
+  await fetch(`${GRAPHQL_URL(chainId)}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -57,7 +66,7 @@ export const loadPetitionSigners = async (id: string) => {
   return res ?? null;
 };
 
-export const getPetitions = async (count = 10) => {
+export const getPetitions = async (chainId: string | number, count = 10) => {
   let res: any = null;
   const query = `{
     petitions(orderBy: signatures, orderDirection: desc, first: ${count}) {
@@ -69,7 +78,7 @@ export const getPetitions = async (count = 10) => {
     }
   }`;
 
-  await fetch(`${GRAPHQL_ENDPOINT}`, {
+  await fetch(`${GRAPHQL_URL(chainId)}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -84,4 +93,37 @@ export const getPetitions = async (count = 10) => {
     });
 
   return res ?? null;
+};
+
+export const getUserSignedPetition = async (
+  chainId: string | number,
+  id: string,
+  account?: string
+): Promise<boolean> => {
+  if (!account) {
+    return false;
+  }
+
+  let res: boolean = false;
+  const query = `{
+    petitionSigneds(where: {signer: "${account}", petitionUuid: "${id}"}) {
+      id
+    }
+  }`;
+
+  await fetch(`${GRAPHQL_URL(chainId)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      query: query
+    })
+  })
+    .then((res) => res.json())
+    .then((response) => {
+      res = response?.data?.petitionSigneds?.length > 0 ?? false;
+    });
+
+  return res;
 };

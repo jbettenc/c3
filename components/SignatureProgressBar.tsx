@@ -1,8 +1,13 @@
+import TooltipWrapper from "@/ui/TooltipWrapper";
 import { useEffect, useState } from "react";
 
 interface SignatureProgressBarProps {
-  signatures: number;
-  color?: string;
+  tier0Signatures: number;
+  tier1Signatures: number;
+  tier2Signatures: number;
+  primaryColor?: string;
+  secondaryColor?: string;
+  tertiaryColor?: string;
   showPercent?: boolean;
   showCount?: boolean;
   customCountStyle?: string;
@@ -13,32 +18,66 @@ export const GOAL_STEPS = [
 ];
 
 function SignatureProgressBar(props: SignatureProgressBarProps) {
-  const { signatures = 0, color = "bg-orange-600", showPercent = false, showCount = false, customCountStyle } = props;
+  const {
+    tier0Signatures = 0,
+    tier1Signatures = 0,
+    tier2Signatures = 0,
+    primaryColor = "bg-primary-700",
+    secondaryColor = "bg-primary-500",
+    tertiaryColor = "bg-primary-300",
+    showPercent = false,
+    showCount = false,
+    customCountStyle
+  } = props;
   const [goal, handleGoal] = useState(5000000);
 
   useEffect(() => {
+    const signatures = tier0Signatures + tier1Signatures + tier2Signatures;
     for (const val of GOAL_STEPS) {
       if (val > signatures) {
-        console.log(signatures ?? 0);
         handleGoal(val);
-        console.log(val);
-        console.log((signatures ?? 0) / val);
         break;
       }
     }
-  }, [signatures]);
+  }, [tier0Signatures, tier1Signatures, tier2Signatures]);
 
   return (
     <>
-      <div className="my-auto mr-2 w-full bg-gray-200 rounded-full h-2.5">
-        <div className={`${color} h-2.5 rounded-full`} style={{ width: `${((signatures ?? 0) / goal) * 100}%` }}></div>
-      </div>
+      <TooltipWrapper
+        className="w-full my-auto mr-2"
+        size="lg"
+        text={`${tier2Signatures} Orb Verified Signature${
+          tier2Signatures !== 1 ? "s" : ""
+        } / ${tier1Signatures} Phone Verified Signature${
+          tier1Signatures !== 1 ? "s" : ""
+        } / ${tier0Signatures} Visitor${tier0Signatures !== 1 ? "s" : ""}`}
+      >
+        <div className="relative bg-gray-200 rounded-full h-2.5">
+          <div
+            className={`${tertiaryColor} h-2.5 rounded-full absolute`}
+            style={{
+              width: `${(((tier2Signatures ?? 0) + (tier1Signatures ?? 0) + (tier0Signatures ?? 0)) / goal) * 100}%`
+            }}
+          ></div>
+          <div
+            className={`${secondaryColor} h-2.5 rounded-full absolute`}
+            style={{ width: `${(((tier2Signatures ?? 0) + (tier1Signatures ?? 0)) / goal) * 100}%` }}
+          ></div>
+          <div
+            className={`${primaryColor} h-2.5 rounded-full absolute`}
+            style={{ width: `${((tier2Signatures ?? 0) / goal) * 100}%` }}
+          ></div>
+        </div>
+      </TooltipWrapper>
+
       {showPercent ? (
-        <div className="whitespace-nowrap font-medium">{Math.floor(((signatures ?? 0) / goal) * 100)}%</div>
+        <div className="whitespace-nowrap font-medium">
+          {Math.floor((((tier2Signatures ?? 0) + (tier1Signatures ?? 0) + (tier0Signatures ?? 0)) / goal) * 100)}%
+        </div>
       ) : null}
       {showCount ? (
         <div className={`${customCountStyle ? customCountStyle : "whitespace-nowrap font-medium"}`}>
-          {signatures ?? 0}/{goal} Signatures
+          {(tier2Signatures ?? 0) + (tier1Signatures ?? 0) + (tier0Signatures ?? 0)}/{goal} Signatures
         </div>
       ) : null}
     </>

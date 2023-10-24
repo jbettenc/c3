@@ -45,7 +45,9 @@ export interface IPetition {
   id: string;
   cid: string;
   petitioner: string;
-  signatures: number;
+  tier2Signatures: number;
+  tier0Signatures?: number;
+  tier1Signatures?: number;
   timestamp: string;
 }
 

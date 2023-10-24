@@ -23,6 +23,7 @@ import { BackArrowIcon } from "../icons/BackArrowIcon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useENS } from "@/utils/hooks/useENS";
+import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID } from "@/constants/constants";
 
 export function Create() {
   const [title, handleTitle] = useState("");
@@ -30,18 +31,20 @@ export function Create() {
   const [step, handleStep] = useState(0);
   const [importState, handleImportState] = useState<File[]>([]);
   const [metadata, handleMetadata] = useState<any>();
-  const [hash, handleHash] = useState("");
-  const { account, library } = useWeb3React();
+  const [hash, handleHash] = useState<string>();
+  const { active, account, library } = useWeb3React();
   const { showModal, hideModal } = useGlobalModalContext();
   const router = useRouter();
   const { alias } = useENS(account ?? "");
 
   useEffect(() => {
-    handleHash(ethers.hashMessage(uuidv4()));
-  }, []);
+    if (!hash) {
+      handleHash(ethers.hashMessage(uuidv4()));
+    }
+  }, [hash]);
 
   useEffect(() => {
-    if (!hash) {
+    if (!hash || !account) {
       return;
     }
     if (!metadata) {
@@ -59,13 +62,11 @@ export function Create() {
                 proof: string;
                 credential_type: CredentialType;
               }) => {
+                // TODO: Remove this console log
                 console.log(e);
                 // Only perform backend check if the credential type is phone. Orb performed on chain.
                 if (e.credential_type === CredentialType.Phone) {
-                  // const res = await fetch("backend/verify")
-                  // if(!res.success) {
-                  //   throw new Error(res.data);
-                  // }
+                  throw new Error("Only Orb Verified accounts can start a petition.");
                 }
               }}
               onSuccess={async (e: {
@@ -102,13 +103,7 @@ export function Create() {
     } else {
       hideModal(true);
     }
-  }, [metadata, hash]);
-
-  useEffect(() => {
-    (async () => {
-      console.log(await Promise.all(importState.map(async (f) => await getBase64(f))));
-    })();
-  }, [importState]);
+  }, [metadata, hash, account]);
 
   if (step < 2) {
     return (
@@ -365,8 +360,13 @@ export function Create() {
 
                 // Trigger smart contract call
                 const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
-                // This address is only for Base
-                const contract = new Contract("0x36e3f7a8C88EE63740b50f7b87c069a74e461f85", C3ABI.abi, provider);
+                const contract = new Contract(
+                  CONTRACT_ADDRESS(
+                    active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID
+                  ),
+                  C3ABI.abi,
+                  provider
+                );
                 const instance = contract.connect(library.getSigner()) as Contract;
                 try {
                   await instance.createPetition(hash, cid, metadata);

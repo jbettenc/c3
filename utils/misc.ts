@@ -244,6 +244,8 @@ export const getProviderUrl = async (library: any) => {
       return "https://eth-mainnet.alchemyapi.io/v2/xTrIufa8bBMhQmEc14yrjDOV0yKIka9r";
     case 5:
       return "https://goerli.infura.io/v3/59e38e7a0505462d810e0ac606665fd1";
+    case 137:
+      return "https://rpc.ankr.com/polygon";
     case 420:
       return "https://optimism-goerli.infura.io/v3/59e38e7a0505462d810e0ac606665fd1";
     case 80001:

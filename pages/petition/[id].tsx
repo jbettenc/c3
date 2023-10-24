@@ -1,9 +1,10 @@
 import Navbar from "@/components/Navbar";
 import Petition from "@/components/Petition";
+import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 import { IPetition, IPetitionMetadata } from "@/types";
 import { useENS } from "@/utils/hooks/useENS";
 import { loadPetition } from "@/utils/queries";
-import { getFileForUser } from "@/utils/storage";
+import { getFileForUser, getSignaturesForPetition } from "@/utils/storage";
 import { GetServerSidePropsContext } from "next";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
@@ -86,15 +87,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   try {
     const arr = id as string;
-    petition = await loadPetition(arr);
+    // TODO: We may need to pull petitions from different chains. Will need to modify URL to make this work.
+    // Currently defaulting to base testnet for petition loading
+    petition = await loadPetition(84531, arr);
+
+    if (petition) {
+      let lowerTierSignatures: any = await getSignaturesForPetition(arr);
+      lowerTierSignatures = lowerTierSignatures?.data ?? {};
+      petition = { ...petition, ...lowerTierSignatures };
+    }
 
     if (petition?.cid) {
       const obj = await getFileForUser(petition.cid);
       metadata = obj?.data ?? null;
     }
-
-    // TODO: Get signature counts (at least for tier 0 and 1 here)
-    // const signatures = await getSignaturesForPetition(arr);
   } catch (err) {}
 
   if (petition && metadata) {

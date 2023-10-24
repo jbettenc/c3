@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 // @ts-ignore
 import { Web3Storage, Web3File } from "web3.storage/dist/bundle.esm.min.js";
 import { ArweavePayload, ResponseObject, StoragePayload, StorageResponse } from "@/types";
-import { ETHSIGN_API_URL, ETHSIGN_PETITION_API_URL } from "@/constants/constants";
+import { ETHSIGN_API_URL, PETITION_API_URL } from "@/constants/constants";
 
 export function makeStorageClient() {
   return new Web3Storage({
@@ -110,17 +110,39 @@ export const getFileForUser = async (id: string): Promise<ArweavePayload | null>
  */
 export const getSignaturesForPetition = async (
   id: string
-): Promise<{ error?: { message: string }; success?: boolean; message?: string } | null> => {
+): Promise<{
+  error?: { message: string };
+  success?: boolean;
+  message?: string;
+  data?: { tier0Signatures: number; tier1Signatures: number };
+} | null> => {
   let ret: any = null;
   try {
-    await fetch(`${ETHSIGN_PETITION_API_URL}/petition/${id}`, {
-      method: "GET",
+    await fetch(`${PETITION_API_URL}/petition/${id}`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
-      }
+      },
+      body: JSON.stringify({
+        justCount: 1
+      })
     })
       .then((res) => res.json())
-      .then((response) => (ret = response ?? { error: { message: "No response" } }));
+      .then((response) => {
+        if (response && response.data === 1) {
+          // Data found for the given petition ID
+          ret = {
+            success: true,
+            data: { tier0Signatures: response.tier0Count, tier1Signatures: response.tier1Count }
+          };
+        } else if (response && response.data === 0) {
+          // No data present in the backend for the given petition ID
+          ret = { success: true, data: { tier0Signatures: 0, tier1Signatures: 0 } };
+        } else {
+          // Unknown error
+          ret = { error: { message: "No response" } };
+        }
+      });
   } catch (err: any) {
     return { error: { message: err?.message ? err.message : err } };
   }

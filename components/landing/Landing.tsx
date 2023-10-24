@@ -7,17 +7,27 @@ import { StartIcon } from "../icons/StartIcon";
 import { getPetitions } from "@/utils/queries";
 import CardLoader from "../cards/CardLoader";
 import Link from "next/link";
+import { useWeb3React } from "@web3-react/core";
+import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 
 function Landing() {
   const router = useRouter();
 
   const [petitions, handlePetitions] = useState<IPetition[]>([]);
 
+  const { active, library } = useWeb3React();
+
   useEffect(() => {
     (async () => {
-      handlePetitions(await getPetitions());
+      if (!library) {
+        handlePetitions(await getPetitions(DEFAULT_CHAIN_ID));
+      } else {
+        handlePetitions(
+          await getPetitions(active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID)
+        );
+      }
     })();
-  }, []);
+  }, [active, library]);
 
   return (
     <div className="w-full pb-16 md:pb-4">

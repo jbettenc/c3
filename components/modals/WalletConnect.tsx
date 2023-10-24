@@ -83,7 +83,7 @@ const WalletSelect = (props: WalletSelectProps) => {
               provider.connector,
               (e: Error) => {
                 if (e.message !== "Call init() first") {
-                  storeNotif("Wallet Connection Error", "", "danger");
+                  storeNotif("Wallet Connection Error", e.message, "danger");
                 }
               },
               false

@@ -17,8 +17,14 @@ function SignerCard(props: SignerCardProps) {
   const [goal, handleGoal] = useState(5000000);
 
   useEffect(() => {
+    if (!petition) {
+      handleGoal(5000000);
+      return;
+    }
+    const signatures =
+      (petition.tier0Signatures ?? 0) + (petition.tier1Signatures ?? 0) + (petition.tier2Signatures ?? 0);
     for (const val of GOAL_STEPS) {
-      if (val > (petition?.signatures ?? 0)) {
+      if (val > signatures) {
         handleGoal(val);
         break;
       }
@@ -31,11 +37,17 @@ function SignerCard(props: SignerCardProps) {
         <div className="flex px-4">
           <div className="font-lg font-semibold mr-2">Signers</div>
           <div className="font-medium bg-orange-50 text-orange-700 rounded-full px-3 text-sm my-auto">
-            {petition?.signatures ?? 0}/{goal} signatures
+            {(petition?.tier2Signatures ?? 0) + (petition?.tier1Signatures ?? 0) + (petition?.tier0Signatures ?? 0)}/
+            {goal} signatures
           </div>
         </div>
         <div className="flex px-4">
-          <SignatureProgressBar signatures={petition?.signatures ?? 0} showPercent />
+          <SignatureProgressBar
+            tier0Signatures={petition?.tier0Signatures ?? 0}
+            tier1Signatures={petition?.tier1Signatures ?? 0}
+            tier2Signatures={petition?.tier2Signatures ?? 0}
+            showPercent
+          />
         </div>
         <table>
           <thead>
@@ -55,7 +67,7 @@ function SignerCard(props: SignerCardProps) {
                   .map((signer: any, idx: number) => (
                     <tr key={`signer-${currentPage}-${idx}`} className="border-b border-gray-300">
                       <td className="pl-4 py-2">
-                        <Signer address={signer.signer} verificationType={2} />
+                        <Signer address={signer.conduit} verificationType={2} />
                       </td>
                       <td className="pr-4 py-2">{new Date(signer.timestamp * 1000).toLocaleDateString()}</td>
                     </tr>
@@ -64,7 +76,7 @@ function SignerCard(props: SignerCardProps) {
           </tbody>
         </table>
         <Pagination
-          total={Math.max(Math.floor(signers.length / SIGNERS_PER_PAGE), 1)}
+          total={Math.max(Math.floor((signers?.length ?? 0) / SIGNERS_PER_PAGE), 1)}
           currentPage={currentPage}
           handleCurrentPage={handleCurrentPage}
         />
