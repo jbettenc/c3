@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID, PETITION_API_URL } from "@/constants/constants";
 import { IPetition } from "@/types";
 import Button from "@/ui/forms/Button";
 import { getProviderUrl, storeNotif } from "@/utils/misc";
 import { useWeb3React } from "@web3-react/core";
-import { CredentialType, IDKitWidget } from "@worldcoin/idkit";
+import { CredentialType, IDKitWidget, useIDKit } from "@worldcoin/idkit";
 import { AbiCoder, Contract, ethers } from "ethers";
 import C3ABI from "../../artifacts/C3.json";
 import Image from "next/image";
@@ -22,8 +22,25 @@ function SignPetition(props: SignPetitionProps) {
   const { petition } = props;
   const [step, handleStep] = useState(0);
   const [loading, handleLoading] = useState(false);
+  const [credentialType, handleCredentialType] = useState<CredentialType[]>();
+  const [appId, handleAppId] = useState("app_staging_6ec3ea829a0d16fa66a44e9872b70153");
+  const [action, handleAction] = useState(`signPetition-${petition?.id ?? "0x00"}`);
   const { active, account, library } = useWeb3React();
   const { hideModal } = useGlobalModalContext();
+
+  useEffect(() => {
+    if (petition) {
+      handleAction(`signPetition-${petition.id ?? "0x00"}`);
+    }
+  }, [petition]);
+
+  const { open: idKitOpen, setOpen: setIdKitOpen } = useIDKit();
+
+  useEffect(() => {
+    if (credentialType) {
+      setIdKitOpen(true);
+    }
+  }, [credentialType]);
 
   if (loading) {
     return (
@@ -148,124 +165,126 @@ function SignPetition(props: SignPetitionProps) {
       </>
     );
   }
+
   return (
     <>
       <div className="flex flex-col p-8">
         <Image src={WorldCoinLogo} alt="WorldCoin" className="mx-auto" />
         <div className="text-lg font-medium text-center my-4">Select Your World ID Verification Type</div>
         <div className="w-full flex gap-4">
+          <div
+            className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
+            onClick={() => {
+              handleAppId("app_staging_6ec3ea829a0d16fa66a44e9872b70153");
+              handleCredentialType([CredentialType.Orb]);
+            }}
+          >
+            <WorldCoinIcon className="mx-auto w-6 h-6" />
+            <div className="text-sm font-medium leading-none">Orb Verified</div>
+          </div>
+          <div
+            className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
+            onClick={() => {
+              handleAppId("app_staging_0ff1142a912bb109636e597b70d6b978");
+              handleCredentialType([CredentialType.Phone]);
+            }}
+          >
+            <PhoneIcon className="mx-auto w-6 h-6" />
+            <div className="text-sm font-medium leading-none">Phone Verified</div>
+          </div>
           <IDKitWidget
-            app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
-            action={`signPetition-${petition?.id ?? "0x00"}`}
+            app_id={appId}
+            action={action}
             signal={account ?? ""}
-            credential_types={[CredentialType.Orb]}
+            credential_types={credentialType}
+            handleVerify={async (e: {
+              merkle_root: string;
+              nullifier_hash: string;
+              proof: string;
+              credential_type: CredentialType;
+            }) => {
+              // Only perform backend check if the credential type is phone. Orb performed on chain.
+              if (
+                e.credential_type === CredentialType.Phone &&
+                appId === "app_staging_6ec3ea829a0d16fa66a44e9872b70153"
+              ) {
+                throw new Error("Please use an Orb Verified account for on-chain petition signatures.");
+              }
+            }}
             onSuccess={async (e: {
               merkle_root: string;
               nullifier_hash: string;
               proof: string;
               credential_type: CredentialType;
             }) => {
-              const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
-              // This address is only for Base
-              const contract = new Contract(
-                CONTRACT_ADDRESS(active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID),
-                C3ABI.abi,
-                provider
-              );
-              const instance = contract.connect(library.getSigner()) as Contract;
-              const proof = [...[...AbiCoder.defaultAbiCoder().decode(["uint256[8]"], e.proof)][0]];
-              const metadata = {
-                root: e.merkle_root,
-                nullifierHash: e.nullifier_hash,
-                proof: proof
-              };
-              try {
-                handleLoading(true);
-                await instance.signPetition(petition?.id ?? "", metadata);
-                handleLoading(false);
-                storeNotif("Success", "Petition signed.", "success");
-                hideModal(true);
-              } catch (err: any) {
-                handleLoading(false);
-                storeNotif("Error", err?.message ? err.message : err, "danger");
+              if (e.credential_type === CredentialType.Orb) {
+                const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
+                // This address is only for Base
+                const contract = new Contract(
+                  CONTRACT_ADDRESS(
+                    active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID
+                  ),
+                  C3ABI.abi,
+                  provider
+                );
+                const instance = contract.connect(library.getSigner()) as Contract;
+                const proof = [...[...AbiCoder.defaultAbiCoder().decode(["uint256[8]"], e.proof)][0]];
+                const metadata = {
+                  root: e.merkle_root,
+                  nullifierHash: e.nullifier_hash,
+                  proof: proof
+                };
+                try {
+                  handleLoading(true);
+                  await instance.signPetition(petition?.id ?? "", metadata);
+                  handleLoading(false);
+                  storeNotif("Success", "Petition signed.", "success");
+                  hideModal(true);
+                } catch (err: any) {
+                  handleLoading(false);
+                  storeNotif("Error", err?.message ? err.message : err, "danger");
+                }
+              } else if (e.credential_type === CredentialType.Phone) {
+                try {
+                  // Call backend
+                  handleLoading(true);
+                  await fetch(`${PETITION_API_URL}/sign`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                      merkle_root: e.merkle_root,
+                      nullifier_hash: e.nullifier_hash,
+                      proof: e.proof,
+                      credential_type: "phone",
+                      petitionId: petition?.id ?? "0x00",
+                      action: `signPetition-${petition?.id ?? "0x00"}`,
+                      signal: account ?? ""
+                    })
+                  })
+                    .then((res) => res.json())
+                    .then((response) => {
+                      if (!response || response.error || !response.success) {
+                        storeNotif(
+                          "Error Signing Petition",
+                          response?.error ? response.error.message : response?.message ? response.message : response,
+                          "danger"
+                        );
+                        return;
+                      }
+                    })
+                    .finally(() => handleLoading(false));
+                  storeNotif("Success", "Petition signed.", "success");
+                  hideModal(true);
+                } catch (err: any) {
+                  handleLoading(false);
+                  storeNotif("Error Signing Petition", err?.message ? err.message : err, "danger");
+                }
               }
             }}
             enableTelemetry
-          >
-            {({ open }) => (
-              <div
-                className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
-                onClick={() => open()}
-              >
-                <WorldCoinIcon className="mx-auto w-6 h-6" />
-                <div className="text-sm font-medium leading-none">Orb Verified</div>
-              </div>
-            )}
-          </IDKitWidget>
-
-          <IDKitWidget
-            app_id="app_staging_0ff1142a912bb109636e597b70d6b978"
-            action={`signPetition-${petition?.id ?? "0x00"}`}
-            signal={account ?? ""}
-            credential_types={[CredentialType.Phone]}
-            onSuccess={async (e: {
-              merkle_root: string;
-              nullifier_hash: string;
-              proof: string;
-              credential_type: CredentialType;
-            }) => {
-              try {
-                // Call backend
-                handleLoading(true);
-                await fetch(`${PETITION_API_URL}/sign`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({
-                    merkle_root: e.merkle_root,
-                    nullifier_hash: e.nullifier_hash,
-                    proof: e.proof,
-                    credential_type: "phone",
-                    petitionId: petition?.id ?? "0x00",
-                    action: `signPetition-${petition?.id ?? "0x00"}`,
-                    signal: account ?? ""
-                  })
-                })
-                  .then((res) => res.json())
-                  .then((response) => {
-                    if (!response || response.error || !response.success) {
-                      storeNotif(
-                        "Error Signing Petition",
-                        response?.error ? response.error.message : response?.message ? response.message : response,
-                        "danger"
-                      );
-                      return;
-                    }
-
-                    // TODO: Handle successful response
-                  })
-                  .finally(() => handleLoading(false));
-                // await instance.signPetition(petition?.id ?? "", metadata);
-                storeNotif("Success", "Petition signed.", "success");
-                hideModal(true);
-              } catch (err: any) {
-                handleLoading(false);
-                storeNotif("Error Signing Petition", err?.message ? err.message : err, "danger");
-              }
-            }}
-            enableTelemetry
-          >
-            {({ open }) => (
-              <div
-                className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
-                onClick={() => open()}
-              >
-                <PhoneIcon className="mx-auto w-6 h-6" />
-                <div className="text-sm font-medium leading-none">Phone Verified</div>
-              </div>
-            )}
-          </IDKitWidget>
+          ></IDKitWidget>
         </div>
       </div>
     </>
