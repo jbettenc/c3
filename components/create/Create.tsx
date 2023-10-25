@@ -29,6 +29,7 @@ export function Create() {
   const [title, handleTitle] = useState("");
   const [description, handleDescription] = useState("");
   const [step, handleStep] = useState(0);
+  const [creating, handleCreating] = useState(false);
   const [importState, handleImportState] = useState<File[]>([]);
   const [metadata, handleMetadata] = useState<any>();
   const [hash, handleHash] = useState<string>();
@@ -62,12 +63,10 @@ export function Create() {
                 proof: string;
                 credential_type: CredentialType;
               }) => {
-                // TODO: Remove this console log
-                console.log(e);
                 // Only perform backend check if the credential type is phone. Orb performed on chain.
-                if (e.credential_type === CredentialType.Phone) {
-                  throw new Error("Only Orb Verified accounts can start a petition.");
-                }
+                // if (e.credential_type === CredentialType.Phone) {
+                //   throw new Error("Only Orb Verified accounts can start a petition.");
+                // }
               }}
               onSuccess={async (e: {
                 merkle_root: string;
@@ -300,12 +299,14 @@ export function Create() {
           </Button>
 
           <Button
+            loading={creating}
             className="my-auto ml-auto"
             disabled={
               step === 0 && (!title || title.trim().length === 0 || !description || description.trim().length === 0)
             }
             onClick={async () => {
               if (step === 2) {
+                handleCreating(true);
                 const tags = [{ name: "Application", value: "EthSignC3" }];
                 // prepare message to sign before upload
                 let payload = {
@@ -354,6 +355,7 @@ export function Create() {
                 const storage = await postUploadToStorage(storagePayload);
                 if (!storage?.message || storage.message !== "success") {
                   storeNotif("Error", "Failed to upload petition metadata to Arweave. Please try again.", "danger");
+                  handleCreating(false);
                   return;
                 }
                 const cid = storage.transaction.itemId ?? "";
@@ -386,6 +388,7 @@ export function Create() {
               } else {
                 handleStep(step + 1);
               }
+              handleCreating(false);
             }}
           >
             {step === 0 ? "Next" : step === 1 ? "Preview Petition" : "Create and Share"}

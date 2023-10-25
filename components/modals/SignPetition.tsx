@@ -236,7 +236,7 @@ function SignPetition(props: SignPetitionProps) {
                 };
                 try {
                   handleLoading(true);
-                  await instance.signPetition(petition?.id ?? "", metadata).then(async (tx) => await tx.wait(1));
+                  await instance.signPetition(petition?.id ?? "", metadata);
                   handleLoading(false);
                   storeNotif("Success", "Petition signed.", "success");
                   hideModal(true);
