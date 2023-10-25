@@ -11,6 +11,7 @@ import { GlobalModal } from "@/components/context/ModalContext";
 import BackgroundAndWalletSelectWrapper from "@/ui/wrappers/BackgroundWrapper";
 import { ReactNotifications } from "react-notifications-component";
 import ConnectorInitiator from "@/web3/ConnectorInitiator";
+import ChainIdLimiter from "@/web3/ChainIdLimiter";
 
 export default function App({ Component, pageProps }: AppProps) {
   const getLibrary = (provider: ExternalProvider) => {
@@ -26,8 +27,10 @@ export default function App({ Component, pageProps }: AppProps) {
           <ConnectorInitiator>
             <GlobalModal>
               <BackgroundAndWalletSelectWrapper>
-                <Component {...pageProps} />
-                <ReactNotifications />
+                <ChainIdLimiter>
+                  <Component {...pageProps} />
+                  <ReactNotifications />
+                </ChainIdLimiter>
               </BackgroundAndWalletSelectWrapper>
             </GlobalModal>
           </ConnectorInitiator>

@@ -2,9 +2,9 @@ import { InjectedConnector } from "@web3-react/injected-connector";
 import { TorusConnector } from "@web3-react/torus-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { WalletLinkConnector } from "@web3-react/walletlink-connector";
-import { INJECTED_SUPPORTED_CHAIN_IDS } from "../../constants/constants";
 
-export const injected = new InjectedConnector({ supportedChainIds: INJECTED_SUPPORTED_CHAIN_IDS });
+// No supported chain IDs on injected connector to allow any network to connect. We will request they change networks after connecting.
+export const injected = new InjectedConnector({});
 
 export const torus = new TorusConnector({
   chainId: 1,

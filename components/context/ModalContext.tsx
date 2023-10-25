@@ -1,19 +1,17 @@
 import React, { useState, createContext, useContext, useRef, useEffect } from "react";
-import { ConfirmView, Custom, Share, TransactionFlow, WalletSelect } from "../modals";
+import { ConfirmView, Custom, Share, SwitchNetwork, TransactionFlow, WalletSelect } from "../modals";
 import Modal, { ModalProps } from "@/ui/modals/Modal";
 import WorldIdVerify from "../modals/WorldIdVerify";
 import SignPetition from "../modals/SignPetition";
 
 export enum MODAL_TYPE {
   CONFIRM_VIEW = "CONFIRM_VIEW",
-  SEARCH_NFTS = "SEARCH_NFTS",
   TRANSACTION_FLOW = "TRANSACTION_FLOW",
-  VIEW_COLLECTION = "VIEW_COLLECTION",
-  VIEW_OFFER = "VIEW_OFFER",
   WALLET_SELECT = "WALLET_SELECT",
   WORLD_ID_VERIFY = "WORLD_ID_VERIFY",
   SIGN_PETITION = "SIGN_PETITION",
   SHARE = "SHARE",
+  SWITCH_NETWORK = "SWITCH_NETWORK",
   CUSTOM = "CUSTOM"
 }
 
@@ -24,6 +22,7 @@ const MODAL_COMPONENTS: any = {
   [MODAL_TYPE.WORLD_ID_VERIFY]: WorldIdVerify,
   [MODAL_TYPE.SIGN_PETITION]: SignPetition,
   [MODAL_TYPE.WALLET_SELECT]: WalletSelect,
+  [MODAL_TYPE.SWITCH_NETWORK]: SwitchNetwork,
   [MODAL_TYPE.CUSTOM]: Custom
 };
 
