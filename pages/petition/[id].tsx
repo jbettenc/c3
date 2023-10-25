@@ -88,8 +88,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   try {
     const arr = id as string;
     // TODO: We may need to pull petitions from different chains. Will need to modify URL to make this work.
-    // Currently defaulting to base testnet for petition loading
-    petition = await loadPetition(84531, arr);
+    // Currently defaulting to polygon testnet for petition loading
+    petition = await loadPetition(DEFAULT_CHAIN_ID, arr);
 
     if (petition) {
       let lowerTierSignatures: any = await getSignaturesForPetition(arr);
