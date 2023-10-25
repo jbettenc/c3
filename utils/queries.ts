@@ -1,5 +1,6 @@
 import { GRAPHQL_URL } from "@/constants/constants";
 import { IPetition } from "@/types";
+import { getSignaturesForPetitionsBatch } from "./storage";
 
 export const loadPetition = async (chainId: string | number, id: string): Promise<IPetition | null> => {
   let res: IPetition | null = null;
@@ -66,7 +67,7 @@ export const loadPetitionSigners = async (chainId: string | number, id: string) 
   return res ?? null;
 };
 
-export const getPetitions = async (chainId: string | number, count = 10) => {
+export const getPetitions = async (chainId: string | number, count = 10): Promise<IPetition[] | null> => {
   let res: any = null;
   const query = `{
     petitions(orderBy: signatures, orderDirection: desc, first: ${count}) {
@@ -88,8 +89,23 @@ export const getPetitions = async (chainId: string | number, count = 10) => {
     })
   })
     .then((res) => res.json())
-    .then((response) => {
+    .then(async (response) => {
       res = response?.data?.petitions;
+      if (response?.data?.petitions) {
+        const idList: string[] = response.data.petitions.map((petition: IPetition) => petition.id);
+        const lowerTierSignatures = await getSignaturesForPetitionsBatch(idList);
+        res = response.data.petitions.map((petition: any, idx: number) => {
+          return {
+            id: petition.id,
+            cid: petition.cid,
+            petitioner: petition.petitioner,
+            tier0Signatures: lowerTierSignatures?.data ? lowerTierSignatures.data[idx]?.tier0Count ?? 0 : 0,
+            tier1Signatures: lowerTierSignatures?.data ? lowerTierSignatures.data[idx]?.tier1Count ?? 0 : 0,
+            tier2Signatures: petition.signatures,
+            timestamp: petition.timestamp
+          };
+        });
+      }
     });
 
   return res ?? null;

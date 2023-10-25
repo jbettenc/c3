@@ -8,9 +8,10 @@ interface TooltipWrapperProps {
   size?: string;
   position?: string;
   text?: string;
+  hidden?: boolean;
 }
 
-function TooltipWrapper({ children, className, bg, size, position, text }: TooltipWrapperProps) {
+function TooltipWrapper({ children, className, bg, size, position, text, hidden }: TooltipWrapperProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   const positionOuterClasses = (position: string | undefined) => {
@@ -64,25 +65,27 @@ function TooltipWrapper({ children, className, bg, size, position, text }: Toolt
       >
         {children}
       </div>
-      <div className={`z-30 absolute ${positionOuterClasses(position)}`} onClick={(e) => e.stopPropagation()}>
-        <Transition
-          show={tooltipOpen}
-          appear={true}
-          unmountOnExit={false}
-          tag="div"
-          className={`rounded overflow-hidden ${
-            bg === "dark" ? "bg-slate-800" : "bg-white border border-slate-200 shadow-lg"
-          } ${sizeClasses(size)} ${positionInnerClasses(position)}`}
-          enter="transition ease-out duration-200 transform"
-          enterStart="opacity-0 -translate-y-2"
-          enterEnd="opacity-100 translate-y-0"
-          leave="transition ease-out duration-200"
-          leaveStart="opacity-100"
-          leaveEnd="opacity-0"
-        >
-          {text ? text : children}
-        </Transition>
-      </div>
+      {!hidden ? (
+        <div className={`z-30 absolute ${positionOuterClasses(position)}`} onClick={(e) => e.stopPropagation()}>
+          <Transition
+            show={tooltipOpen}
+            appear={true}
+            unmountOnExit={false}
+            tag="div"
+            className={`rounded overflow-hidden ${
+              bg === "dark" ? "bg-slate-800" : "bg-white border border-slate-200 shadow-lg"
+            } ${sizeClasses(size)} ${positionInnerClasses(position)}`}
+            enter="transition ease-out duration-200 transform"
+            enterStart="opacity-0 -translate-y-2"
+            enterEnd="opacity-100 translate-y-0"
+            leave="transition ease-out duration-200"
+            leaveStart="opacity-100"
+            leaveEnd="opacity-0"
+          >
+            {text ? text : children}
+          </Transition>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -13,7 +13,7 @@ import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 function Landing() {
   const router = useRouter();
 
-  const [petitions, handlePetitions] = useState<IPetition[]>([]);
+  const [petitions, handlePetitions] = useState<IPetition[] | null>([]);
 
   const { active, library } = useWeb3React();
 
@@ -62,9 +62,8 @@ function Landing() {
           <div className="font-bold font-poppins text-2xl">Petitions</div>
         </div>
         <div className="flex flex-wrap w-full gap-4">
-          {petitions.map((petition, idx) => (
-            <CardLoader petition={petition} key={`landing-petition-${idx}`} />
-          ))}
+          {petitions &&
+            petitions.map((petition, idx) => <CardLoader petition={petition} key={`landing-petition-${idx}`} />)}
         </div>
       </div>
     </div>

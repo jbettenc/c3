@@ -61,6 +61,7 @@ function TitleCard(props: TitleCardProps) {
               customCountStyle={`${
                 verificationStatus === 2 ? "text-black" : "text-white"
               } text-xs font-medium text-left mt-2`}
+              tooltipHidden={true}
             />
             <Button style="secondary" onClick={props.onClick} className="w-full mt-2">
               Sign Now

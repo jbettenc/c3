@@ -45,6 +45,7 @@ function ImageCard(props: ImageCardProps) {
               secondaryColor="bg-purple-500"
               tertiaryColor="bg-purple-400"
               customCountStyle={`text-white text-xs font-medium text-left mt-2`}
+              tooltipHidden={true}
             />
             <Button style="secondary" onClick={props.onClick} className="w-full mt-2">
               Sign Now

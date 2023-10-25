@@ -11,6 +11,7 @@ interface SignatureProgressBarProps {
   showPercent?: boolean;
   showCount?: boolean;
   customCountStyle?: string;
+  tooltipHidden?: boolean;
 }
 
 export const GOAL_STEPS = [
@@ -27,7 +28,8 @@ function SignatureProgressBar(props: SignatureProgressBarProps) {
     tertiaryColor = "bg-primary-300",
     showPercent = false,
     showCount = false,
-    customCountStyle
+    customCountStyle,
+    tooltipHidden
   } = props;
   const [goal, handleGoal] = useState(5000000);
 
@@ -44,7 +46,8 @@ function SignatureProgressBar(props: SignatureProgressBarProps) {
   return (
     <>
       <TooltipWrapper
-        className="w-full my-auto mr-2"
+        hidden={tooltipHidden}
+        className="w-full my-auto mr-2 text-black"
         size="lg"
         text={`${tier2Signatures} Orb Verified Signature${
           tier2Signatures !== 1 ? "s" : ""

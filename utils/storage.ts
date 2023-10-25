@@ -149,3 +149,43 @@ export const getSignaturesForPetition = async (
 
   return ret;
 };
+
+export const getSignaturesForPetitionsBatch = async (
+  ids: string[]
+): Promise<{
+  error?: { message: string };
+  success?: boolean;
+  message?: string;
+  data?: { tier0Count: number; tier1Count: number }[];
+} | null> => {
+  let ret: any = null;
+  try {
+    await fetch(`${PETITION_API_URL}/batch/petitions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        justCount: 1,
+        ids
+      })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response) {
+          // Data found for the given petition ID
+          ret = {
+            success: true,
+            data: response.petitions
+          };
+        } else {
+          // Unknown error
+          ret = { error: { message: "No response" } };
+        }
+      });
+  } catch (err: any) {
+    return { error: { message: err?.message ? err.message : err } };
+  }
+
+  return ret;
+};
