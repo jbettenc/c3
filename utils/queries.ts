@@ -1,6 +1,6 @@
 import { GRAPHQL_URL } from "@/constants/constants";
 import { IPetition } from "@/types";
-import { getSignaturesForPetitionsBatch } from "./storage";
+import { getSignaturesForPetition, getSignaturesForPetitionsBatch } from "./storage";
 
 export const loadPetition = async (chainId: string | number, id: string): Promise<IPetition | null> => {
   let res: IPetition | null = null;
@@ -41,6 +41,8 @@ export const loadPetition = async (chainId: string | number, id: string): Promis
 
 export const loadPetitionSigners = async (chainId: string | number, id: string) => {
   let res: any = null;
+
+  // Fetch tier 2 signers
   const query = `{
     petitionSigneds(where: {petitionUuid: "${id}"}) {
       id
@@ -61,8 +63,25 @@ export const loadPetitionSigners = async (chainId: string | number, id: string) 
   })
     .then((res) => res.json())
     .then((response) => {
-      res = response?.data?.petitionSigneds;
+      res = response?.data?.petitionSigneds.map((signer: any) => Object.assign(signer, { type: 2 }));
     });
+
+  // Fetch remaining signers
+  const lowerTierSigners = await getSignaturesForPetition(id, 0);
+  if (lowerTierSigners?.data) {
+    res = res.concat(
+      (lowerTierSigners.data as any[])
+        .filter((vote: any) => !!vote.address)
+        .map((vote: any) => {
+          return {
+            petitionUuid: id,
+            conduit: vote.address.toLowerCase(),
+            type: vote.type,
+            timestamp: Math.floor(new Date(vote.createdAt).getTime() / 1000)
+          };
+        })
+    );
+  }
 
   return res ?? null;
 };

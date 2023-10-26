@@ -109,12 +109,13 @@ export const getFileForUser = async (id: string): Promise<ArweavePayload | null>
  * @returns Signature count or error message.
  */
 export const getSignaturesForPetition = async (
-  id: string
+  id: string,
+  justCount = 1
 ): Promise<{
   error?: { message: string };
   success?: boolean;
   message?: string;
-  data?: { tier0Signatures: number; tier1Signatures: number };
+  data?: { tier0Signatures: number; tier1Signatures: number } | any[];
 } | null> => {
   let ret: any = null;
   try {
@@ -124,17 +125,24 @@ export const getSignaturesForPetition = async (
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        justCount: 1
+        justCount
       })
     })
       .then((res) => res.json())
       .then((response) => {
         if (response && response.data === 1) {
           // Data found for the given petition ID
-          ret = {
-            success: true,
-            data: { tier0Signatures: response.tier0Count, tier1Signatures: response.tier1Count }
-          };
+          if (justCount) {
+            ret = {
+              success: true,
+              data: { tier0Signatures: response.tier0Count, tier1Signatures: response.tier1Count }
+            };
+          } else {
+            ret = {
+              success: true,
+              data: response.petition.votes
+            };
+          }
         } else if (response && response.data === 0) {
           // No data present in the backend for the given petition ID
           ret = { success: true, data: { tier0Signatures: 0, tier1Signatures: 0 } };
@@ -151,7 +159,8 @@ export const getSignaturesForPetition = async (
 };
 
 export const getSignaturesForPetitionsBatch = async (
-  ids: string[]
+  ids: string[],
+  justCount = 1
 ): Promise<{
   error?: { message: string };
   success?: boolean;
@@ -166,7 +175,7 @@ export const getSignaturesForPetitionsBatch = async (
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        justCount: 1,
+        justCount,
         ids
       })
     })

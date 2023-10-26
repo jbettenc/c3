@@ -67,7 +67,7 @@ function SignerCard(props: SignerCardProps) {
                   .map((signer: any, idx: number) => (
                     <tr key={`signer-${currentPage}-${idx}`} className="border-b border-gray-300">
                       <td className="pl-4 py-2">
-                        <Signer address={signer.conduit} verificationType={2} />
+                        <Signer address={signer.conduit} verificationType={signer.type} />
                       </td>
                       <td className="pr-4 py-2">{new Date(signer.timestamp * 1000).toLocaleDateString()}</td>
                     </tr>
