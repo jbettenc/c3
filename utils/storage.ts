@@ -145,7 +145,11 @@ export const getSignaturesForPetition = async (
           }
         } else if (response && response.data === 0) {
           // No data present in the backend for the given petition ID
-          ret = { success: true, data: { tier0Signatures: 0, tier1Signatures: 0 } };
+          if (justCount) {
+            ret = { success: true, data: { tier0Signatures: 0, tier1Signatures: 0 } };
+          } else {
+            ret = { success: true, data: [] };
+          }
         } else {
           // Unknown error
           ret = { error: { message: "No response" } };

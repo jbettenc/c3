@@ -139,9 +139,9 @@ function SignPetition(props: SignPetitionProps) {
                           );
                           return;
                         }
+                        storeNotif("Success", "Petition signed.", "success");
                       })
                       .finally(() => handleLoading(false));
-                    storeNotif("Success", "Petition signed.", "success");
                     hideModal(true);
                   } catch (err: any) {
                     handleLoading(false);
@@ -274,9 +274,9 @@ function SignPetition(props: SignPetitionProps) {
                         );
                         return;
                       }
+                      storeNotif("Success", "Petition signed.", "success");
                     })
                     .finally(() => handleLoading(false));
-                  storeNotif("Success", "Petition signed.", "success");
                   hideModal(true);
                 } catch (err: any) {
                   handleLoading(false);
