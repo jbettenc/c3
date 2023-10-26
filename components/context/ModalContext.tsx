@@ -28,7 +28,7 @@ const MODAL_COMPONENTS: any = {
 
 type GlobalModalContext = {
   showModal: (modalType: MODAL_TYPE, modalProps?: any, modalWrapperProps?: any) => void;
-  hideModal: (closeAll?: boolean | undefined) => void;
+  hideModal: (closeAll?: boolean, bypassPreventClose?: boolean) => void;
   getTopModalType: () => MODAL_TYPE | undefined;
   store: any;
 };
@@ -72,8 +72,8 @@ export const GlobalModal = ({ children }: any) => {
     });
   };
 
-  const hideModal = (closeAll?: boolean | undefined) => {
-    if (!store.modalWrapperProps?.preventModalClose) {
+  const hideModal = (closeAll?: boolean, bypassPreventClose?: boolean) => {
+    if (!store.modalWrapperProps?.preventModalClose || bypassPreventClose) {
       if (closeAll) {
         openedModals.current = [];
         setStore({

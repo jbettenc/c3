@@ -25,7 +25,7 @@ function ImageCard(props: ImageCardProps) {
           <img
             src={props.image}
             alt={props.title}
-            className="rounded-lg mx-auto min-h-[4rem] h-full min-w-[9.75rem] max-w-full shrink object-cover"
+            className="rounded-lg mx-auto min-h-[4rem] h-full min-w-[9.75rem] max-w-full shrink object-contain"
           />
           <div className="text-center my-3 font-semibold text-xs text-[#FFC4C9]">
             {alias

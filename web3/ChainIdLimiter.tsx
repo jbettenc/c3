@@ -18,7 +18,7 @@ function ChainIdLimiter(props: any) {
           }
         } else {
           if (getTopModalType() === MODAL_TYPE.SWITCH_NETWORK) {
-            hideModal();
+            hideModal(false, true);
           }
         }
       };
