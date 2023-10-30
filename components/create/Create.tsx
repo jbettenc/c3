@@ -308,12 +308,13 @@ export function Create() {
               if (step === 2) {
                 handleCreating(true);
                 const tags = [{ name: "Application", value: "EthSignC3" }];
+                const images = await Promise.all(importState.map(async (f) => await getBase64(f)));
                 // prepare message to sign before upload
                 let payload = {
                   address: account,
                   title,
                   description,
-                  images: await Promise.all(importState.map(async (f) => await getBase64(f)))
+                  images
                 };
 
                 const messagePayload = {
@@ -374,7 +375,12 @@ export function Create() {
                   await instance.createPetition(hash, cid, metadata);
                   showModal(
                     MODAL_TYPE.SHARE,
-                    { url: `${window.location.href.replace("create", "petition")}/${hash}` },
+                    {
+                      url: `${window.location.href.replace("create", "petition")}/${hash}`,
+                      title,
+                      address: account,
+                      images
+                    },
                     {
                       title: "Share Petition",
                       headerSeparator: false,
