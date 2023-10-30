@@ -9,7 +9,7 @@ const CONTRACT_ADDRESS_POLYGON_MUMBAI = "0x8D92827CdB67A503e9FB21B28a58F9dAb36B4
 const CONTRACT_ADDRESS_TESTNET = "0x36e3f7a8C88EE63740b50f7b87c069a74e461f85";
 const GRAPHQL_URL_MAINNET = "https://api.studio.thegraph.com/query/33336/deal-mainnet/v0.1.9.2";
 const GRAPHQL_URL_POLYGON = "https://api.studio.thegraph.com/query/49892/c3-polygon/v0.0.1";
-const GRAPHQL_URL_POLYGON_MUMBAI = "https://api.studio.thegraph.com/query/49892/c3-mumbai/v0.0.4";
+const GRAPHQL_URL_POLYGON_MUMBAI = "https://api.studio.thegraph.com/query/49892/c3-mumbai/v0.0.5";
 // const GRAPHQL_URL_MAINNET = "https://api.studio.thegraph.com/query/33336/deal-mainnet-staging/v0.1.9.2";
 const GRAPHQL_URL_TESTNET = "https://api.studio.thegraph.com/query/49892/c3-base-goerli/v0.1.6";
 
