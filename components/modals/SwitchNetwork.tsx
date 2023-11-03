@@ -1,9 +1,12 @@
 import Button from "@/ui/forms/Button";
 import { WarningIcon } from "../icons/WarningIcon";
 
-interface SwitchNetworkProps {}
+interface SwitchNetworkProps {
+  switchChain: () => void;
+}
 
 function SwitchNetwork(props: SwitchNetworkProps) {
+  const { switchChain } = props;
   return (
     <>
       <div className="flex flex-col p-8 gap-4">
@@ -16,16 +19,7 @@ function SwitchNetwork(props: SwitchNetworkProps) {
           filled={false}
           shadow={false}
           onClick={() => {
-            const { ethereum } = window as any;
-            ethereum &&
-              ethereum.request({
-                method: "wallet_switchEthereumChain",
-                params: [
-                  {
-                    chainId: "0x13881" // hex for polygon mumbai
-                  }
-                ]
-              });
+            switchChain && switchChain();
           }}
         >
           Switch to Polygon Testnet

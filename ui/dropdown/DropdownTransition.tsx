@@ -1,4 +1,4 @@
-import Transition from "@/utils/Transition";
+import Transition from "@/ui/Transition";
 
 interface DropdownTransitionProps {
   className?: string;

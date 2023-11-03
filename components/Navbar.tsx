@@ -16,19 +16,6 @@ function Navbar(props: NavbarProps) {
   const { logoOnly = false, applyMaxWidth = true, fixed = true, transparent = false } = props;
 
   const [subMenuActive, handleSubMenuActive] = useState(-1);
-  const [chainId, handleChainId] = useState(-1);
-
-  const { active, library } = useWeb3React();
-
-  useEffect(() => {
-    if (active) {
-      (async () => {
-        handleChainId((await library.getNetwork()).chainId);
-      })();
-    } else {
-      handleChainId(-1);
-    }
-  }, [chainId, library, active]);
 
   useEffect(() => {
     let eventListener: any = null;

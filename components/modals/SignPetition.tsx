@@ -13,6 +13,7 @@ import Link from "next/link";
 import { WorldCoinIcon } from "../icons/WorldCoinLogo";
 import { PhoneIcon } from "../icons/PhoneIcon";
 import { useGlobalModalContext } from "../context/ModalContext";
+import { getLibrary } from "@/web3/utils";
 
 interface SignPetitionProps {
   petition?: IPetition;
@@ -25,7 +26,7 @@ function SignPetition(props: SignPetitionProps) {
   const [credentialType, handleCredentialType] = useState<CredentialType[]>();
   const [appId, handleAppId] = useState("app_staging_6ec3ea829a0d16fa66a44e9872b70153");
   const [action, handleAction] = useState(`signPetition-${petition?.id ?? "0x00"}`);
-  const { active, account, library } = useWeb3React();
+  const { account, chainId, connector } = useWeb3React();
   const { hideModal } = useGlobalModalContext();
 
   useEffect(() => {
@@ -85,6 +86,9 @@ function SignPetition(props: SignPetitionProps) {
                 style="secondary"
                 className="w-full"
                 onClick={async () => {
+                  if (!connector.provider) {
+                    return;
+                  }
                   let payload = {
                     address: account
                   };
@@ -108,7 +112,7 @@ function SignPetition(props: SignPetitionProps) {
                   )}`;
 
                   // sign signature with the messages in details
-                  const signature = await library.provider.request({
+                  const signature = await connector.provider.request({
                     method: "personal_sign",
                     params: [message, account]
                   });
@@ -218,16 +222,15 @@ function SignPetition(props: SignPetitionProps) {
               credential_type: CredentialType;
             }) => {
               if (e.credential_type === CredentialType.Orb) {
-                const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
+                if (!connector.provider) {
+                  storeNotif("Error", "No wallet connected.", "danger");
+                  return;
+                }
+                const provider = new ethers.JsonRpcProvider(await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID));
                 // This address is only for Base
-                const contract = new Contract(
-                  CONTRACT_ADDRESS(
-                    active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID
-                  ),
-                  C3ABI.abi,
-                  provider
-                );
-                const instance = contract.connect(library.getSigner()) as Contract;
+                const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
+                const library = getLibrary(connector.provider);
+                const instance = contract.connect(library.getSigner() as any) as Contract;
                 const proof = [...[...AbiCoder.defaultAbiCoder().decode(["uint256[8]"], e.proof)][0]];
                 const metadata = {
                   root: e.merkle_root,

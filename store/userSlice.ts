@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface UserState {
-  loginType?: "injected" | "torus" | "walletConnect" | "walletLink";
+  loginType?: "metaMask" | "walletConnect" | "coinbaseWallet";
   openLoginModal: boolean;
 }
 
@@ -9,7 +9,7 @@ const userSlice = createSlice({
   name: "auth",
   initialState: {
     openLoginModal: false,
-    loginType: "injected",
+    loginType: "metaMask",
     ethAlias: undefined,
     ethAvatar: undefined
   } as UserState,

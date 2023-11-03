@@ -233,12 +233,7 @@ export function storeNotif(subject: string, message: string, type: NOTIFICATION_
   });
 }
 
-export const getProviderUrl = async (library: any) => {
-  let chainId = 1;
-  if (library) {
-    chainId = (await library.getNetwork()).chainId;
-  }
-
+export const getProviderUrl = async (chainId: number) => {
   switch (chainId) {
     case 1:
       return "https://eth-mainnet.alchemyapi.io/v2/xTrIufa8bBMhQmEc14yrjDOV0yKIka9r";

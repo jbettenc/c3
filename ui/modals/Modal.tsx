@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { useRouter } from "next/router";
-import Transition from "@/utils/Transition";
+import Transition from "@/ui/Transition";
 import { useGlobalModalContext } from "@/components/context/ModalContext";
 
 export interface ModalProps {

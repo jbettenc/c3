@@ -17,13 +17,12 @@ import { RootState } from "@/store/root";
 import { useENS } from "@/utils/hooks/useENS";
 
 function DropdownUser() {
-  const { active, account, deactivate } = useWeb3React();
-  const connector: any = useWeb3React().connector;
+  const { isActive, account, connector } = useWeb3React();
   const dispatch = useDispatch();
   const router = useRouter();
   const { alias, avatar } = useENS(account ?? "");
 
-  if (!active) {
+  if (!isActive) {
     return (
       <>
         <Button
@@ -105,34 +104,6 @@ function DropdownUser() {
             </div>
             <UserDisplay accountData={{ ethAvatar: avatar, ethAlias: alias }} />
           </div>
-          {!!connector?.torus && (
-            <div className="flex justify-center my-4 gap-4">
-              <Button
-                style="secondary"
-                icon={<OpenWalletIcon className="fill-current" />}
-                tabIndex={-1}
-                id="user-menu-item-2"
-                onClick={() => {
-                  connector.torus.showWallet("home");
-                }}
-              >
-                Open Wallet
-              </Button>
-              <Button
-                style="secondary"
-                icon={<DollarIcon className="fill-current" />}
-                tabIndex={-1}
-                id="user-menu-item-2"
-                onClick={() => {
-                  connector.torus.initiateTopup("moonpay", {
-                    selectedAddress: account
-                  });
-                }}
-              >
-                Deposit
-              </Button>
-            </div>
-          )}
 
           <div className="h-px bg-gray-300"></div>
 
@@ -163,8 +134,12 @@ function DropdownUser() {
             onClick={async (e: any) => {
               e.preventDefault();
               e.stopPropagation();
-              deactivate();
-              dispatch(setLoginType(""));
+              if (connector?.deactivate) {
+                connector.deactivate();
+              } else {
+                connector.resetState();
+              }
+              dispatch(setLoginType(undefined));
             }}
           >
             <div className="flex-col justify-start mr-4 my-auto">

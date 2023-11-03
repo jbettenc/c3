@@ -24,23 +24,20 @@ function Petition(props: PetitionProps) {
   const [signers, handleSigners] = useState<any>([]);
   const [userSignedPetition, handleUserSignedPetition] = useState<boolean>();
   // TODO: Load different signature types and display them
-  const { active, account, library } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const { showModal } = useGlobalModalContext();
   const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
       if (petition?.id) {
-        const signers = await loadPetitionSigners(
-          active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID,
-          petition.id
-        );
+        const signers = await loadPetitionSigners(chainId ?? DEFAULT_CHAIN_ID, petition.id);
         handleSigners(signers ?? undefined);
       } else {
         // storeNotif("Error", "Cannot locate petition.", "danger");
       }
     })();
-  }, [petition]);
+  }, [petition, chainId]);
 
   useEffect(() => {
     (async () => {

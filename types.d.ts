@@ -5,9 +5,9 @@ import { TorusConnector } from "@web3-react/torus-connector";
 export interface Provider {
   id: string;
   name: string;
-  type: "injected" | "torus" | "walletConnect" | "walletLink";
+  type: "metaMask" | "walletConnect" | "coinbaseWallet";
   description?: string;
-  connector: AbstractConnector | TorusConnector;
+  connector: MetaMask | WalletConnectV2 | CoinbaseWallet;
   logos?: ((props: SVGProps<SVGSVGElement>) => JSX.Element)[];
   check: string;
 }

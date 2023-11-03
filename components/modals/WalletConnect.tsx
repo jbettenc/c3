@@ -1,8 +1,9 @@
 import { useWeb3React } from "@web3-react/core";
 import { useCallback, useEffect } from "react";
-import { WALLET_CONNECT, COINBASE, METAMASK, TORUS } from "../../utils/web3/providers";
 import { Provider as ProviderType } from "../../types";
 import { guidGenerator, storeNotif } from "../../utils/misc";
+import { DEFAULT_CHAIN_ID } from "@/constants/constants";
+import { METAMASK, WALLET_CONNECT, COINBASE } from "@/web3/providers";
 
 interface ProviderProps {
   name: string;
@@ -58,17 +59,17 @@ const Divider = () => {
 
 const WalletSelect = (props: WalletSelectProps) => {
   const { handleLoginType, onClose, open } = props;
-  const { activate, active } = useWeb3React();
+  const { isActive } = useWeb3React();
 
   useEffect(() => {
-    if (active) {
+    if (isActive) {
       if (onClose) {
         onClose();
       }
     }
-  }, [active, onClose]);
+  }, [isActive, onClose]);
 
-  const providers = [METAMASK, WALLET_CONNECT, COINBASE, undefined, TORUS];
+  const providers = [METAMASK, undefined, WALLET_CONNECT, COINBASE];
 
   const renderProvider = useCallback(
     (provider: ProviderType | undefined) =>
@@ -79,22 +80,20 @@ const WalletSelect = (props: WalletSelectProps) => {
           logos={provider.logos}
           description={provider.description}
           onClick={() => {
-            activate(
-              provider.connector,
-              (e: Error) => {
+            provider.connector
+              .activate(DEFAULT_CHAIN_ID)
+              .then(() => handleLoginType(provider.id))
+              .catch((e: Error) => {
                 if (e.message !== "Call init() first") {
                   storeNotif("Wallet Connection Error", e.message, "danger");
                 }
-              },
-              false
-            );
-            handleLoginType(provider.id);
+              });
           }}
         />
       ) : (
         <Divider key={guidGenerator()} />
       ),
-    [handleLoginType, activate]
+    [handleLoginType]
   );
 
   return (

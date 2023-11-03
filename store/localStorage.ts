@@ -9,7 +9,7 @@ export function loadState(): any | undefined {
     // We will cache ENS data for 1 day locally to prevent 429s.
     if (json?.ens?.ensState) {
       for (const key of Object.keys(json.ens.ensState)) {
-        if (json.ens[key].timestamp < Date.now() - 86400000) {
+        if (json.ens.ensState[key].timestamp < Date.now() - 86400000) {
           delete json.ens[key];
         }
       }

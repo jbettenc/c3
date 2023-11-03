@@ -15,19 +15,13 @@ function Landing() {
 
   const [petitions, handlePetitions] = useState<IPetition[] | null>([]);
 
-  const { active, library } = useWeb3React();
+  const { chainId } = useWeb3React();
 
   useEffect(() => {
     (async () => {
-      if (!library) {
-        handlePetitions(await getPetitions(DEFAULT_CHAIN_ID));
-      } else {
-        handlePetitions(
-          await getPetitions(active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID)
-        );
-      }
+      handlePetitions(await getPetitions(chainId ?? DEFAULT_CHAIN_ID));
     })();
-  }, [active, library]);
+  }, [chainId]);
 
   return (
     <div className="w-full pb-16 md:pb-4">

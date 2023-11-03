@@ -1,4 +1,4 @@
-import Transition from "@/utils/Transition";
+import Transition from "@/ui/Transition";
 import React, { useState } from "react";
 
 interface TooltipProps {

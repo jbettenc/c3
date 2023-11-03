@@ -24,6 +24,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useENS } from "@/utils/hooks/useENS";
 import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID } from "@/constants/constants";
+import { getLibrary } from "@/web3/utils";
 
 export function Create() {
   const [title, handleTitle] = useState("");
@@ -33,7 +34,7 @@ export function Create() {
   const [importState, handleImportState] = useState<File[]>([]);
   const [metadata, handleMetadata] = useState<any>();
   const [hash, handleHash] = useState<string>();
-  const { active, account, library } = useWeb3React();
+  const { account, chainId, connector } = useWeb3React();
   const { showModal, hideModal } = useGlobalModalContext();
   const router = useRouter();
   const { alias } = useENS(account ?? "");
@@ -306,6 +307,11 @@ export function Create() {
             }
             onClick={async () => {
               if (step === 2) {
+                if (!connector.provider) {
+                  storeNotif("Error", "No wallet connected.", "danger");
+                  return;
+                }
+
                 handleCreating(true);
                 const tags = [{ name: "Application", value: "EthSignC3" }];
                 const images = await Promise.all(importState.map(async (f) => await getBase64(f)));
@@ -336,10 +342,10 @@ export function Create() {
                 )}`;
 
                 // sign signature with the messages in details
-                const signature = await library.provider.request({
+                const signature = (await connector.provider.request({
                   method: "personal_sign",
                   params: [message, account]
-                });
+                })) as string;
 
                 // payload to upload arweave storage
                 const storagePayload: StoragePayload = {
@@ -362,15 +368,10 @@ export function Create() {
                 const cid = storage.transaction.itemId ?? "";
 
                 // Trigger smart contract call
-                const provider = new ethers.JsonRpcProvider(await getProviderUrl(library));
-                const contract = new Contract(
-                  CONTRACT_ADDRESS(
-                    active ? (await library.getNetwork()).chainId ?? DEFAULT_CHAIN_ID : DEFAULT_CHAIN_ID
-                  ),
-                  C3ABI.abi,
-                  provider
-                );
-                const instance = contract.connect(library.getSigner()) as Contract;
+                const provider = new ethers.JsonRpcProvider(await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID));
+                const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
+                const library = getLibrary(connector.provider);
+                const instance = contract.connect(library.getSigner() as any) as Contract;
                 try {
                   await instance.createPetition(hash, cid, metadata);
                   showModal(
