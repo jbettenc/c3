@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { IPetition } from "@/types";
 import Button from "@/ui/forms/Button";
-import { useRouter } from "next/router";
-import { SearchIcon } from "../icons/SearchIcon";
 import { StartIcon } from "../icons/StartIcon";
 import { getPetitions } from "@/utils/queries";
 import CardLoader from "../cards/CardLoader";
 import Link from "next/link";
 import { useWeb3React } from "@web3-react/core";
 import { DEFAULT_CHAIN_ID } from "@/constants/constants";
+import dynamic from "next/dynamic";
+
+// Uses ResizeObserver, which can only render on the frontend.
+const HorizontalScrollContainer = dynamic(() => import("@/ui/HorizontalScrollContainer"), {
+  ssr: false
+});
 
 function Landing() {
-  const router = useRouter();
-
   const [petitions, handlePetitions] = useState<IPetition[] | null>([]);
 
   const { chainId } = useWeb3React();
@@ -52,13 +54,20 @@ function Landing() {
             Search for a Petition
           </Button> */}
         </div>
-        <div className="flex flex-row w-full text-black mt-12">
-          <div className="font-bold font-poppins text-2xl">Petitions</div>
-        </div>
-        <div className="flex flex-wrap w-full gap-4">
-          {petitions &&
-            petitions.map((petition, idx) => <CardLoader petition={petition} key={`landing-petition-${idx}`} />)}
-        </div>
+        <HorizontalScrollContainer
+          title="Petitions"
+          items={
+            petitions &&
+            petitions.map((petition, idx) => (
+              <div
+                key={`item-${idx}`}
+                className="grow shrink-0 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5 overflow-hidden px-2"
+              >
+                <CardLoader petition={petition} key={`landing-petition-${idx}`} />
+              </div>
+            ))
+          }
+        />
       </div>
     </div>
   );

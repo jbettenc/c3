@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import DropdownUser from "./dropdown/DropdownUser";
 import Link from "next/link";
-import { useWeb3React } from "@web3-react/core";
 import Image from "next/image";
 import Logo from "../assets/logo.svg";
 

@@ -20,6 +20,17 @@ select {
   max-height: 10rem;
 }
 
+.hidden-scroll, .horizontal-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+  -webkit-overflow-scrolling: touch;
+}
+
+.hidden-scroll::-webkit-scrollbar, .horizontal-scroll::-webkit-scrollbar {
+  /* Webkit */
+  width: 0;
+  height: 0;
+}
 
 /* Modal */
 .drawer {

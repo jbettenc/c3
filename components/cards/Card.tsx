@@ -8,7 +8,7 @@ function Card(props: CardProps) {
 
   return (
     <div
-      className={`overflow-hidden rounded-lg w-[17.5rem] h-[23.125rem] ${props.onClick ? "cursor-pointer" : ""}`}
+      className={`overflow-hidden rounded-lg w-full h-[23.125rem] ${props.onClick ? "cursor-pointer" : ""}`}
       onClick={props.onClick}
     >
       {children}

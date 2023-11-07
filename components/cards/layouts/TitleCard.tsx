@@ -44,7 +44,7 @@ function TitleCard(props: TitleCardProps) {
                 : verificationStatus === 1
                 ? "text-white text-4xl"
                 : "text-white"
-            } font-anton text-left mb-auto break-words shrink overflow-hidden leading-tight`}
+            } font-anton text-left mb-auto break-words shrink overflow-y-scroll leading-tight hidden-scroll`}
           >
             {props.title.toUpperCase()}
           </div>
