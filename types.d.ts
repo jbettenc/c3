@@ -1,6 +1,7 @@
 import { SVGProps } from "react";
 import { AbstractConnector } from "@web3-react/abstract-connector";
 import { TorusConnector } from "@web3-react/torus-connector";
+import { ReportCategory, ReportReason } from "./components/modals/ReportPetition";
 
 export interface Provider {
   id: string;
@@ -48,6 +49,8 @@ export interface IPetition {
   tier2Signatures: number;
   tier0Signatures?: number;
   tier1Signatures?: number;
+  reportCount: number;
+  reportMostFrequentCategory: { category: ReportCategory; count: number };
   timestamp: string;
 }
 
@@ -60,4 +63,15 @@ export interface IPetitionMetadata {
 
 export type ArweavePayload = {
   [key: string]: any;
+};
+
+export type PetitionReport = {
+  createdAt: string;
+  updatedAt: string;
+  id: string;
+  category: ReportCategory;
+  petitionId: string;
+  address: string;
+  message?: string;
+  signature: string;
 };

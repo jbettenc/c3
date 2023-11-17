@@ -12,6 +12,10 @@ import Link from "next/link";
 import { BackArrowIcon } from "./icons/BackArrowIcon";
 import { setOpenLoginModal } from "@/store/userSlice";
 import { DEFAULT_CHAIN_ID } from "@/constants/constants";
+import Tooltip from "@/ui/Tooltip";
+import { WarningIcon } from "./icons/WarningIcon";
+import TooltipWrapper from "@/ui/TooltipWrapper";
+import { ReportCategory, ReportCategoryText } from "./modals/ReportPetition";
 
 interface PetitionProps {
   petition?: IPetition;
@@ -50,12 +54,47 @@ function Petition(props: PetitionProps) {
 
   return (
     <>
-      <div className="flex text-black w-full mb-16 px-6">
+      <div className="flex text-black w-full mb-20 px-6">
         <div className="mt-4 flex-col sm:flex-row flex max-w-7xl mx-auto w-full gap-4">
           <div className="flex flex-col max-w-5xl w-full gap-4">
             <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
-              <div className="font-semibold text-lg">{metadata?.title}</div>
-              <div>{metadata?.description}</div>
+              <div className="flex font-semibold text-lg gap-2">
+                <div className="my-auto">{metadata?.title}</div>
+                {petition?.reportCount &&
+                petition.reportCount >
+                  // Either reports need to be larger than 25 or greater than 1/4 the number of signatures, whichever is larger
+                  Math.max(
+                    25,
+                    ((petition.tier0Signatures ?? 0) +
+                      (petition.tier1Signatures ?? 0) +
+                      (petition.tier2Signatures ?? 0)) /
+                      4
+                  ) ? (
+                  <TooltipWrapper
+                    className="text-xs font-normal"
+                    size="lg"
+                    text={`This petition has been reported ${petition.reportCount} time${
+                      petition.reportCount !== 1 ? "s" : ""
+                    }, most frequently as ${(() => {
+                      switch (petition.reportMostFrequentCategory.category) {
+                        case ReportCategory.FRAUD_SCAM:
+                          return ReportCategoryText.FRAUD_SCAM;
+                        case ReportCategory.HARASSMENT:
+                          return ReportCategoryText.HARASSMENT;
+                        case ReportCategory.HATE_SPEECH:
+                          return ReportCategoryText.HATE_SPEECH;
+                        case ReportCategory.VIOLENCE:
+                          return ReportCategoryText.VIOLENCE;
+                        case ReportCategory.OTHER:
+                          return ReportCategoryText.SOMETHING_ELSE;
+                      }
+                    })()}. Proceed with discretion.`}
+                  >
+                    <WarningIcon className="my-auto h-8 w-8" />
+                  </TooltipWrapper>
+                ) : null}
+              </div>
+              <div className="whitespace-pre-wrap">{metadata?.description}</div>
               {metadata?.images?.length && metadata.images.length > 0 ? (
                 <div className="w-full">
                   <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
@@ -67,18 +106,49 @@ function Petition(props: PetitionProps) {
                   </Carousel>
                 </div>
               ) : null}
-              <div className="font-medium">
-                Initiated by:{" "}
-                {creatorAlias
-                  ? creatorAlias +
-                    ` (${
-                      petition?.petitioner.substring(0, 6) +
+              <div className="flex flex-row flex-wrap justify-between gap-4">
+                <div className="font-medium flex-shrink-0">
+                  Initiated by:{" "}
+                  {creatorAlias
+                    ? creatorAlias +
+                      ` (${
+                        petition?.petitioner.substring(0, 6) +
+                        "..." +
+                        petition?.petitioner.substring(petition.petitioner.length - 4)
+                      })`
+                    : petition?.petitioner.substring(0, 6) +
                       "..." +
-                      petition?.petitioner.substring(petition.petitioner.length - 4)
-                    })`
-                  : petition?.petitioner.substring(0, 6) +
-                    "..." +
-                    petition?.petitioner.substring(petition.petitioner.length - 4)}
+                      petition?.petitioner.substring(petition.petitioner.length - 4)}
+                </div>
+                <div className="flex-shrink-0 flex">
+                  <Button
+                    style="tertiary"
+                    shadow={false}
+                    customSizing
+                    className="mr-1"
+                    onClick={() => {
+                      if (!petition) {
+                        return;
+                      }
+                      showModal(
+                        MODAL_TYPE.REPORT_PETITION,
+                        { petitionId: petition.id },
+                        {
+                          title: "Report Petition",
+                          headerSeparator: false,
+                          border: false
+                        }
+                      );
+                    }}
+                  >
+                    Report
+                  </Button>
+                  <Tooltip>
+                    <div className="w-56 text-xs">
+                      Report this petition if you believe it goes against our community standards.
+                    </div>
+                  </Tooltip>
+                </div>
               </div>
             </div>
           </div>

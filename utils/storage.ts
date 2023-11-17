@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 // @ts-ignore
 import { Web3Storage, Web3File } from "web3.storage/dist/bundle.esm.min.js";
-import { ArweavePayload, ResponseObject, StoragePayload, StorageResponse } from "@/types";
+import { ArweavePayload, PetitionReport, ResponseObject, StoragePayload, StorageResponse } from "@/types";
 import { ETHSIGN_API_URL, PETITION_API_URL } from "@/constants/constants";
+import { ReportCategory } from "@/components/modals/ReportPetition";
 
 export function makeStorageClient() {
   return new Web3Storage({
@@ -115,7 +116,14 @@ export const getSignaturesForPetition = async (
   error?: { message: string };
   success?: boolean;
   message?: string;
-  data?: { tier0Signatures: number; tier1Signatures: number } | any[];
+  data?:
+    | {
+        tier0Signatures: number;
+        tier1Signatures: number;
+        reportCount: number;
+        reportMostFrequentCategory: { category: ReportCategory; count: number };
+      }
+    | any[];
 } | null> => {
   let ret: any = null;
   try {
@@ -135,7 +143,12 @@ export const getSignaturesForPetition = async (
           if (justCount) {
             ret = {
               success: true,
-              data: { tier0Signatures: response.tier0Count, tier1Signatures: response.tier1Count }
+              data: {
+                tier0Signatures: response.tier0Count,
+                tier1Signatures: response.tier1Count,
+                reportCount: response.reportCount,
+                reportMostFrequentCategory: response.reportMostFrequentCategory
+              }
             };
           } else {
             ret = {
@@ -194,6 +207,51 @@ export const getSignaturesForPetitionsBatch = async (
         } else {
           // Unknown error
           ret = { error: { message: "No response" } };
+        }
+      });
+  } catch (err: any) {
+    return { error: { message: err?.message ? err.message : err } };
+  }
+
+  return ret;
+};
+
+export const reportPetition = async (
+  petitionId: string,
+  message: string,
+  signature: string,
+  address: string
+): Promise<{
+  error?: { message: string };
+  success?: boolean;
+  message?: string;
+  data?: PetitionReport;
+} | null> => {
+  let ret: any = null;
+  try {
+    await fetch(`${PETITION_API_URL}/report`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        petitionId,
+        message,
+        signature,
+        address
+      })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response.data) {
+          // Data found for the given petition ID
+          ret = {
+            success: true,
+            data: response.data
+          };
+        } else {
+          // Unknown error
+          ret = { error: { message: "Unexpected Error" } };
         }
       });
   } catch (err: any) {

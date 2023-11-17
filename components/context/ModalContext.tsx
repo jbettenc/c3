@@ -3,6 +3,7 @@ import { ConfirmView, Custom, Share, SwitchNetwork, TransactionFlow, WalletSelec
 import Modal, { ModalProps } from "@/ui/modals/Modal";
 import WorldIdVerify from "../modals/WorldIdVerify";
 import SignPetition from "../modals/SignPetition";
+import ReportPetition from "../modals/ReportPetition";
 
 export enum MODAL_TYPE {
   CONFIRM_VIEW = "CONFIRM_VIEW",
@@ -12,6 +13,7 @@ export enum MODAL_TYPE {
   SIGN_PETITION = "SIGN_PETITION",
   SHARE = "SHARE",
   SWITCH_NETWORK = "SWITCH_NETWORK",
+  REPORT_PETITION = "REPORT_PETITION",
   CUSTOM = "CUSTOM"
 }
 
@@ -23,6 +25,7 @@ const MODAL_COMPONENTS: any = {
   [MODAL_TYPE.SIGN_PETITION]: SignPetition,
   [MODAL_TYPE.WALLET_SELECT]: WalletSelect,
   [MODAL_TYPE.SWITCH_NETWORK]: SwitchNetwork,
+  [MODAL_TYPE.REPORT_PETITION]: ReportPetition,
   [MODAL_TYPE.CUSTOM]: Custom
 };
 

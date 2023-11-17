@@ -1,3 +1,4 @@
+import { InfoIcon } from "@/components/icons/InfoIcon";
 import Transition from "@/ui/Transition";
 import React, { useState } from "react";
 
@@ -59,10 +60,13 @@ function Tooltip({ children, className, bg, size, position }: TooltipProps) {
       onFocus={() => setTooltipOpen(true)}
       onBlur={() => setTooltipOpen(false)}
     >
-      <button className="block" aria-haspopup="true" aria-expanded={tooltipOpen} onClick={(e) => e.preventDefault()}>
-        <svg className="w-4 h-4 fill-current text-slate-400" viewBox="0 0 16 16">
-          <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-        </svg>
+      <button
+        className="flex h-full"
+        aria-haspopup="true"
+        aria-expanded={tooltipOpen}
+        onClick={(e) => e.preventDefault()}
+      >
+        <InfoIcon className="h-4 w-4 my-auto" />
       </button>
       <div className={`z-30 absolute ${positionOuterClasses(position)}`}>
         <Transition
