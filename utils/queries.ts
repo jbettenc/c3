@@ -1,6 +1,7 @@
 import { GRAPHQL_URL } from "@/constants/constants";
 import { IPetition } from "@/types";
 import { getSignaturesForPetition, getSignaturesForPetitionsBatch } from "./storage";
+import { ReportCategory } from "@/components/modals/ReportPetition";
 
 export const loadPetition = async (chainId: string | number, id: string): Promise<IPetition | null> => {
   let res: IPetition | null = null;
@@ -31,7 +32,9 @@ export const loadPetition = async (chainId: string | number, id: string): Promis
           cid: response.data.petition.cid,
           petitioner: response.data.petition.petitioner,
           tier2Signatures: response.data.petition.signatures,
-          timestamp: response.data.petition.timestamp
+          timestamp: response.data.petition.timestamp,
+          reportCount: 0,
+          reportMostFrequentCategory: { category: ReportCategory.OTHER, count: 0 }
         };
       }
     });
