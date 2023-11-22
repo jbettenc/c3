@@ -260,3 +260,30 @@ export const reportPetition = async (
 
   return ret;
 };
+
+export const logPageView = async (path: string): Promise<{ success: boolean; message?: string }> => {
+  let ret: any = null;
+  try {
+    await fetch(`${PETITION_API_URL}/metrics/page`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        url: path
+      })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response.error) {
+          ret = { success: false, message: response.error.message };
+        } else {
+          ret = response;
+        }
+      });
+  } catch (err: any) {
+    return { success: false, message: err?.message ? err.message : err };
+  }
+
+  return ret;
+};
