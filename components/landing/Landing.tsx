@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useWeb3React } from "@web3-react/core";
 import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 import dynamic from "next/dynamic";
+import { getRecommendedPetitions } from "@/utils/storage";
 
 // Uses ResizeObserver, which can only render on the frontend.
 const HorizontalScrollContainer = dynamic(() => import("@/ui/HorizontalScrollContainer"), {
@@ -21,7 +22,12 @@ function Landing() {
 
   useEffect(() => {
     (async () => {
-      handlePetitions(await getPetitions(chainId ?? DEFAULT_CHAIN_ID));
+      const petitions = await getRecommendedPetitions(chainId ?? DEFAULT_CHAIN_ID);
+      if (petitions?.success && petitions.data) {
+        handlePetitions(petitions.data);
+      } else {
+        handlePetitions([]);
+      }
     })();
   }, [chainId]);
 
@@ -58,14 +64,16 @@ function Landing() {
           title="Petitions"
           items={
             petitions &&
-            petitions.map((petition, idx) => (
-              <div
-                key={`item-${idx}`}
-                className="grow shrink-0 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5 overflow-hidden px-2"
-              >
-                <CardLoader petition={petition} key={`landing-petition-${idx}`} />
-              </div>
-            ))
+            petitions
+              .filter((petition) => petition.cid !== "")
+              .map((petition, idx) => (
+                <div
+                  key={`item-${idx}`}
+                  className="grow shrink-0 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5 overflow-hidden px-2"
+                >
+                  <CardLoader petition={petition} key={`landing-petition-${idx}`} />
+                </div>
+              ))
           }
         />
       </div>

@@ -89,16 +89,22 @@ export const loadPetitionSigners = async (chainId: string | number, id: string) 
   return res ?? null;
 };
 
-export const getPetitions = async (chainId: string | number, count = 10): Promise<IPetition[] | null> => {
+export const getPetitions = async (
+  chainId: string | number,
+  ids: string[]
+): Promise<{ [key: string]: IPetition } | null> => {
   let res: any = null;
   const query = `{
-    petitions(orderBy: signatures, orderDirection: desc, first: ${count}) {
-      id
-      petitioner
-      signatures
-      cid
-      timestamp
-    }
+    ${ids.map(
+      (id: string) =>
+        `s${id}: petition(id: "${id}") {
+        id
+        petitioner
+        signatures
+        cid
+        timestamp
+      }`
+    )}
   }`;
 
   await fetch(`${GRAPHQL_URL(chainId)}`, {
@@ -112,21 +118,27 @@ export const getPetitions = async (chainId: string | number, count = 10): Promis
   })
     .then((res) => res.json())
     .then(async (response) => {
-      res = response?.data?.petitions;
-      if (response?.data?.petitions) {
-        const idList: string[] = response.data.petitions.map((petition: IPetition) => petition.id);
-        const lowerTierSignatures = await getSignaturesForPetitionsBatch(idList);
-        res = response.data.petitions.map((petition: any, idx: number) => {
-          return {
-            id: petition.id,
-            cid: petition.cid,
-            petitioner: petition.petitioner,
-            tier0Signatures: lowerTierSignatures?.data ? lowerTierSignatures.data[idx]?.tier0Count ?? 0 : 0,
-            tier1Signatures: lowerTierSignatures?.data ? lowerTierSignatures.data[idx]?.tier1Count ?? 0 : 0,
-            tier2Signatures: petition.signatures,
-            timestamp: petition.timestamp
-          };
-        });
+      res = response?.data;
+      if (response?.data) {
+        res = {};
+        for (const key of Object.keys(response.data)) {
+          const id = key.substring(1);
+          res[id] = response.data[key]
+            ? {
+                id: response.data[key].id,
+                cid: response.data[key].cid,
+                petitioner: response.data[key].petitioner,
+                tier2Signatures: response.data[key].signatures,
+                timestamp: response.data[key].timestamp
+              }
+            : {
+                id: "",
+                cid: "",
+                petitioner: "",
+                tier2Signatures: 0,
+                timestamp: ""
+              };
+        }
       }
     });
 

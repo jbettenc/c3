@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 // @ts-ignore
 import { Web3Storage, Web3File } from "web3.storage/dist/bundle.esm.min.js";
-import { ArweavePayload, PetitionReport, ResponseObject, StoragePayload, StorageResponse } from "@/types";
+import { ArweavePayload, IPetition, PetitionReport, ResponseObject, StoragePayload, StorageResponse } from "@/types";
 import { ETHSIGN_API_URL, PETITION_API_URL } from "@/constants/constants";
 import { ReportCategory } from "@/components/modals/ReportPetition";
+import { getPetitions } from "./queries";
 
 export function makeStorageClient() {
   return new Web3Storage({
@@ -175,6 +176,72 @@ export const getSignaturesForPetition = async (
   return ret;
 };
 
+export const getRecommendedPetitions = async (
+  chainId: string | number,
+  limit = 10,
+  justCount = 1,
+  inputPetitionIds?: string[]
+): Promise<{
+  error?: { message: string };
+  success?: boolean;
+  message?: string;
+  data?: IPetition[] | null;
+} | null> => {
+  let ret: any = null;
+  try {
+    await fetch(`${PETITION_API_URL}/batch/petitions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        limit,
+        justCount,
+        currentPetitions: inputPetitionIds ?? null
+      })
+    })
+      .then((res) => res.json())
+      .then(async (response) => {
+        if (response) {
+          // Data found for the given petition ID
+          const ids = response.petitions.map((petition: any) => petition.id);
+          const petitionsData = await getPetitions(chainId, ids);
+          const petitions = ids.map((id: any, idx: number) => {
+            const petition = petitionsData
+              ? petitionsData[id]
+              : {
+                  id: "",
+                  cid: "",
+                  petitioner: "",
+                  tier2Signatures: 0,
+                  timestamp: ""
+                };
+            return {
+              id: id,
+              cid: petition.cid,
+              petitioner: petition.petitioner,
+              tier0Signatures: response.petitions[idx] ? response.petitions[idx].tier0Count ?? 0 : 0,
+              tier1Signatures: response.petitions[idx] ? response.petitions[idx].tier1Count ?? 0 : 0,
+              tier2Signatures: petition.tier2Signatures,
+              timestamp: petition.timestamp
+            };
+          });
+          ret = {
+            success: true,
+            data: petitions
+          };
+        } else {
+          // Unknown error
+          ret = { error: { message: "No response" } };
+        }
+      });
+  } catch (err: any) {
+    return { error: { message: err?.message ? err.message : err } };
+  }
+
+  return ret;
+};
+
 export const getSignaturesForPetitionsBatch = async (
   ids: string[],
   justCount = 1
@@ -261,7 +328,7 @@ export const reportPetition = async (
   return ret;
 };
 
-export const logPageView = async (path: string): Promise<{ success: boolean; message?: string }> => {
+export const logPageView = async (path: string, referer?: string): Promise<{ success: boolean; message?: string }> => {
   let ret: any = null;
   try {
     await fetch(`${PETITION_API_URL}/metrics/page`, {
@@ -270,7 +337,8 @@ export const logPageView = async (path: string): Promise<{ success: boolean; mes
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        url: path
+        url: path,
+        lastUrl: referer
       })
     })
       .then((res) => res.json())

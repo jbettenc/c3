@@ -13,29 +13,29 @@ import ConnectorInitiator from "@/web3/ConnectorInitiator";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { logPageView } from "@/utils/storage";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { HistoryProvider } from "@/ui/wrappers/HistoryWrapper";
+import MetricLogger from "@/ui/wrappers/MetricLogger";
 
 export default function App({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-  useEffect(() => {
-    if (router?.asPath) {
-      logPageView(router.asPath);
-    }
-  }, [router.asPath]);
-
   return (
     <Provider store={store}>
-      <Web3ReactProvider connectors={connectors}>
-        <div className="h-full w-full">
-          <GlobalModal>
-            <ConnectorInitiator>
-              <BackgroundAndWalletSelectWrapper>
-                <Component {...pageProps} />
-                <ReactNotifications />
-              </BackgroundAndWalletSelectWrapper>
-            </ConnectorInitiator>
-          </GlobalModal>
-        </div>
-      </Web3ReactProvider>
+      <HistoryProvider>
+        <MetricLogger>
+          <Web3ReactProvider connectors={connectors}>
+            <div className="h-full w-full">
+              <GlobalModal>
+                <ConnectorInitiator>
+                  <BackgroundAndWalletSelectWrapper>
+                    <Component {...pageProps} />
+                    <ReactNotifications />
+                  </BackgroundAndWalletSelectWrapper>
+                </ConnectorInitiator>
+              </GlobalModal>
+            </div>
+          </Web3ReactProvider>
+        </MetricLogger>
+      </HistoryProvider>
     </Provider>
   );
 }
