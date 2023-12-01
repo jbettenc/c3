@@ -107,7 +107,7 @@ function DropdownUser() {
 
           <div className="h-px bg-gray-300"></div>
 
-          <div
+          {/* <div
             className={`justify-start px-6 flex cursor-pointer mx-auto py-4 bg-white hover:bg-gray-50 active:bg-white rounded-b-md`}
             role="menuitem"
             tabIndex={-1}
@@ -125,7 +125,7 @@ function DropdownUser() {
               </svg>
             </div>
             <div className="text-black">My Profile</div>
-          </div>
+          </div> */}
 
           <div
             className={`justify-start px-6 flex cursor-pointer mx-auto py-4 bg-white hover:bg-gray-50 active:bg-white rounded-b-md`}
