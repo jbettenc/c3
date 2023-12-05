@@ -41,7 +41,7 @@ function Modal({
   useEffect(() => {
     const handleRouteChange = () => {
       if (hideOnPathnameChange) {
-        hideModal();
+        hideModal(false, true);
       }
     };
 

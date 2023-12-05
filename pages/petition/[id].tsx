@@ -62,9 +62,11 @@ function PetitionPage(props: PetitionPageProps) {
                       "..." +
                       petition?.petitioner.substring(petition.petitioner.length - 4)
                     })`
-                  : petition?.petitioner.substring(0, 6) +
+                  : petition?.petitioner
+                  ? petition?.petitioner.substring(0, 6) +
                     "..." +
-                    petition?.petitioner.substring(petition.petitioner.length - 4)}
+                    petition?.petitioner.substring(petition.petitioner.length - 4)
+                  : "--"}
               </div>
             </div>
           </div>

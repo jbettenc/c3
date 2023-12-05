@@ -4,6 +4,7 @@ import Modal, { ModalProps } from "@/ui/modals/Modal";
 import WorldIdVerify from "../modals/WorldIdVerify";
 import SignPetition from "../modals/SignPetition";
 import ReportPetition from "../modals/ReportPetition";
+import ErrorLoadingPetition from "../modals/ErrorLoadingPetition";
 
 export enum MODAL_TYPE {
   CONFIRM_VIEW = "CONFIRM_VIEW",
@@ -14,6 +15,7 @@ export enum MODAL_TYPE {
   SHARE = "SHARE",
   SWITCH_NETWORK = "SWITCH_NETWORK",
   REPORT_PETITION = "REPORT_PETITION",
+  ERROR_LOADING_PETITION = "ERROR_LOADING_PETITION",
   CUSTOM = "CUSTOM"
 }
 
@@ -26,11 +28,12 @@ const MODAL_COMPONENTS: any = {
   [MODAL_TYPE.WALLET_SELECT]: WalletSelect,
   [MODAL_TYPE.SWITCH_NETWORK]: SwitchNetwork,
   [MODAL_TYPE.REPORT_PETITION]: ReportPetition,
+  [MODAL_TYPE.ERROR_LOADING_PETITION]: ErrorLoadingPetition,
   [MODAL_TYPE.CUSTOM]: Custom
 };
 
 type GlobalModalContext = {
-  showModal: (modalType: MODAL_TYPE, modalProps?: any, modalWrapperProps?: any) => void;
+  showModal: (modalType: MODAL_TYPE, modalProps?: any, modalWrapperProps?: any, hideOnPathnameChange?: boolean) => void;
   hideModal: (closeAll?: boolean, bypassPreventClose?: boolean) => void;
   getTopModalType: () => MODAL_TYPE | undefined;
   store: any;

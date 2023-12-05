@@ -29,7 +29,7 @@ function Petition(props: PetitionProps) {
   const [userSignedPetition, handleUserSignedPetition] = useState<boolean>();
   // TODO: Load different signature types and display them
   const { account, chainId } = useWeb3React();
-  const { showModal } = useGlobalModalContext();
+  const { showModal, getTopModalType, hideModal } = useGlobalModalContext();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -52,6 +52,25 @@ function Petition(props: PetitionProps) {
     })();
   }, [petition, account]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (!metadata) {
+        if (getTopModalType() !== MODAL_TYPE.ERROR_LOADING_PETITION) {
+          showModal(
+            MODAL_TYPE.ERROR_LOADING_PETITION,
+            {},
+            { showHeader: false, border: false, preventModalClose: true },
+            true
+          );
+        }
+      } else {
+        if (getTopModalType() === MODAL_TYPE.ERROR_LOADING_PETITION) {
+          hideModal(false, true);
+        }
+      }
+    }, 10);
+  }, [metadata]);
+
   return (
     <>
       <div className="flex text-black w-full mb-20 px-6">
@@ -59,7 +78,7 @@ function Petition(props: PetitionProps) {
           <div className="flex flex-col max-w-5xl w-full gap-4">
             <div className="w-full flex flex-col gap-4 border border-gray-200 rounded-md p-4">
               <div className="flex font-semibold text-lg gap-2">
-                <div className="my-auto">{metadata?.title}</div>
+                <div className="my-auto">{metadata?.title ?? "--"}</div>
                 {petition?.reportCount &&
                 petition.reportCount >
                   // Either reports need to be larger than 25 or greater than 1/4 the number of signatures, whichever is larger
@@ -116,9 +135,11 @@ function Petition(props: PetitionProps) {
                         "..." +
                         petition?.petitioner.substring(petition.petitioner.length - 4)
                       })`
-                    : petition?.petitioner.substring(0, 6) +
+                    : petition?.petitioner
+                    ? petition?.petitioner.substring(0, 6) +
                       "..." +
-                      petition?.petitioner.substring(petition.petitioner.length - 4)}
+                      petition?.petitioner.substring(petition.petitioner.length - 4)
+                    : "--"}
                 </div>
                 <div className="flex-shrink-0 flex">
                   <Button
@@ -197,9 +218,11 @@ function Petition(props: PetitionProps) {
                         "..." +
                         petition?.petitioner.substring(petition.petitioner.length - 4)
                       })`
-                    : petition?.petitioner.substring(0, 6) +
+                    : petition?.petitioner
+                    ? petition?.petitioner.substring(0, 6) +
                       "..." +
-                      petition?.petitioner.substring(petition.petitioner.length - 4),
+                      petition?.petitioner.substring(petition.petitioner.length - 4)
+                    : "--",
                   images: metadata?.images
                 },
                 { title: "Share Petition", headerSeparator: false, border: false }
