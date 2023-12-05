@@ -29,15 +29,12 @@ function CardLoader(props: CardLoaderProps) {
     })();
   }, [props.petition]);
 
-  if (!metadata) {
-    return null;
-  }
-
-  if (metadata.images.length > 0) {
+  if (!metadata || metadata.images.length > 0) {
     return (
       <ImageCard
-        image={metadata.images[0]}
-        title={metadata.title}
+        loading={!metadata}
+        image={metadata ? metadata.images[0] : undefined}
+        title={metadata ? metadata.title : ""}
         petitioner={props.petition.petitioner}
         tier0Signatures={props.petition.tier0Signatures}
         tier1Signatures={props.petition.tier1Signatures}

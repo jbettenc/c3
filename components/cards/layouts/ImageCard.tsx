@@ -4,6 +4,7 @@ import SignatureProgressBar from "@/components/SignatureProgressBar";
 import Button from "@/ui/forms/Button";
 
 interface ImageCardProps {
+  loading?: boolean;
   image: any;
   title: string;
   petitioner: string;
@@ -17,6 +18,26 @@ function ImageCard(props: ImageCardProps) {
   const { tier0Signatures, tier1Signatures, tier2Signatures } = props;
 
   const { alias } = useENS(props.petitioner);
+
+  if (props.loading) {
+    return (
+      <Card>
+        <div className="w-full h-full bg-gray-20 p-6 border-2 border-gray-50 rounded-lg">
+          <div className="animate-pulse w-full h-full flex flex-col overflow-hidden">
+            <div className="bg-gray-300/30 rounded-lg mx-auto min-h-[4rem] h-full min-w-[9.75rem] max-w-full shrink object-contain"></div>
+            <div className="bg-gray-300/30 rounded-md mx-auto my-2 h-10 w-24"></div>
+            <div className="bg-gray-300/30 rounded-md mx-auto h-12 w-44"></div>
+            <div className="shrink-0 flex flex-col mt-2">
+              <div className="bg-gray-300/30 rounded-full h-2.5"></div>
+              <div className="mt-2 bg-gray-300/30 rounded-md h-4 w-24"></div>
+              <div className="mt-2 bg-gray-300/30 rounded-md "></div>
+              <div className="mt-2 bg-gray-300/30 w-full h-[2.25rem] rounded-md"></div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card>

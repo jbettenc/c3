@@ -9,6 +9,7 @@ import { useWeb3React } from "@web3-react/core";
 import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 import dynamic from "next/dynamic";
 import { getRecommendedPetitions } from "@/utils/storage";
+import { ReportCategory } from "../modals/ReportPetition";
 
 // Uses ResizeObserver, which can only render on the frontend.
 const HorizontalScrollContainer = dynamic(() => import("@/ui/HorizontalScrollContainer"), {
@@ -16,7 +17,7 @@ const HorizontalScrollContainer = dynamic(() => import("@/ui/HorizontalScrollCon
 });
 
 function Landing() {
-  const [petitions, handlePetitions] = useState<IPetition[] | null>([]);
+  const [petitions, handlePetitions] = useState<IPetition[] | null>(null);
 
   const { chainId } = useWeb3React();
 
@@ -63,17 +64,36 @@ function Landing() {
         <HorizontalScrollContainer
           title="Petitions"
           items={
-            petitions &&
             petitions
-              .filter((petition) => petition.cid !== "")
-              .map((petition, idx) => (
-                <div
-                  key={`item-${idx}`}
-                  className="grow shrink-0 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5 overflow-hidden px-2"
-                >
-                  <CardLoader petition={petition} key={`landing-petition-${idx}`} />
-                </div>
-              ))
+              ? petitions
+                  .filter((petition) => petition.cid !== "")
+                  .map((petition, idx) => (
+                    <div
+                      key={`item-${idx}`}
+                      className="grow shrink-0 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5 overflow-hidden px-2"
+                    >
+                      <CardLoader petition={petition} key={`landing-petition-${idx}`} />
+                    </div>
+                  ))
+              : [0, 1, 2, 3, 4].map((idx) => (
+                  <div
+                    key={`loader-item-${idx}`}
+                    className="grow shrink-0 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5 overflow-hidden px-2"
+                  >
+                    <CardLoader
+                      petition={{
+                        id: "",
+                        cid: "",
+                        petitioner: "",
+                        reportCount: 0,
+                        tier2Signatures: 0,
+                        timestamp: "0",
+                        reportMostFrequentCategory: { category: ReportCategory.OTHER, count: 0 }
+                      }}
+                      key={`landing-petition-${idx}`}
+                    />
+                  </div>
+                ))
           }
         />
       </div>

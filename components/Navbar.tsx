@@ -57,7 +57,7 @@ function Navbar(props: NavbarProps) {
               <div className="flex flex-row h-full">
                 <div className="flex flex-col mr-4">
                   <Link href="/" className="h-full flex">
-                    <Image src={Logo} alt="Communities Creating Change" />
+                    <Image src={Logo} alt="Communities Creating Change" className="h-12 w-auto my-auto" />
                   </Link>
                 </div>
                 {!logoOnly ? (
