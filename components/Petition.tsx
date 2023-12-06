@@ -25,7 +25,7 @@ interface PetitionProps {
 
 function Petition(props: PetitionProps) {
   const { petition, metadata, creatorAlias } = props;
-  const [signers, handleSigners] = useState<any>([]);
+  const [signers, handleSigners] = useState<any[]>();
   const [userSignedPetition, handleUserSignedPetition] = useState<boolean>();
   // TODO: Load different signature types and display them
   const { account, chainId } = useWeb3React();

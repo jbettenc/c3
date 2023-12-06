@@ -5,13 +5,34 @@ import { WorldCoinIcon } from "./icons/WorldCoinLogo";
 import { ProfileBlankIcon } from "./icons/ProfileBlankIcon";
 
 interface SignerProps {
+  loading?: boolean;
   address?: string;
   verificationType?: number;
 }
 
 function Signer(props: SignerProps) {
-  const { address, verificationType = 0 } = props;
+  const { loading, address, verificationType = 0 } = props;
   const { avatar, alias } = useENS(address);
+
+  if (loading) {
+    return (
+      <>
+        <div className="flex animate-pulse">
+          <div className="my-auto p-1">
+            <div className="bg-gray-300/30 w-7 h-7 rounded-full"></div>
+          </div>
+          <div className="flex flex-col">
+            <div className="flex font-semibold flex-wrap gap-x-2">
+              <div className="h-6 w-24 bg-gray-300/30 rounded-md"></div>
+              <div className={` bg-gray-300/30 rounded-full h-6 w-24 my-auto`}></div>
+            </div>
+
+            <div className="mt-2 h-6 w-36 bg-gray-300/30 rounded-md"></div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

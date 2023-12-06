@@ -72,7 +72,16 @@ function SignerCard(props: SignerCardProps) {
                       <td className="pr-4 py-2">{new Date(signer.timestamp * 1000).toLocaleDateString()}</td>
                     </tr>
                   ))
-              : null}
+              : [0, 1, 2, 3, 4].map((idx) => (
+                  <tr key={`signer-loading-${currentPage}-${idx}`} className="border-b border-gray-300 animate-pulse">
+                    <td className="pl-4 py-2">
+                      <Signer loading />
+                    </td>
+                    <td className="pr-4 py-2">
+                      <div className="bg-gray-300/30 w-20 h-6 rounded-md"></div>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
         <Pagination
