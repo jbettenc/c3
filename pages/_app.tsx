@@ -10,10 +10,6 @@ import { GlobalModal } from "@/components/context/ModalContext";
 import BackgroundAndWalletSelectWrapper from "@/ui/wrappers/BackgroundWrapper";
 import { ReactNotifications } from "react-notifications-component";
 import ConnectorInitiator from "@/web3/ConnectorInitiator";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-import { logPageView } from "@/utils/storage";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { HistoryProvider } from "@/ui/wrappers/HistoryWrapper";
 import MetricLogger from "@/ui/wrappers/MetricLogger";
 

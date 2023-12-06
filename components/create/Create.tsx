@@ -11,13 +11,11 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useWeb3React } from "@web3-react/core";
 import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
 import { postUploadToStorage } from "@/utils/storage";
-import { ethers } from "ethers";
+import { ethers, Contract } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 import { CredentialType, IDKitWidget } from "@worldcoin/idkit";
-import { Contract } from "ethers";
 import C3ABI from "../../artifacts/C3.json";
 import { getBase64, getProviderUrl, storeNotif } from "@/utils/misc";
-import { AbiCoder } from "ethers";
 import { StoragePayload } from "@/types";
 import { BackArrowIcon } from "../icons/BackArrowIcon";
 import Link from "next/link";
@@ -25,6 +23,7 @@ import { useRouter } from "next/router";
 import { useENS } from "@/utils/hooks/useENS";
 import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID } from "@/constants/constants";
 import { getLibrary } from "@/web3/utils";
+import { defaultAbiCoder } from "ethers/lib/utils";
 
 export function Create() {
   const [title, handleTitle] = useState("");
@@ -41,7 +40,7 @@ export function Create() {
 
   useEffect(() => {
     if (!hash) {
-      handleHash(ethers.hashMessage(uuidv4()));
+      handleHash(ethers.utils.hashMessage(uuidv4()));
     }
   }, [hash]);
 
@@ -75,7 +74,7 @@ export function Create() {
                 proof: string;
                 credential_type: string;
               }) => {
-                const proof = [...[...AbiCoder.defaultAbiCoder().decode(["uint256[8]"], e.proof)][0]];
+                const proof = [...[...defaultAbiCoder.decode(["uint256[8]"], e.proof)][0]];
                 const md = {
                   root: e.merkle_root,
                   nullifierHash: e.nullifier_hash,
@@ -327,7 +326,7 @@ export function Create() {
                   address: account,
                   timestamp: new Date().toISOString(),
                   version: "4.1",
-                  hash: ethers.hashMessage(
+                  hash: ethers.utils.hashMessage(
                     JSON.stringify({
                       data: payload
                     })
@@ -368,26 +367,32 @@ export function Create() {
                 const cid = storage.transaction.itemId ?? "";
 
                 // Trigger smart contract call
-                const provider = new ethers.JsonRpcProvider(await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID));
+                const provider = new ethers.providers.JsonRpcProvider(
+                  await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID)
+                );
                 const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
                 const library = getLibrary(connector.provider);
                 const instance = contract.connect(library.getSigner() as any) as Contract;
                 try {
-                  await instance.createPetition(hash, cid, metadata);
-                  showModal(
-                    MODAL_TYPE.SHARE,
-                    {
-                      url: `${window.location.href.replace("create", "petition")}/${hash}`,
-                      title,
-                      address: account,
-                      images
-                    },
-                    {
-                      title: "Share Petition",
-                      headerSeparator: false,
-                      border: false,
-                      onClose: () => router.push(`/petition/${hash}`)
-                    }
+                  await instance.createPetition(hash, cid, metadata).then(
+                    async (tx: any) =>
+                      await tx.wait(1).then(() => {
+                        showModal(
+                          MODAL_TYPE.SHARE,
+                          {
+                            url: `${window.location.href.replace("create", "petition")}/${hash}`,
+                            title,
+                            address: account,
+                            images
+                          },
+                          {
+                            title: "Share Petition",
+                            headerSeparator: false,
+                            border: false,
+                            onClose: () => router.push(`/petition/${hash}`)
+                          }
+                        );
+                      })
                   );
                 } catch (err: any) {
                   storeNotif("Error", err?.message ? err.message : err, "danger");

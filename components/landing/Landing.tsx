@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { IPetition } from "@/types";
 import Button from "@/ui/forms/Button";
 import { StartIcon } from "../icons/StartIcon";
-import { getPetitions } from "@/utils/queries";
 import CardLoader from "../cards/CardLoader";
 import Link from "next/link";
 import { useWeb3React } from "@web3-react/core";

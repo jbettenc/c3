@@ -1,7 +1,7 @@
 import { setENSState, setENSMutex } from "@/store/ensSlice";
 import { RootState } from "@/store/root";
+import { JsonRpcProvider } from "@ethersproject/providers";
 import { Mutex } from "async-mutex";
-import { JsonRpcProvider } from "ethers";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

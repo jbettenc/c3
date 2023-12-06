@@ -145,7 +145,7 @@ export const ensToTokenId = (ens: string) => {
     ens = ens.substring(0, ens.length - 4);
   }
 
-  const labelHash = ethers.keccak256(ethers.toUtf8Bytes(ens));
+  const labelHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(ens));
   const tokenId = BigInt(labelHash).toString();
 
   return tokenId;

@@ -5,7 +5,7 @@ import Button from "@/ui/forms/Button";
 import { getProviderUrl, storeNotif } from "@/utils/misc";
 import { useWeb3React } from "@web3-react/core";
 import { CredentialType, IDKitWidget, useIDKit } from "@worldcoin/idkit";
-import { AbiCoder, Contract, ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import C3ABI from "../../artifacts/C3.json";
 import Image from "next/image";
 import WorldCoinLogo from "../../assets/WorldCoinLogo.svg";
@@ -14,6 +14,7 @@ import { WorldCoinIcon } from "../icons/WorldCoinLogo";
 import { PhoneIcon } from "../icons/PhoneIcon";
 import { useGlobalModalContext } from "../context/ModalContext";
 import { getLibrary } from "@/web3/utils";
+import { defaultAbiCoder } from "ethers/lib/utils";
 
 interface SignPetitionProps {
   petition?: IPetition;
@@ -97,7 +98,7 @@ function SignPetition(props: SignPetitionProps) {
                     address: account,
                     timestamp: new Date().toISOString(),
                     version: "4.1",
-                    hash: ethers.hashMessage(
+                    hash: ethers.utils.hashMessage(
                       JSON.stringify({
                         data: payload
                       })
@@ -226,12 +227,14 @@ function SignPetition(props: SignPetitionProps) {
                   storeNotif("Error", "No wallet connected.", "danger");
                   return;
                 }
-                const provider = new ethers.JsonRpcProvider(await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID));
+                const provider = new ethers.providers.JsonRpcProvider(
+                  await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID)
+                );
                 // This address is only for Base
                 const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
                 const library = getLibrary(connector.provider);
                 const instance = contract.connect(library.getSigner() as any) as Contract;
-                const proof = [...[...AbiCoder.defaultAbiCoder().decode(["uint256[8]"], e.proof)][0]];
+                const proof = [...[...defaultAbiCoder.decode(["uint256[8]"], e.proof)][0]];
                 const metadata = {
                   root: e.merkle_root,
                   nullifierHash: e.nullifier_hash,
@@ -239,10 +242,14 @@ function SignPetition(props: SignPetitionProps) {
                 };
                 try {
                   handleLoading(true);
-                  await instance.signPetition(petition?.id ?? "", metadata);
+                  await instance.signPetition(petition?.id ?? "", metadata).then(
+                    async (tx: any) =>
+                      await tx.wait(1).then(() => {
+                        storeNotif("Success", "Petition signed.", "success");
+                        hideModal(true);
+                      })
+                  );
                   handleLoading(false);
-                  storeNotif("Success", "Petition signed.", "success");
-                  hideModal(true);
                 } catch (err: any) {
                   handleLoading(false);
                   storeNotif("Error", err?.message ? err.message : err, "danger");
