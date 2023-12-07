@@ -33,9 +33,7 @@ function Share(props: ShareProps) {
             onClick={() => {
               window.open(
                 encodeURI(
-                  `https://twitter.com/intent/tweet?text=${"Please sign and share my petition."}&url=${
-                    window.location.href
-                  }`
+                  `https://twitter.com/intent/tweet?text=${"Please sign and share my petition."}&url=${props.url}`
                 ),
                 "_blank"
               );
@@ -49,9 +47,7 @@ function Share(props: ShareProps) {
             onClick={() => {
               window.open(
                 encodeURI(
-                  `https://telegram.me/share/url?text=${"Please sign and share my petition."}&url=${
-                    window.location.href
-                  }`
+                  `https://telegram.me/share/url?text=${"Please sign and share my petition."}&url=${props.url}`
                 ),
                 "_blank"
               );
