@@ -64,7 +64,11 @@ export const MAINNET_CHAINS: ChainConfig = {
     name: "Mainnet"
   },
   10: {
-    urls: [getInfuraUrlFor("optimism-mainnet"), "https://mainnet.optimism.io"].filter(Boolean) as string[],
+    urls: [
+      "https://opt-mainnet.g.alchemy.com/v2/gOydpYzY6RKFMDV6W3CfSdGmFmrZ18M4",
+      getInfuraUrlFor("optimism-mainnet"),
+      "https://mainnet.optimism.io"
+    ].filter(Boolean) as string[],
     name: "Optimism",
     nativeCurrency: ETH,
     blockExplorerUrls: ["https://optimistic.etherscan.io"]

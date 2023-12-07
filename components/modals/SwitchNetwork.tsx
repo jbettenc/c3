@@ -22,7 +22,7 @@ function SwitchNetwork(props: SwitchNetworkProps) {
             switchChain && switchChain();
           }}
         >
-          Switch to Polygon Testnet
+          Switch to Optimism
         </Button>
       </div>
     </>
