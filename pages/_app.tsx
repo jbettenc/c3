@@ -16,9 +16,9 @@ import MetricLogger from "@/ui/wrappers/MetricLogger";
 import PageError from "@/components/pages/PageError";
 
 export default function App({ Component, pageProps }: AppProps) {
-  if (process.env.REACT_APP_SENTRY_DSN) {
+  if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
     Sentry.init({
-      dsn: process.env.REACT_APP_SENTRY_DSN,
+      dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
       integrations: [new Sentry.BrowserTracing()],
       tracesSampleRate: 1.0,
       enabled: true
