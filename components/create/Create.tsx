@@ -13,7 +13,6 @@ import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
 import { postUploadToStorage } from "@/utils/storage";
 import { ethers, Contract } from "ethers";
 import { v4 as uuidv4 } from "uuid";
-import { CredentialType, IDKitWidget } from "@worldcoin/idkit";
 import C3ABI from "../../artifacts/C3.json";
 import { getBase64, getProviderUrl, storeNotif } from "@/utils/misc";
 import { StoragePayload } from "@/types";
@@ -24,6 +23,7 @@ import { useENS } from "@/utils/hooks/useENS";
 import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID } from "@/constants/constants";
 import { getLibrary } from "@/web3/utils";
 import { defaultAbiCoder } from "ethers/lib/utils";
+import { CredentialType } from "@worldcoin/idkit";
 
 export function Create() {
   const [title, handleTitle] = useState("");
@@ -31,6 +31,7 @@ export function Create() {
   const [step, handleStep] = useState(0);
   const [creating, handleCreating] = useState(false);
   const [importState, handleImportState] = useState<File[]>([]);
+  const [credentialType, handleCredentialType] = useState<CredentialType>();
   const [metadata, handleMetadata] = useState<any>();
   const [hash, handleHash] = useState<string>();
   const { account, chainId, connector } = useWeb3React();
@@ -52,50 +53,22 @@ export function Create() {
       showModal(
         MODAL_TYPE.WORLD_ID_VERIFY,
         {
-          idkitButton: (
-            <IDKitWidget
-              app_id="app_staging_6ec3ea829a0d16fa66a44e9872b70153"
-              action={`createPetition-${hash}`} // or signPetition
-              signal={account ?? ""}
-              handleVerify={async (e: {
-                merkle_root: string;
-                nullifier_hash: string;
-                proof: string;
-                credential_type: CredentialType;
-              }) => {
-                // Only perform backend check if the credential type is phone. Orb performed on chain.
-                // if (e.credential_type === CredentialType.Phone) {
-                //   throw new Error("Only Orb Verified accounts can start a petition.");
-                // }
-              }}
-              onSuccess={async (e: {
-                merkle_root: string;
-                nullifier_hash: string;
-                proof: string;
-                credential_type: string;
-              }) => {
-                const proof = [...[...defaultAbiCoder.decode(["uint256[8]"], e.proof)][0]];
-                const md = {
-                  root: e.merkle_root,
-                  nullifierHash: e.nullifier_hash,
-                  proof: proof
-                };
-                handleMetadata(md);
-              }}
-              enableTelemetry
-            >
-              {({ open }) => (
-                <Button
-                  className="w-full sm:w-[49%]"
-                  onClick={async () => {
-                    open();
-                  }}
-                >
-                  Sign In with WorldCoin
-                </Button>
-              )}
-            </IDKitWidget>
-          )
+          hash,
+          onSuccess: async (e: {
+            merkle_root: string;
+            nullifier_hash: string;
+            proof: string;
+            credential_type: CredentialType;
+          }) => {
+            const proof = [...[...defaultAbiCoder.decode(["uint256[8]"], e.proof)][0]];
+            const md = {
+              root: e.merkle_root,
+              nullifierHash: e.nullifier_hash,
+              proof: proof
+            };
+            handleCredentialType(e.credential_type);
+            handleMetadata(md);
+          }
         },
         { showHeader: false, border: false, hideOnPathnameChange: true, preventModalClose: true }
       );
@@ -366,36 +339,61 @@ export function Create() {
                 }
                 const cid = storage.transaction.itemId ?? "";
 
-                // Trigger smart contract call
-                const provider = new ethers.providers.JsonRpcProvider(
-                  await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID)
-                );
-                const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
-                const library = getLibrary(connector.provider);
-                const instance = contract.connect(library.getSigner() as any) as Contract;
-                try {
-                  await instance.createPetition(hash, cid, metadata).then(
-                    async (tx: any) =>
-                      await tx.wait(1).then(() => {
-                        showModal(
-                          MODAL_TYPE.SHARE,
-                          {
-                            url: `${window.location.href.replace("create", "petition")}/${hash}`,
-                            title,
-                            address: account,
-                            images
-                          },
-                          {
-                            title: "Share Petition",
-                            headerSeparator: false,
-                            border: false,
-                            onClose: () => router.push(`/petition/${hash}`)
-                          }
-                        );
-                      })
+                if (credentialType === CredentialType.Orb) {
+                  // Trigger smart contract call
+                  const provider = new ethers.providers.JsonRpcProvider(
+                    await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID)
                   );
-                } catch (err: any) {
-                  storeNotif("Error", err?.message ? err.message : err, "danger");
+                  const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
+                  const library = getLibrary(connector.provider);
+                  const instance = contract.connect(library.getSigner() as any) as Contract;
+                  try {
+                    await instance.createPetition(hash, cid, metadata).then(
+                      async (tx: any) =>
+                        await tx.wait(1).then(() => {
+                          showModal(
+                            MODAL_TYPE.SHARE,
+                            {
+                              url: `${window.location.href.replace("create", "petition")}/${hash}`,
+                              title,
+                              address: account,
+                              images
+                            },
+                            {
+                              title: "Share Petition",
+                              headerSeparator: false,
+                              border: false,
+                              onClose: () => router.push(`/petition/${hash}`)
+                            }
+                          );
+                        })
+                    );
+                  } catch (err: any) {
+                    storeNotif("Error", err?.message ? err.message : err, "danger");
+                  }
+                } else {
+                  try {
+                    // TODO: call backend to create off-chain petition
+                    // I have hash, cid, metadata, petitioner/account to send to backend
+
+                    showModal(
+                      MODAL_TYPE.SHARE,
+                      {
+                        url: `${window.location.href.replace("create", "petition")}/${hash}`,
+                        title,
+                        address: account,
+                        images
+                      },
+                      {
+                        title: "Share Petition",
+                        headerSeparator: false,
+                        border: false,
+                        onClose: () => router.push(`/petition/${hash}`)
+                      }
+                    );
+                  } catch (err: any) {
+                    storeNotif("Error", err?.message ? err.message : err, "danger");
+                  }
                 }
               } else {
                 handleStep(step + 1);
