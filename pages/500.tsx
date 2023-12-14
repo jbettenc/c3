@@ -11,7 +11,7 @@ const InternalServerErrorPage = () => {
         <title>DEAL</title>
       </Head>
       <main className="w-full">
-        <div className="w-full flex justify-around items-center h-full py-16">
+        <div className="w-full flex justify-around items-center h-full">
           <PageError />
         </div>
       </main>
