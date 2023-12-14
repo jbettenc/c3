@@ -14,7 +14,7 @@ import { createOffChainPetition, postUploadToStorage } from "@/utils/storage";
 import { ethers, Contract } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 import C3ABI from "../../artifacts/C3.json";
-import { getBase64, getProviderUrl, storeNotif } from "@/utils/misc";
+import { getBase64, getCompressedBase64, getProviderUrl, storeNotif } from "@/utils/misc";
 import { StoragePayload } from "@/types";
 import { BackArrowIcon } from "../icons/BackArrowIcon";
 import Link from "next/link";
@@ -293,12 +293,14 @@ export function Create() {
                 handleCreating(true);
                 const tags = [{ name: "Application", value: "EthSignC3" }];
                 const images = await Promise.all(importState.map(async (f) => await getBase64(f)));
+                const thumbnails = await Promise.all(importState.map(async (f) => await getCompressedBase64(f)));
                 // prepare message to sign before upload
                 let payload = {
                   address: account,
                   title,
                   description,
-                  images
+                  images,
+                  thumbnails
                 };
 
                 const messagePayload = {

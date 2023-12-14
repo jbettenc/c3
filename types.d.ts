@@ -58,6 +58,7 @@ export interface IPetitionMetadata {
   address: string;
   title: string;
   description: string;
+  thumbnails: string[];
   images: string[];
 }
 

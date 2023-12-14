@@ -90,8 +90,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   try {
     const arr = id as string;
-    // TODO: We may need to pull petitions from different chains. Will need to modify URL to make this work.
-    // Currently defaulting to polygon testnet for petition loading
     const { prefix } = splitPetitionId(arr);
     petition = await loadPetition(DEFAULT_CHAIN_ID, arr);
 
@@ -117,7 +115,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       petition,
-      metadata,
+      metadata: { ...metadata, images: [] },
       url: context.req.headers.host
     }
   };

@@ -16,6 +16,7 @@ import Tooltip from "@/ui/Tooltip";
 import { WarningIcon } from "./icons/WarningIcon";
 import TooltipWrapper from "@/ui/TooltipWrapper";
 import { ReportCategory, ReportCategoryText } from "./modals/ReportPetition";
+import { getFileForUser } from "@/utils/storage";
 
 interface PetitionProps {
   petition?: IPetition;
@@ -24,7 +25,8 @@ interface PetitionProps {
 }
 
 function Petition(props: PetitionProps) {
-  const { petition, metadata, creatorAlias } = props;
+  const { petition, metadata: serverMetadata, creatorAlias } = props;
+  const [metadata, handleMetadata] = useState<IPetitionMetadata | null | undefined>(serverMetadata);
   const [signers, handleSigners] = useState<any[]>();
   const [userSignedPetition, handleUserSignedPetition] = useState<boolean>();
   // TODO: Load different signature types and display them
@@ -42,6 +44,20 @@ function Petition(props: PetitionProps) {
       }
     })();
   }, [petition, chainId]);
+
+  useEffect(() => {
+    (async () => {
+      if (metadata) {
+        if ((metadata.images?.length ?? 0) < (metadata.thumbnails?.length ?? 0)) {
+          // We loaded thumbnails, but not images. Need to load images.
+          if (petition?.cid) {
+            const obj = await getFileForUser(petition.cid);
+            handleMetadata(obj?.data ?? null);
+          }
+        }
+      }
+    })();
+  }, [serverMetadata]);
 
   useEffect(() => {
     (async () => {
