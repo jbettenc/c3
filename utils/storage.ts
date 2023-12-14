@@ -5,6 +5,8 @@ import { ArweavePayload, IPetition, PetitionReport, ResponseObject, StoragePaylo
 import { ETHSIGN_API_URL, PETITION_API_URL } from "@/constants/constants";
 import { ReportCategory } from "@/components/modals/ReportPetition";
 import { getPetitions } from "./queries";
+import { VerificationLevel } from "@worldcoin/idkit";
+import { splitPetitionId } from "./misc";
 
 export function makeStorageClient() {
   return new Web3Storage({
@@ -104,6 +106,140 @@ export const getFileForUser = async (id: string): Promise<ArweavePayload | null>
   return ret?.transaction ? ret.transaction : ret;
 };
 
+export const createOffChainPetition = async (prefix: string, cid: string, petitioner: string, metadata: any) => {
+  let ret: any = null;
+  try {
+    await fetch(`${PETITION_API_URL}/petition`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        prefix,
+        cid,
+        petitioner,
+        data: null,
+        merkle_root: metadata.root,
+        nullifier_hash: metadata.nullifierHash,
+        proof: metadata.proof,
+        verification_level: "device",
+        action: metadata.action,
+        signal: metadata.signal
+      })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (!response.success) {
+          ret = response;
+        } else {
+          ret = { success: true, data: response.data };
+        }
+      });
+  } catch (err: any) {
+    ret = { success: false, message: err?.message ? err.message : err };
+  }
+
+  return ret;
+};
+
+export const getPetitionOffChain = async (
+  prefix: string,
+  id: string
+): Promise<{
+  error?: { message: string };
+  success?: boolean;
+  message?: string;
+  data?: any;
+} | null> => {
+  let ret: any = null;
+  try {
+    await fetch(`${PETITION_API_URL}/petition/${prefix}${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        justCount: 0
+      })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response && response.data === 1) {
+          // Data found for the given petition ID
+          ret = {
+            success: true,
+            data: {
+              ...response.petition,
+              tier0Signatures: response.tier0Count,
+              tier1Signatures: response.tier1Count,
+              reportCount: response.reportCount,
+              reportMostFrequentCategory: response.reportMostFrequentCategory
+            }
+          };
+        } else if (response && response.data === 0) {
+          // No data present in the backend for the given petition ID
+          ret = { success: true, data: null };
+        } else {
+          // Unknown error
+          ret = { error: { message: "No response" } };
+        }
+      });
+  } catch (err: any) {
+    return { error: { message: err?.message ? err.message : err } };
+  }
+
+  return ret;
+};
+
+export const getPetitionOffChainBatch = async (
+  ids: { prefix: string; id: string }[]
+): Promise<{
+  error?: { message: string };
+  success?: boolean;
+  message?: string;
+  data?: any;
+} | null> => {
+  let ret: any = null;
+  try {
+    await fetch(`${PETITION_API_URL}/batch/petitions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ids: ids.map((id) => `${id.prefix}${id.id}`),
+        justCount: 0
+      })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response && response.data === 1) {
+          // Data found for the given petition ID
+          ret = {
+            success: true,
+            data: {
+              ...response.petition,
+              tier0Signatures: response.tier0Count,
+              tier1Signatures: response.tier1Count,
+              reportCount: response.reportCount,
+              reportMostFrequentCategory: response.reportMostFrequentCategory
+            }
+          };
+        } else if (response && response.data === 0) {
+          // No data present in the backend for the given petition ID
+          ret = { success: true, data: null };
+        } else {
+          // Unknown error
+          ret = { error: { message: "No response" } };
+        }
+      });
+  } catch (err: any) {
+    return { error: { message: err?.message ? err.message : err } };
+  }
+
+  return ret;
+};
+
 /**
  * Get the Tier 0 and 1 signature count from our backend.
  *
@@ -179,7 +315,7 @@ export const getSignaturesForPetition = async (
 export const getRecommendedPetitions = async (
   chainId: string | number,
   limit = 10,
-  justCount = 1,
+  justCount = 0,
   inputPetitionIds?: string[]
 ): Promise<{
   error?: { message: string };
@@ -205,7 +341,21 @@ export const getRecommendedPetitions = async (
         if (response) {
           // Data found for the given petition ID
           const ids = response.petitions.map((petition: any) => petition.id);
-          const petitionsData = await getPetitions(chainId, ids);
+          const petitionsData = (await getPetitions(chainId, ids)) ?? {};
+
+          for (const pet of response.petitions) {
+            if (pet.petition.cid !== "") {
+              petitionsData[pet.id] = {
+                ...(petitionsData[pet.id] ?? { tier2Signatures: 0 }),
+                ...pet.petition,
+                tier0Signatures: pet.tier0Count,
+                tier1Signatures: pet.tier1Count,
+                reportCount: pet.reportCount,
+                reportMostFrequentCategory: pet.reportMostFrequentCategory
+              };
+            }
+          }
+
           const petitions = ids.map((id: any, idx: number) => {
             const petition = petitionsData
               ? petitionsData[id]

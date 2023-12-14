@@ -276,3 +276,17 @@ export async function getBase64(file: File) {
     };
   });
 }
+
+export function splitPetitionId(id: string) {
+  const idx = id.indexOf("_");
+  if (idx < 0) {
+    return {
+      prefix: "",
+      id
+    };
+  }
+  return {
+    prefix: id.substring(0, idx + 1),
+    id: id.substring(idx + 1)
+  };
+}

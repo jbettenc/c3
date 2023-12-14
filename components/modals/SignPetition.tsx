@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID, PETITION_API_URL } from "@/constants/constants";
+import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID, PETITION_API_URL, WORLDCOIN_APP_ID } from "@/constants/constants";
 import { IPetition } from "@/types";
 import Button from "@/ui/forms/Button";
 import { getProviderUrl, storeNotif } from "@/utils/misc";
 import { useWeb3React } from "@web3-react/core";
-import { CredentialType, IDKitWidget, useIDKit } from "@worldcoin/idkit";
+import { IDKitWidget, VerificationLevel, useIDKit } from "@worldcoin/idkit";
 import { Contract, ethers } from "ethers";
 import C3ABI from "../../artifacts/C3.json";
 import Image from "next/image";
@@ -24,8 +24,8 @@ function SignPetition(props: SignPetitionProps) {
   const { petition } = props;
   const [step, handleStep] = useState(0);
   const [loading, handleLoading] = useState(false);
-  const [credentialType, handleCredentialType] = useState<CredentialType[]>();
-  const [appId, handleAppId] = useState("app_staging_6ec3ea829a0d16fa66a44e9872b70153");
+  const [credentialType, handleCredentialType] = useState<VerificationLevel>();
+  const [appId, handleAppId] = useState<`app_${string}`>(WORLDCOIN_APP_ID(VerificationLevel.Orb));
   const [action, handleAction] = useState(`signPetition-${petition?.id ?? "0x00"}`);
   const { account, chainId, connector } = useWeb3React();
   const { hideModal } = useGlobalModalContext();
@@ -180,8 +180,8 @@ function SignPetition(props: SignPetitionProps) {
           <div
             className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
             onClick={() => {
-              handleAppId("app_staging_6ec3ea829a0d16fa66a44e9872b70153");
-              handleCredentialType([CredentialType.Orb]);
+              handleAppId(WORLDCOIN_APP_ID(VerificationLevel.Orb));
+              handleCredentialType(VerificationLevel.Orb);
             }}
           >
             <WorldCoinIcon className="mx-auto w-6 h-6" />
@@ -190,8 +190,8 @@ function SignPetition(props: SignPetitionProps) {
           <div
             className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
             onClick={() => {
-              handleAppId("app_staging_0ff1142a912bb109636e597b70d6b978");
-              handleCredentialType([CredentialType.Phone]);
+              handleAppId(WORLDCOIN_APP_ID(VerificationLevel.Device));
+              handleCredentialType(VerificationLevel.Device);
             }}
           >
             <PhoneIcon className="mx-auto w-6 h-6" />
@@ -201,17 +201,17 @@ function SignPetition(props: SignPetitionProps) {
             app_id={appId}
             action={action}
             signal={account ?? ""}
-            credential_types={credentialType}
+            verification_level={credentialType}
             handleVerify={async (e: {
               merkle_root: string;
               nullifier_hash: string;
               proof: string;
-              credential_type: CredentialType;
+              verification_level: VerificationLevel;
             }) => {
-              // Only perform backend check if the credential type is phone. Orb performed on chain.
+              // Only perform backend check if the credential type is device. Orb performed on chain.
               if (
-                e.credential_type === CredentialType.Phone &&
-                appId === "app_staging_6ec3ea829a0d16fa66a44e9872b70153"
+                e.verification_level === VerificationLevel.Device &&
+                appId === WORLDCOIN_APP_ID(VerificationLevel.Orb)
               ) {
                 throw new Error("Please use an Orb Verified account for on-chain petition signatures.");
               }
@@ -220,9 +220,9 @@ function SignPetition(props: SignPetitionProps) {
               merkle_root: string;
               nullifier_hash: string;
               proof: string;
-              credential_type: CredentialType;
+              verification_level: VerificationLevel;
             }) => {
-              if (e.credential_type === CredentialType.Orb) {
+              if (e.verification_level === VerificationLevel.Orb) {
                 if (!connector.provider) {
                   storeNotif("Error", "No wallet connected.", "danger");
                   return;
@@ -254,7 +254,7 @@ function SignPetition(props: SignPetitionProps) {
                   handleLoading(false);
                   storeNotif("Error", err?.message ? err.message : err, "danger");
                 }
-              } else if (e.credential_type === CredentialType.Phone) {
+              } else if (e.verification_level === VerificationLevel.Device) {
                 try {
                   // Call backend
                   handleLoading(true);
@@ -268,7 +268,7 @@ function SignPetition(props: SignPetitionProps) {
                       merkle_root: e.merkle_root,
                       nullifier_hash: e.nullifier_hash,
                       proof: e.proof,
-                      credential_type: "phone",
+                      verification_level: "device",
                       petitionId: petition?.id ?? "0x00",
                       action: `signPetition-${petition?.id ?? "0x00"}`,
                       signal: account ?? ""
@@ -294,7 +294,6 @@ function SignPetition(props: SignPetitionProps) {
                 }
               }
             }}
-            enableTelemetry
           ></IDKitWidget>
         </div>
       </div>

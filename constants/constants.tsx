@@ -1,11 +1,15 @@
 // @param production
 // false: Testnet support for Goerli + testnet endpoints and testnet contract addresses.
+
+import { VerificationLevel } from "@worldcoin/idkit";
+
 // true: Mainnet support ONLY. Use real endpoints and real contract addresses.
 const production = process.env.NEXT_PUBLIC_SENTRY_DSN ? true : false;
 
 const CONTRACT_ADDRESS_OPTIMISM = "0x4e4af2a21ebf62850fD99Eb6253E1eFBb56098cD";
 const CONTRACT_ADDRESS_POLYGON_MUMBAI = "0x8D92827CdB67A503e9FB21B28a58F9dAb36B4973";
-const GRAPHQL_URL_OPTIMISM = "https://subgraph.satsuma-prod.com/team-ethsign--23914/c3-op/version/v0.0.6/api";
+const GRAPHQL_URL_OPTIMISM =
+  "https://subgraph.satsuma-prod.com/746168fe5a7e/team-ethsign--23914/c3-op/version/v0.0.6/api";
 const GRAPHQL_URL_POLYGON_MUMBAI =
   "https://subgraph.satsuma-prod.com/746168fe5a7e/team-ethsign--23914/c3-mumbai/version/v0.0.5/api";
 
@@ -38,6 +42,17 @@ export const GRAPHQL_URL = (chainId: string | number) => {
       return GRAPHQL_URL_POLYGON_MUMBAI;
   }
   return production ? GRAPHQL_URL_OPTIMISM : GRAPHQL_URL_POLYGON_MUMBAI;
+};
+
+export const WORLDCOIN_APP_ID = (verificationLevel: VerificationLevel) => {
+  switch (verificationLevel) {
+    case VerificationLevel.Orb:
+      return "app_7f9557d75a9989cc762d18a645cb2c1c";
+    case VerificationLevel.Device:
+      return "app_b7d787f43d70812fa623356b8f4bb1c6";
+    default:
+      return "app_7f9557d75a9989cc762d18a645cb2c1c";
+  }
 };
 
 export {};

@@ -3,6 +3,7 @@ import Petition from "@/components/Petition";
 import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 import { IPetition, IPetitionMetadata } from "@/types";
 import { useENS } from "@/utils/hooks/useENS";
+import { splitPetitionId } from "@/utils/misc";
 import { loadPetition } from "@/utils/queries";
 import { getFileForUser, getSignaturesForPetition } from "@/utils/storage";
 import { GetServerSidePropsContext } from "next";
@@ -91,9 +92,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     const arr = id as string;
     // TODO: We may need to pull petitions from different chains. Will need to modify URL to make this work.
     // Currently defaulting to polygon testnet for petition loading
+    const { prefix } = splitPetitionId(id as string);
     petition = await loadPetition(DEFAULT_CHAIN_ID, arr);
 
-    if (petition) {
+    if (prefix === "" && petition) {
       let lowerTierSignatures: any = await getSignaturesForPetition(arr);
       lowerTierSignatures = lowerTierSignatures?.data ?? {};
       petition = { ...petition, ...lowerTierSignatures };

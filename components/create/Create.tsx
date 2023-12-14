@@ -10,7 +10,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useWeb3React } from "@web3-react/core";
 import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
-import { postUploadToStorage } from "@/utils/storage";
+import { createOffChainPetition, postUploadToStorage } from "@/utils/storage";
 import { ethers, Contract } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 import C3ABI from "../../artifacts/C3.json";
@@ -23,7 +23,7 @@ import { useENS } from "@/utils/hooks/useENS";
 import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID } from "@/constants/constants";
 import { getLibrary } from "@/web3/utils";
 import { defaultAbiCoder } from "ethers/lib/utils";
-import { CredentialType } from "@worldcoin/idkit";
+import { VerificationLevel } from "@worldcoin/idkit";
 
 export function Create() {
   const [title, handleTitle] = useState("");
@@ -31,7 +31,7 @@ export function Create() {
   const [step, handleStep] = useState(0);
   const [creating, handleCreating] = useState(false);
   const [importState, handleImportState] = useState<File[]>([]);
-  const [credentialType, handleCredentialType] = useState<CredentialType>();
+  const [credentialType, handleCredentialType] = useState<VerificationLevel>();
   const [metadata, handleMetadata] = useState<any>();
   const [hash, handleHash] = useState<string>();
   const { account, chainId, connector } = useWeb3React();
@@ -58,15 +58,16 @@ export function Create() {
             merkle_root: string;
             nullifier_hash: string;
             proof: string;
-            credential_type: CredentialType;
+            verification_level: VerificationLevel;
           }) => {
             const proof = [...[...defaultAbiCoder.decode(["uint256[8]"], e.proof)][0]];
             const md = {
               root: e.merkle_root,
               nullifierHash: e.nullifier_hash,
-              proof: proof
+              proof: proof,
+              originalProof: e.proof
             };
-            handleCredentialType(e.credential_type);
+            handleCredentialType(e.verification_level);
             handleMetadata(md);
           }
         },
@@ -284,6 +285,11 @@ export function Create() {
                   return;
                 }
 
+                if (!credentialType) {
+                  storeNotif("Error", "Please refresh your page and retry World ID verification.", "danger");
+                  return;
+                }
+
                 handleCreating(true);
                 const tags = [{ name: "Application", value: "EthSignC3" }];
                 const images = await Promise.all(importState.map(async (f) => await getBase64(f)));
@@ -339,7 +345,7 @@ export function Create() {
                 }
                 const cid = storage.transaction.itemId ?? "";
 
-                if (credentialType === CredentialType.Orb) {
+                if (credentialType === VerificationLevel.Orb) {
                   // Trigger smart contract call
                   const provider = new ethers.providers.JsonRpcProvider(
                     await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID)
@@ -348,49 +354,64 @@ export function Create() {
                   const library = getLibrary(connector.provider);
                   const instance = contract.connect(library.getSigner() as any) as Contract;
                   try {
-                    await instance.createPetition(hash, cid, metadata).then(
-                      async (tx: any) =>
-                        await tx.wait(1).then(() => {
-                          showModal(
-                            MODAL_TYPE.SHARE,
-                            {
-                              url: `${window.location.href.replace("create", "petition")}/${hash}`,
-                              title,
-                              address: account,
-                              images
-                            },
-                            {
-                              title: "Share Petition",
-                              headerSeparator: false,
-                              border: false,
-                              onClose: () => router.push(`/petition/${hash}`)
-                            }
-                          );
-                        })
-                    );
+                    await instance
+                      .createPetition(hash, cid, {
+                        proof: metadata.proof,
+                        nullifierHash: metadata.nullifierHash,
+                        root: metadata.root
+                      })
+                      .then(
+                        async (tx: any) =>
+                          await tx.wait(1).then(() => {
+                            showModal(
+                              MODAL_TYPE.SHARE,
+                              {
+                                url: `${window.location.href.replace("create", "petition")}/${hash}`,
+                                title,
+                                address: account,
+                                images
+                              },
+                              {
+                                title: "Share Petition",
+                                headerSeparator: false,
+                                border: false,
+                                onClose: () => router.push(`/petition/${hash}`)
+                              }
+                            );
+                          })
+                      );
                   } catch (err: any) {
                     storeNotif("Error", err?.message ? err.message : err, "danger");
                   }
                 } else {
                   try {
                     // TODO: call backend to create off-chain petition
-                    // I have hash, cid, metadata, petitioner/account to send to backend
-
-                    showModal(
-                      MODAL_TYPE.SHARE,
-                      {
-                        url: `${window.location.href.replace("create", "petition")}/${hash}`,
-                        title,
-                        address: account,
-                        images
-                      },
-                      {
-                        title: "Share Petition",
-                        headerSeparator: false,
-                        border: false,
-                        onClose: () => router.push(`/petition/${hash}`)
+                    // I have hash (make sure to prefix it), cid, metadata, petitioner/account to send to backend
+                    await createOffChainPetition("wid_", cid, account ?? "", {
+                      root: metadata.root,
+                      nullifierHash: metadata.nullifierHash,
+                      proof: metadata.originalProof,
+                      action: `createPetition-${hash}`,
+                      signal: account ?? ""
+                    }).then((res) => {
+                      if (res.success) {
+                        showModal(
+                          MODAL_TYPE.SHARE,
+                          {
+                            url: `${window.location.href.replace("create", "petition")}/${res.data.id}`,
+                            title,
+                            address: account,
+                            images
+                          },
+                          {
+                            title: "Share Petition",
+                            headerSeparator: false,
+                            border: false,
+                            onClose: () => router.push(`/petition/${res.data.id}`)
+                          }
+                        );
                       }
-                    );
+                    });
                   } catch (err: any) {
                     storeNotif("Error", err?.message ? err.message : err, "danger");
                   }

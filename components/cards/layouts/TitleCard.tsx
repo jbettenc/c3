@@ -9,7 +9,7 @@ import Button from "@/ui/forms/Button";
 interface TitleCardProps {
   title: string;
   petitioner: string;
-  verificationStatus?: number; // 0 = none, 1 = phone, 2 = orb
+  verificationStatus?: number; // 0 = none, 1 = device, 2 = orb
   tier0Signatures?: number;
   tier1Signatures?: number;
   tier2Signatures?: number;

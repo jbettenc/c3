@@ -1,10 +1,17 @@
 import { GRAPHQL_URL } from "@/constants/constants";
 import { IPetition } from "@/types";
-import { getSignaturesForPetition, getSignaturesForPetitionsBatch } from "./storage";
+import {
+  getPetitionOffChain,
+  getPetitionOffChainBatch,
+  getSignaturesForPetition,
+  getSignaturesForPetitionsBatch
+} from "./storage";
 import { ReportCategory } from "@/components/modals/ReportPetition";
+import { splitPetitionId } from "./misc";
 
-export const loadPetition = async (chainId: string | number, id: string): Promise<IPetition | null> => {
+const loadPetitionOnChain = async (chainId: string | number, id: string) => {
   let res: IPetition | null = null;
+
   const query = `{
         petition(id: "${id}") {
             id
@@ -38,8 +45,61 @@ export const loadPetition = async (chainId: string | number, id: string): Promis
         };
       }
     });
+  return res ?? null;
+};
+
+const loadPetitionOffChain = async (chainId: string | number, prefix: string, id: string) => {
+  let res: IPetition | null = null;
+  let tier2Signatures = 0;
+  const petitionData = await getPetitionOffChain(prefix, id);
+  if (!petitionData?.data) {
+    return res;
+  }
+
+  const query = `{
+        petition(id: "${prefix}${id}") {
+            signatures
+          }
+    }`;
+
+  await fetch(`${GRAPHQL_URL(chainId)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      query: query
+    })
+  })
+    .then((res) => res.clone().json())
+    .then((response) => {
+      if (response?.data?.petition) {
+        tier2Signatures = response.data.petition.signatures;
+      }
+    });
+
+  res = {
+    id: petitionData.data.id,
+    cid: petitionData.data.cid,
+    petitioner: petitionData.data.petitioner,
+    tier0Signatures: petitionData.data.tier0Signatures,
+    tier1Signatures: petitionData.data.tier1Signatures,
+    tier2Signatures,
+    timestamp: petitionData.data.createdAt,
+    reportCount: petitionData.data.reportCount,
+    reportMostFrequentCategory: petitionData.data.reportMostFrequentCategory
+  };
 
   return res ?? null;
+};
+
+export const loadPetition = async (chainId: string | number, idCombined: string): Promise<IPetition | null> => {
+  const { prefix, id } = splitPetitionId(idCombined);
+  if (prefix === "") {
+    return await loadPetitionOnChain(chainId, id);
+  } else {
+    return await loadPetitionOffChain(chainId, prefix, id);
+  }
 };
 
 export const loadPetitionSigners = async (chainId: string | number, id: string) => {
