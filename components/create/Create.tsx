@@ -10,7 +10,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useWeb3React } from "@web3-react/core";
 import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
-import { createOffChainPetition, postUploadToStorage } from "@/utils/storage";
+import { createOffChainPetition, postUploadToStorage, postUploadToStorageBatch } from "@/utils/storage";
 import { ethers, Contract } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 import C3ABI from "../../artifacts/C3.json";
@@ -77,6 +77,79 @@ export function Create() {
       hideModal(true);
     }
   }, [metadata, hash, account]);
+
+  const uploadImagesToArweave = async (images: string[]) => {
+    if (!connector.provider) {
+      storeNotif("Error", "No wallet connected.", "danger");
+      return;
+    }
+
+    if (!credentialType) {
+      storeNotif("Error", "Please refresh your page and retry World ID verification.", "danger");
+      return;
+    }
+    const cids: string[] = [];
+    const payloads: StoragePayload[] = [];
+    // prepare message to sign before upload
+    const tags = [{ name: "Application", value: "EthSignC3" }];
+    for (let idx in images) {
+      let payload = images[idx];
+
+      const messagePayload = {
+        address: account,
+        timestamp: new Date().toISOString(),
+        version: "4.1",
+        hash: ethers.utils.hashMessage(
+          JSON.stringify({
+            data: payload
+          })
+        )
+      };
+
+      // messages converted to string before sign with statement prefix
+      const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
+        messagePayload,
+        null,
+        2
+      )}`;
+
+      // sign signature with the messages in details
+      const signature = (await connector.provider.request({
+        method: "personal_sign",
+        params: [message, account]
+      })) as string;
+
+      // payload to upload arweave storage
+      const storagePayload: StoragePayload = {
+        signature,
+        message,
+        data: JSON.stringify({
+          data: payload
+        }),
+        tags,
+        shouldVerify: true
+      };
+      payloads.push(storagePayload);
+    }
+
+    // Upload to our Arweave endpoint
+    const storage = await postUploadToStorageBatch(payloads);
+    if (storage) {
+      for (const s of storage) {
+        if (!s?.message || s.message !== "success") {
+          storeNotif("Error", "Failed to upload petition metadata to Arweave. Please try again.", "danger");
+          handleCreating(false);
+          return;
+        }
+        const cid = s.transaction.itemId ?? "";
+        if (cid !== "") {
+          cids.push(cid);
+        }
+      }
+    }
+
+    return cids;
+  };
 
   if (step < 2) {
     return (
@@ -292,15 +365,15 @@ export function Create() {
 
                 handleCreating(true);
                 const tags = [{ name: "Application", value: "EthSignC3" }];
-                const images = await Promise.all(importState.map(async (f) => await getBase64(f)));
-                const thumbnails = await Promise.all(importState.map(async (f) => await getCompressedBase64(f)));
+                const images = (await Promise.all(importState.map(async (f) => await getBase64(f)))) as string[];
+                const cids = await uploadImagesToArweave(images);
+
                 // prepare message to sign before upload
                 let payload = {
                   address: account,
                   title,
                   description,
-                  images,
-                  thumbnails
+                  images: cids
                 };
 
                 const messagePayload = {

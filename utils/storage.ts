@@ -82,6 +82,41 @@ export const postUploadToStorage = async (data: StoragePayload): Promise<Storage
   return tx as any;
 };
 
+export const postUploadToStorageBatch = async (data: StoragePayload[]): Promise<StorageResponse[] | undefined> => {
+  let tx: any;
+  try {
+    await fetch(`${ETHSIGN_API_URL}/uploadBatch`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ batchedUploads: data })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response) {
+          tx = response.transactions.map((transaction: { message?: string; itemId?: string }) => ({
+            message: response.message,
+            transaction
+          }));
+        }
+      })
+      .catch((err) => {
+        tx = {
+          message: "failed",
+          transactions: err as any
+        };
+      });
+  } catch (err) {
+    tx = {
+      message: "failed",
+      transactions: err as any
+    };
+  }
+
+  return tx as any;
+};
+
 /**
  * Get file given an Arweave ID.
  *

@@ -3,7 +3,7 @@ import Petition from "@/components/Petition";
 import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 import { IPetition, IPetitionMetadata } from "@/types";
 import { useENS } from "@/utils/hooks/useENS";
-import { splitPetitionId } from "@/utils/misc";
+import { parseImage, splitPetitionId } from "@/utils/misc";
 import { loadPetition } from "@/utils/queries";
 import { getFileForUser, getSignaturesForPetition } from "@/utils/storage";
 import { GetServerSidePropsContext } from "next";
@@ -32,8 +32,8 @@ function PetitionPage(props: PetitionPageProps) {
           title: `${metadata?.title ? metadata.title + " | " : ""}C3`,
           description: metadata?.description ?? "Communities Creating Change",
           images: metadata
-            ? metadata.thumbnails.map((image) => ({
-                url: image,
+            ? metadata.images.map((image) => ({
+                url: parseImage(image),
                 width: 400,
                 height: 400,
                 alt: "Image"
@@ -115,7 +115,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       petition,
-      metadata: { ...metadata, images: [] },
+      metadata,
       url: context.req.headers.host
     }
   };

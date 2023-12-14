@@ -2,6 +2,7 @@ import { useENS } from "@/utils/hooks/useENS";
 import Card from "../Card";
 import SignatureProgressBar from "@/components/SignatureProgressBar";
 import Button from "@/ui/forms/Button";
+import { parseImage } from "@/utils/misc";
 
 interface ImageCardProps {
   loading?: boolean;
@@ -44,7 +45,7 @@ function ImageCard(props: ImageCardProps) {
       <div className="w-full h-full bg-red-75 p-6">
         <div className="w-full h-full flex flex-col overflow-hidden">
           <img
-            src={props.image}
+            src={parseImage(props.image)}
             alt={props.title}
             className="rounded-lg mx-auto min-h-[4rem] h-full min-w-[9.75rem] max-w-full shrink object-contain"
             draggable={false}

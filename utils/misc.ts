@@ -1,3 +1,4 @@
+import { ETHSIGN_API_URL } from "@/constants/constants";
 import { ethers } from "ethers";
 import _ from "lodash";
 import { NOTIFICATION_TYPE, Store } from "react-notifications-component";
@@ -343,4 +344,12 @@ export function splitPetitionId(id: string) {
     prefix: id.substring(0, idx + 1),
     id: id.substring(idx + 1)
   };
+}
+
+export function parseImage(image: string) {
+  if (image.startsWith("data:")) {
+    return image;
+  } else {
+    return `${ETHSIGN_API_URL}/blob/${image}`;
+  }
 }

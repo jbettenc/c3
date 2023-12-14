@@ -11,12 +11,13 @@ import SignerCard from "./SignerCard";
 import Link from "next/link";
 import { BackArrowIcon } from "./icons/BackArrowIcon";
 import { setOpenLoginModal } from "@/store/userSlice";
-import { DEFAULT_CHAIN_ID } from "@/constants/constants";
+import { DEFAULT_CHAIN_ID, ETHSIGN_API_URL } from "@/constants/constants";
 import Tooltip from "@/ui/Tooltip";
 import { WarningIcon } from "./icons/WarningIcon";
 import TooltipWrapper from "@/ui/TooltipWrapper";
 import { ReportCategory, ReportCategoryText } from "./modals/ReportPetition";
 import { getFileForUser } from "@/utils/storage";
+import { parseImage } from "@/utils/misc";
 
 interface PetitionProps {
   petition?: IPetition;
@@ -44,20 +45,6 @@ function Petition(props: PetitionProps) {
       }
     })();
   }, [petition, chainId]);
-
-  useEffect(() => {
-    (async () => {
-      if (metadata) {
-        if ((metadata.images?.length ?? 0) < (metadata.thumbnails?.length ?? 0)) {
-          // We loaded thumbnails, but not images. Need to load images.
-          if (petition?.cid) {
-            const obj = await getFileForUser(petition.cid);
-            handleMetadata(obj?.data ?? null);
-          }
-        }
-      }
-    })();
-  }, [serverMetadata]);
 
   useEffect(() => {
     (async () => {
@@ -133,9 +120,9 @@ function Petition(props: PetitionProps) {
               {metadata?.images?.length && metadata.images.length > 0 ? (
                 <div className="w-full">
                   <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
-                    {metadata.images.map((file, idx) => (
+                    {metadata.images.map((image, idx) => (
                       <div className="" key={`ipfsimages-${idx}`}>
-                        <img className="w-full h-auto" src={file} alt="Image" />
+                        <img className="w-full h-auto" src={parseImage(image)} alt="Image" />
                       </div>
                     ))}
                   </Carousel>

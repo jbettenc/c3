@@ -3,7 +3,7 @@ import DiscordIcon from "../../assets/Discord.svg";
 import TelegramIcon from "../../assets/Telegram.svg";
 import XIcon from "../../assets/X.svg";
 import Button from "@/ui/forms/Button";
-import { copyStringToClipboard, storeNotif } from "@/utils/misc";
+import { copyStringToClipboard, parseImage, storeNotif } from "@/utils/misc";
 import { Carousel } from "react-responsive-carousel";
 
 interface ShareProps {
@@ -66,7 +66,7 @@ function Share(props: ShareProps) {
                 <Carousel dynamicHeight={true} infiniteLoop={true} showThumbs={false} showStatus={false}>
                   {props.images.map((file, idx) => (
                     <div className="" key={`shareimages-${idx}`}>
-                      <img className="w-full h-auto" src={file} alt="Image" />
+                      <img className="w-full h-auto" src={parseImage(file)} alt="Image" />
                     </div>
                   ))}
                 </Carousel>
