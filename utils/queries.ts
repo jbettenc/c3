@@ -1,11 +1,6 @@
 import { GRAPHQL_URL } from "@/constants/constants";
 import { IPetition } from "@/types";
-import {
-  getPetitionOffChain,
-  getPetitionOffChainBatch,
-  getSignaturesForPetition,
-  getSignaturesForPetitionsBatch
-} from "./storage";
+import { getPetitionOffChain, getSignaturesForPetition } from "./storage";
 import { ReportCategory } from "@/components/modals/ReportPetition";
 import { splitPetitionId } from "./misc";
 
@@ -156,8 +151,8 @@ export const getPetitions = async (
   let res: any = null;
   const query = `{
     ${ids.map(
-      (id: string) =>
-        `s${id}: petition(id: "${id}") {
+      (id: string, idx) =>
+        `s${idx}: petition(id: "${id}") {
         id
         petitioner
         signatures
@@ -182,22 +177,24 @@ export const getPetitions = async (
       if (response?.data) {
         res = {};
         for (const key of Object.keys(response.data)) {
-          const id = key.substring(1);
-          res[id] = response.data[key]
-            ? {
-                id: response.data[key].id,
-                cid: response.data[key].cid,
-                petitioner: response.data[key].petitioner,
-                tier2Signatures: response.data[key].signatures,
-                timestamp: response.data[key].timestamp
-              }
-            : {
-                id: "",
-                cid: "",
-                petitioner: "",
-                tier2Signatures: 0,
-                timestamp: ""
-              };
+          const id = response.data[key]?.id ?? null;
+          if (id !== null) {
+            res[id] = response.data[key]
+              ? {
+                  id: response.data[key].id,
+                  cid: response.data[key].cid,
+                  petitioner: response.data[key].petitioner,
+                  tier2Signatures: response.data[key].signatures,
+                  timestamp: response.data[key].timestamp
+                }
+              : {
+                  id: "",
+                  cid: "",
+                  petitioner: "",
+                  tier2Signatures: 0,
+                  timestamp: ""
+                };
+          }
         }
       }
     });
