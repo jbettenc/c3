@@ -32,7 +32,7 @@ function PetitionPage(props: PetitionPageProps) {
           title: `${metadata?.title ? metadata.title + " | " : ""}C3`,
           description: metadata?.description ?? "Communities Creating Change",
           images: metadata
-            ? metadata.images.map((image) => ({
+            ? metadata.thumbnails.map((image) => ({
                 url: image,
                 width: 400,
                 height: 400,
