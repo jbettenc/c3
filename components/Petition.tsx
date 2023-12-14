@@ -197,7 +197,14 @@ function Petition(props: PetitionProps) {
                 }
                 showModal(
                   MODAL_TYPE.SIGN_PETITION,
-                  { petition: petition },
+                  {
+                    petition: petition,
+                    onSuccess: (petitionUuid: string, conduit: string, type: number, timestamp: number) => {
+                      const tmpSigners = [...(signers ?? [])];
+                      tmpSigners.unshift({ petitionUuid, conduit, type, timestamp });
+                      handleSigners(tmpSigners);
+                    }
+                  },
                   { showHeader: false, border: false, hideOnPathnameChange: true }
                 );
               }}

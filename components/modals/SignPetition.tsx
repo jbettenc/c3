@@ -18,10 +18,11 @@ import { defaultAbiCoder } from "ethers/lib/utils";
 
 interface SignPetitionProps {
   petition?: IPetition;
+  onSuccess?: (petitionUuid: string, conduit: string, type: number, timestamp: number) => void;
 }
 
 function SignPetition(props: SignPetitionProps) {
-  const { petition } = props;
+  const { petition, onSuccess } = props;
   const [step, handleStep] = useState(0);
   const [loading, handleLoading] = useState(false);
   const [credentialType, handleCredentialType] = useState<VerificationLevel>();
@@ -145,6 +146,8 @@ function SignPetition(props: SignPetitionProps) {
                           return;
                         }
                         storeNotif("Success", "Petition signed.", "success");
+                        onSuccess &&
+                          onSuccess(petition?.id ?? "", account?.toLowerCase() ?? "", 0, Math.floor(Date.now() / 1000));
                       })
                       .finally(() => handleLoading(false));
                     hideModal(true);
@@ -230,7 +233,6 @@ function SignPetition(props: SignPetitionProps) {
                 const provider = new ethers.providers.JsonRpcProvider(
                   await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID)
                 );
-                // This address is only for Base
                 const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
                 const library = getLibrary(connector.provider);
                 const instance = contract.connect(library.getSigner() as any) as Contract;
@@ -246,6 +248,8 @@ function SignPetition(props: SignPetitionProps) {
                     async (tx: any) =>
                       await tx.wait(1).then(() => {
                         storeNotif("Success", "Petition signed.", "success");
+                        onSuccess &&
+                          onSuccess(petition?.id ?? "", account?.toLowerCase() ?? "", 2, Math.floor(Date.now() / 1000));
                         hideModal(true);
                       })
                   );
@@ -285,6 +289,8 @@ function SignPetition(props: SignPetitionProps) {
                         return;
                       }
                       storeNotif("Success", "Petition signed.", "success");
+                      onSuccess &&
+                        onSuccess(petition?.id ?? "", account?.toLowerCase() ?? "", 1, Math.floor(Date.now() / 1000));
                     })
                     .finally(() => handleLoading(false));
                   hideModal(true);

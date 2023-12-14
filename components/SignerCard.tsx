@@ -65,7 +65,7 @@ function SignerCard(props: SignerCardProps) {
               ? signers
                   .slice(SIGNERS_PER_PAGE * currentPage, SIGNERS_PER_PAGE * (1 + currentPage))
                   .map((signer: any, idx: number) => (
-                    <tr key={`signer-${currentPage}-${idx}`} className="border-b border-gray-300">
+                    <tr key={`signer-${currentPage}-${idx}-${signer.conduit}`} className="border-b border-gray-300">
                       <td className="pl-4 py-2">
                         <Signer address={signer.conduit} verificationType={signer.type} />
                       </td>
