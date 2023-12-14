@@ -92,7 +92,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     const arr = id as string;
     // TODO: We may need to pull petitions from different chains. Will need to modify URL to make this work.
     // Currently defaulting to polygon testnet for petition loading
-    const { prefix } = splitPetitionId(id as string);
+    const { prefix } = splitPetitionId(arr);
     petition = await loadPetition(DEFAULT_CHAIN_ID, arr);
 
     if (prefix === "" && petition) {
