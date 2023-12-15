@@ -11,12 +11,11 @@ import SignerCard from "./SignerCard";
 import Link from "next/link";
 import { BackArrowIcon } from "./icons/BackArrowIcon";
 import { setOpenLoginModal } from "@/store/userSlice";
-import { DEFAULT_CHAIN_ID, ETHSIGN_API_URL } from "@/constants/constants";
+import { DEFAULT_CHAIN_ID } from "@/constants/constants";
 import Tooltip from "@/ui/Tooltip";
 import { WarningIcon } from "./icons/WarningIcon";
 import TooltipWrapper from "@/ui/TooltipWrapper";
 import { ReportCategory, ReportCategoryText } from "./modals/ReportPetition";
-import { getFileForUser } from "@/utils/storage";
 import { parseImage } from "@/utils/misc";
 
 interface PetitionProps {
@@ -26,14 +25,18 @@ interface PetitionProps {
 }
 
 function Petition(props: PetitionProps) {
-  const { petition, metadata: serverMetadata, creatorAlias } = props;
+  const { petition: initialPetition, metadata: serverMetadata, creatorAlias } = props;
+  const [petition, handlePetition] = useState(initialPetition);
   const [metadata, handleMetadata] = useState<IPetitionMetadata | null | undefined>(serverMetadata);
   const [signers, handleSigners] = useState<any[]>();
   const [userSignedPetition, handleUserSignedPetition] = useState<boolean>();
-  // TODO: Load different signature types and display them
   const { account, chainId } = useWeb3React();
   const { showModal, getTopModalType, hideModal } = useGlobalModalContext();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    handlePetition(petition);
+  }, [initialPetition]);
 
   useEffect(() => {
     (async () => {
@@ -200,6 +203,21 @@ function Petition(props: PetitionProps) {
                   {
                     petition: petition,
                     onSuccess: (petitionUuid: string, conduit: string, type: number, timestamp: number) => {
+                      const tmpPetition = petition ? { ...petition } : undefined;
+                      if (tmpPetition) {
+                        switch (type) {
+                          case 0:
+                            tmpPetition.tier0Signatures = (tmpPetition.tier0Signatures ?? 0) + 1;
+                            break;
+                          case 1:
+                            tmpPetition.tier1Signatures = (tmpPetition.tier1Signatures ?? 0) + 1;
+                            break;
+                          case 2:
+                            tmpPetition.tier2Signatures = (tmpPetition.tier2Signatures ?? 0) + 1;
+                            break;
+                        }
+                        handlePetition(tmpPetition);
+                      }
                       const tmpSigners = [...(signers ?? [])];
                       tmpSigners.unshift({ petitionUuid, conduit, type, timestamp });
                       handleSigners(tmpSigners);
