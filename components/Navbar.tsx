@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DropdownUser from "./dropdown/DropdownUser";
 import Link from "next/link";
 import Image from "next/image";
+import LogoFull from "../assets/logo_full.svg";
 import Logo from "../assets/logo.svg";
 
 interface NavbarProps {
@@ -48,16 +49,25 @@ function Navbar(props: NavbarProps) {
       <nav className={`select-none${!logoOnly ? " w-full" : ""}`}>
         <div
           id="nav"
-          className={`h-16 ${transparent ? "" : "border-b border-gray-300 bg-white "}flex flex-col lg:flex-row ${
+          className={`px-6 h-16 ${transparent ? "" : "border-b border-gray-300 bg-white "}flex flex-col lg:flex-row ${
             fixed ? "fixed " : ""
           }z-8${!logoOnly ? " w-full" : ""}`}
         >
-          <div className={`w-full flex flex-col lg:flex-row mx-auto${applyMaxWidth ? " max-w-7xl" : ""}`}>
-            <div id="nav-top" className="bg-transparent w-full px-4 lg:px-6">
+          <div className={`h-full w-full flex flex-col lg:flex-row mx-auto${applyMaxWidth ? " max-w-7xl" : ""}`}>
+            <div id="nav-top" className="h-full bg-transparent w-full">
               <div className="flex flex-row h-full">
                 <div className="flex flex-col mr-4">
                   <Link href="/" className="h-full flex">
-                    <Image src={Logo} alt="Communities Creating Change" className="h-12 w-auto my-auto" />
+                    <Image
+                      src={Logo}
+                      alt="Communities Creating Change"
+                      className="block xs:hidden h-10 w-auto my-auto"
+                    />
+                    <Image
+                      src={LogoFull}
+                      alt="Communities Creating Change"
+                      className="hidden xs:block h-10 w-auto my-auto"
+                    />
                   </Link>
                 </div>
                 {!logoOnly ? (
