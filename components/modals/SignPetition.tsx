@@ -76,7 +76,7 @@ function SignPetition(props: SignPetitionProps) {
       <>
         <div className="flex flex-col p-8">
           <Image src={WorldCoinLogo} alt="WorldCoin" className="mx-auto" />
-          <div className="text-lg font-medium text-center my-4">Sign With Your World ID</div>
+          <div className="text-lg font-medium text-center my-4">Sign with Your World ID</div>
           <div className="mt-2 text-sm text-center">
             Sign the petition with your verified World ID identity to increase the authenticity of your signature.
           </div>
