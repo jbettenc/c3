@@ -154,6 +154,7 @@ function SignPetition(props: SignPetitionProps) {
                     hideModal(true);
                   } catch (err: any) {
                     handleLoading(false);
+                    console.log(err?.message ? err.message : err ?? "");
                     storeNotif("Error", parseWeb3Error(err?.message ? err.message : err ?? ""), "danger");
                   }
                 }}
@@ -167,7 +168,7 @@ function SignPetition(props: SignPetitionProps) {
                 handleStep(1);
               }}
             >
-              Sign with WorldCoin
+              Sign with World ID
             </Button>
           </div>
         </div>
@@ -257,6 +258,7 @@ function SignPetition(props: SignPetitionProps) {
                   handleLoading(false);
                 } catch (err: any) {
                   handleLoading(false);
+                  console.log(err?.message ? err.message : err ?? "");
                   storeNotif("Error", parseWeb3Error(err?.message ? err.message : err ?? ""), "danger");
                 }
               } else if (e.verification_level === VerificationLevel.Device) {
@@ -297,6 +299,7 @@ function SignPetition(props: SignPetitionProps) {
                   hideModal(true);
                 } catch (err: any) {
                   handleLoading(false);
+                  console.log(err?.message ? err.message : err ?? "");
                   storeNotif("Error", parseWeb3Error(err?.message ? err.message : err ?? ""), "danger");
                 }
               }
