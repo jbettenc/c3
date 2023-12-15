@@ -120,7 +120,7 @@ export const GlobalModal = ({ children }: any) => {
 
   const hideModalsOfType = (type: MODAL_TYPE, bypassPreventClose?: boolean) => {
     openedModals.current = openedModals.current.filter(
-      (modal) => modal.type !== type || (!bypassPreventClose && modal.modalWrapperProps?.preventModalClose)
+      (modal) => modal.modalType !== type || (!bypassPreventClose && modal.modalWrapperProps?.preventModalClose)
     );
     if (openedModals.current.length > 1) {
       setStore({
