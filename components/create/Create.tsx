@@ -24,6 +24,8 @@ import { CONTRACT_ADDRESS, DEFAULT_CHAIN_ID } from "@/constants/constants";
 import { getLibrary } from "@/web3/utils";
 import { defaultAbiCoder } from "ethers/lib/utils";
 import { VerificationLevel } from "@worldcoin/idkit";
+import { setOpenLoginModal } from "@/store/userSlice";
+import { useDispatch } from "react-redux";
 
 export function Create() {
   const [title, handleTitle] = useState("");
@@ -39,6 +41,8 @@ export function Create() {
   const router = useRouter();
   const { alias } = useENS(account ?? "");
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (!hash) {
       handleHash(ethers.utils.hashMessage(uuidv4()));
@@ -46,7 +50,7 @@ export function Create() {
   }, [hash]);
 
   useEffect(() => {
-    if (!hash || !account) {
+    if (!hash || !account || !connector) {
       return;
     }
     if (!metadata) {
@@ -76,9 +80,13 @@ export function Create() {
     } else {
       hideModal(true);
     }
-  }, [metadata, hash, account]);
+  }, [metadata, hash, account, connector]);
 
   const uploadImagesToArweave = async (images: string[]) => {
+    if (images.length === 0) {
+      return [];
+    }
+
     if (!connector.provider) {
       storeNotif("Error", "No wallet connected.", "danger");
       return;
@@ -353,143 +361,157 @@ export function Create() {
             }
             onClick={async () => {
               if (step === 2) {
-                if (!connector.provider) {
-                  storeNotif("Error", "No wallet connected.", "danger");
-                  return;
-                }
+                try {
+                  if (!connector.provider) {
+                    dispatch(setOpenLoginModal(true));
+                    return;
+                  }
 
-                if (!credentialType) {
-                  storeNotif("Error", "Please refresh your page and retry World ID verification.", "danger");
-                  return;
-                }
+                  if (!credentialType) {
+                    storeNotif("Error", "Please refresh your page and retry World ID verification.", "danger");
+                    return;
+                  }
 
-                handleCreating(true);
-                const tags = [{ name: "Application", value: "EthSignC3" }];
-                const images = (await Promise.all(importState.map(async (f) => await getBase64(f)))) as string[];
-                const cids = await uploadImagesToArweave(images);
+                  handleCreating(true);
+                  const tags = [{ name: "Application", value: "EthSignC3" }];
+                  const images = (await Promise.all(importState.map(async (f) => await getBase64(f)))) as string[];
+                  const cids = await uploadImagesToArweave(images);
 
-                // prepare message to sign before upload
-                let payload = {
-                  address: account,
-                  title,
-                  description,
-                  images: cids
-                };
+                  // prepare message to sign before upload
+                  let payload = {
+                    address: account,
+                    title,
+                    description,
+                    images: cids
+                  };
 
-                const messagePayload = {
-                  address: account,
-                  timestamp: new Date().toISOString(),
-                  version: "4.1",
-                  hash: ethers.utils.hashMessage(
-                    JSON.stringify({
-                      data: payload
-                    })
-                  )
-                };
-
-                // messages converted to string before sign with statement prefix
-                const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
-                  messagePayload,
-                  null,
-                  2
-                )}`;
-
-                // sign signature with the messages in details
-                const signature = (await connector.provider.request({
-                  method: "personal_sign",
-                  params: [message, account]
-                })) as string;
-
-                // payload to upload arweave storage
-                const storagePayload: StoragePayload = {
-                  signature,
-                  message,
-                  data: JSON.stringify({
-                    data: payload
-                  }),
-                  tags,
-                  shouldVerify: true
-                };
-
-                // Upload to our Arweave endpoint
-                const storage = await postUploadToStorage(storagePayload);
-                if (!storage?.message || storage.message !== "success") {
-                  storeNotif("Error", "Failed to upload petition metadata to Arweave. Please try again.", "danger");
-                  handleCreating(false);
-                  return;
-                }
-                const cid = storage.transaction.itemId ?? "";
-
-                if (credentialType === VerificationLevel.Orb) {
-                  // Trigger smart contract call
-                  const provider = new ethers.providers.JsonRpcProvider(
-                    await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID)
-                  );
-                  const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
-                  const library = getLibrary(connector.provider);
-                  const instance = contract.connect(library.getSigner() as any) as Contract;
-                  try {
-                    await instance
-                      .createPetition(hash, cid, {
-                        proof: metadata.proof,
-                        nullifierHash: metadata.nullifierHash,
-                        root: metadata.root
+                  const messagePayload = {
+                    address: account,
+                    timestamp: new Date().toISOString(),
+                    version: "4.1",
+                    hash: ethers.utils.hashMessage(
+                      JSON.stringify({
+                        data: payload
                       })
-                      .then(
-                        async (tx: any) =>
-                          await tx.wait(1).then(() => {
-                            showModal(
-                              MODAL_TYPE.SHARE,
-                              {
-                                url: `${window.location.href.replace("create", "petition")}/${hash}`,
-                                title,
-                                address: account,
-                                images
-                              },
-                              {
-                                title: "Share Petition",
-                                headerSeparator: false,
-                                border: false,
-                                onClose: () => router.push(`/petition/${hash}`)
+                    )
+                  };
+
+                  // messages converted to string before sign with statement prefix
+                  const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
+                    messagePayload,
+                    null,
+                    2
+                  )}`;
+
+                  // sign signature with the messages in details
+                  const signature = (await connector.provider.request({
+                    method: "personal_sign",
+                    params: [message, account]
+                  })) as string;
+
+                  // payload to upload arweave storage
+                  const storagePayload: StoragePayload = {
+                    signature,
+                    message,
+                    data: JSON.stringify({
+                      data: payload
+                    }),
+                    tags,
+                    shouldVerify: true
+                  };
+
+                  // Upload to our Arweave endpoint
+                  const storage = await postUploadToStorage(storagePayload);
+                  if (!storage?.message || storage.message !== "success") {
+                    storeNotif("Error", "Failed to upload petition metadata to Arweave. Please try again.", "danger");
+                    handleCreating(false);
+                    return;
+                  }
+                  const cid = storage.transaction.itemId ?? "";
+
+                  if (credentialType === VerificationLevel.Orb) {
+                    // Trigger smart contract call
+                    const provider = new ethers.providers.JsonRpcProvider(
+                      await getProviderUrl(chainId ?? DEFAULT_CHAIN_ID)
+                    );
+                    const contract = new Contract(CONTRACT_ADDRESS(chainId ?? DEFAULT_CHAIN_ID), C3ABI.abi, provider);
+                    const library = getLibrary(connector.provider);
+                    const instance = contract.connect(library.getSigner() as any) as Contract;
+                    try {
+                      await instance
+                        .createPetition(hash, cid, {
+                          proof: metadata.proof,
+                          nullifierHash: metadata.nullifierHash,
+                          root: metadata.root
+                        })
+                        .then(
+                          async (tx: any) =>
+                            await tx.wait(1).then(() => {
+                              showModal(
+                                MODAL_TYPE.SHARE,
+                                {
+                                  url: `${window.location.href.replace("create", "petition")}/${hash}`,
+                                  title,
+                                  address: account,
+                                  images
+                                },
+                                {
+                                  title: "Share Petition",
+                                  headerSeparator: false,
+                                  border: false,
+                                  onClose: () => router.push(`/petition/${hash}`)
+                                }
+                              );
+                            })
+                        )
+                        .catch((err: any) => {
+                          storeNotif("Error", err?.message ? err.message : err, "danger");
+                          handleCreating(true);
+                        });
+                    } catch (err: any) {
+                      storeNotif("Error", err?.message ? err.message : err, "danger");
+                      handleCreating(true);
+                    }
+                  } else {
+                    try {
+                      // TODO: call backend to create off-chain petition
+                      // I have hash (make sure to prefix it), cid, metadata, petitioner/account to send to backend
+                      await createOffChainPetition("wid_", cid, account ?? "", {
+                        root: metadata.root,
+                        nullifierHash: metadata.nullifierHash,
+                        proof: metadata.originalProof,
+                        action: `createPetition-${hash}`,
+                        signal: account ?? ""
+                      }).then((res) => {
+                        if (res.success) {
+                          showModal(
+                            MODAL_TYPE.SHARE,
+                            {
+                              url: `${window.location.href.replace("create", "petition")}/${res.data.id}`,
+                              title,
+                              address: account,
+                              images
+                            },
+                            {
+                              title: "Share Petition",
+                              headerSeparator: false,
+                              border: false,
+                              onClose: () => {
+                                handleCreating(true);
+                                router.push(`/petition/${res.data.id}`);
                               }
-                            );
-                          })
-                      );
-                  } catch (err: any) {
-                    storeNotif("Error", err?.message ? err.message : err, "danger");
+                            }
+                          );
+                        }
+                      });
+                    } catch (err: any) {
+                      storeNotif("Error", err?.message ? err.message : err, "danger");
+                      handleCreating(true);
+                    }
                   }
-                } else {
-                  try {
-                    // TODO: call backend to create off-chain petition
-                    // I have hash (make sure to prefix it), cid, metadata, petitioner/account to send to backend
-                    await createOffChainPetition("wid_", cid, account ?? "", {
-                      root: metadata.root,
-                      nullifierHash: metadata.nullifierHash,
-                      proof: metadata.originalProof,
-                      action: `createPetition-${hash}`,
-                      signal: account ?? ""
-                    }).then((res) => {
-                      if (res.success) {
-                        showModal(
-                          MODAL_TYPE.SHARE,
-                          {
-                            url: `${window.location.href.replace("create", "petition")}/${res.data.id}`,
-                            title,
-                            address: account,
-                            images
-                          },
-                          {
-                            title: "Share Petition",
-                            headerSeparator: false,
-                            border: false,
-                            onClose: () => router.push(`/petition/${res.data.id}`)
-                          }
-                        );
-                      }
-                    });
-                  } catch (err: any) {
-                    storeNotif("Error", err?.message ? err.message : err, "danger");
-                  }
+                } catch (err: any) {
+                  storeNotif("Error", err?.message ? err.message : err, "danger");
+                  handleCreating(true);
                 }
               } else {
                 handleStep(step + 1);

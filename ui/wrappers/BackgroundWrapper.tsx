@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 function BackgroundAndWalletSelectWrapper(props: any) {
   const { openLoginModal } = useSelector((state: RootState) => state.user);
-  const { showModal, hideModal } = useGlobalModalContext();
+  const { showModal, hideModalsOfType } = useGlobalModalContext();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -27,13 +27,13 @@ function BackgroundAndWalletSelectWrapper(props: any) {
           shadow: false,
           border: false,
           onClose: () => {
-            hideModal(true);
+            hideModalsOfType(MODAL_TYPE.WALLET_SELECT, true);
             dispatch(setOpenLoginModal(false));
           }
         }
       );
     } else {
-      hideModal(true);
+      hideModalsOfType(MODAL_TYPE.WALLET_SELECT, true);
     }
   }, [openLoginModal]);
 

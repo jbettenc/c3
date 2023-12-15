@@ -35,6 +35,7 @@ const MODAL_COMPONENTS: any = {
 type GlobalModalContext = {
   showModal: (modalType: MODAL_TYPE, modalProps?: any, modalWrapperProps?: any, hideOnPathnameChange?: boolean) => void;
   hideModal: (closeAll?: boolean, bypassPreventClose?: boolean) => void;
+  hideModalsOfType: (type: MODAL_TYPE, bypassPreventClose?: boolean) => void;
   getTopModalType: () => MODAL_TYPE | undefined;
   store: any;
 };
@@ -42,6 +43,7 @@ type GlobalModalContext = {
 const initalState: GlobalModalContext = {
   showModal: () => {},
   hideModal: () => {},
+  hideModalsOfType: () => {},
   getTopModalType: () => undefined,
   store: {}
 };
@@ -116,6 +118,28 @@ export const GlobalModal = ({ children }: any) => {
     }
   };
 
+  const hideModalsOfType = (type: MODAL_TYPE, bypassPreventClose?: boolean) => {
+    openedModals.current = openedModals.current.filter(
+      (modal) => modal.type !== type || (!bypassPreventClose && modal.modalWrapperProps?.preventModalClose)
+    );
+    if (openedModals.current.length > 1) {
+      setStore({
+        ...store,
+        modalType: openedModals.current[openedModals.current.length - 1].modalType,
+        modalProps: openedModals.current[openedModals.current.length - 1].modalProps,
+        modalWrapperProps: {
+          ...openedModals.current[openedModals.current.length - 1].modalWrapperProps,
+          modalOpen: true
+        }
+      });
+    } else {
+      setStore({
+        ...store,
+        modalWrapperProps: { ...modalWrapperProps, modalOpen: false }
+      });
+    }
+  };
+
   const getTopModalType = () => {
     // @ts-ignore
     return openedModals.current.length > 0
@@ -149,7 +173,7 @@ export const GlobalModal = ({ children }: any) => {
   }, [store]);
 
   return (
-    <GlobalModalContext.Provider value={{ store, showModal, hideModal, getTopModalType }}>
+    <GlobalModalContext.Provider value={{ store, showModal, hideModal, hideModalsOfType, getTopModalType }}>
       {store.modalWrapperProps && store.modalWrapperProps.modalOpen && renderComponent()}
       {children}
     </GlobalModalContext.Provider>
