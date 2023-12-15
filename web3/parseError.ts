@@ -12,22 +12,25 @@ const parseWeb3Error = (error_message: string) => {
       .split(", ")[3]
       .substring(6)
   );
-  console.log("JACK SEND ME THIS: ", jsonStr);
-  const hexData = jsonStr.data.data;
+  try {
+    const hexData = jsonStr.data.data;
 
-  if (hexData == "0x44ed284e") {
-    return "Petition already exists.";
-  } else if (hexData == "0xb36e9f2f") {
-    return "Petition does not exist.";
-  } else if (hexData == "0x65085684") {
-    return "Update already exists.";
-  } else if (hexData == "0xb4c1e9ab") {
-    return "Victory already declared.";
-  } else if (hexData == "0x5d904cb2") {
-    return "Invalid nullifier.";
-  } else if (hexData == "0x82b42900") {
-    return "Action is unauthorized.";
-  } else {
+    if (hexData == "0x44ed284e") {
+      return "Petition already exists.";
+    } else if (hexData == "0xb36e9f2f") {
+      return "Petition does not exist.";
+    } else if (hexData == "0x65085684") {
+      return "Update already exists.";
+    } else if (hexData == "0xb4c1e9ab") {
+      return "Victory already declared.";
+    } else if (hexData == "0x5d904cb2") {
+      return "Invalid nullifier.";
+    } else if (hexData == "0x82b42900") {
+      return "Action is unauthorized.";
+    } else {
+      return error_message;
+    }
+  } catch (err: any) {
     return error_message;
   }
 };
