@@ -14,21 +14,17 @@ const parseWeb3Error = (error_message: string) => {
   );
   const hexData = jsonStr.data.originalError.data;
 
-  if (hexData == "0x4c88ca2a") {
-    return "Room already exists.";
-  } else if (hexData == "0x4b4e8872") {
-    return "Room does not exist.";
-  } else if (hexData == "0x8890b3b1") {
-    return "Room not joined.";
-  } else if (hexData == "0xc2d944a7") {
-    return "Room already joined.";
-  } else if (hexData == "0x37416bb1") {
-    return "Offer is empty.";
-  } else if (hexData == "0x8b87d9bd") {
-    return "Offer has expired.";
-  } else if (hexData == "0x67e71c08") {
-    return "Offer is invalid.";
-  } else if (hexData == "0x8c12a053") {
+  if (hexData == "0x44ed284e") {
+    return "Petition already exists.";
+  } else if (hexData == "0xb36e9f2f") {
+    return "Petition does not exist.";
+  } else if (hexData == "0x65085684") {
+    return "Update already exists.";
+  } else if (hexData == "0xb4c1e9ab") {
+    return "Victory already declared.";
+  } else if (hexData == "0x5d904cb2") {
+    return "Invalid nullifier.";
+  } else if (hexData == "0x82b42900") {
     return "Action is unauthorized.";
   } else {
     return error_message;

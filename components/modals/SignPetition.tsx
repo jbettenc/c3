@@ -15,6 +15,7 @@ import { PhoneIcon } from "../icons/PhoneIcon";
 import { useGlobalModalContext } from "../context/ModalContext";
 import { getLibrary } from "@/web3/utils";
 import { defaultAbiCoder } from "ethers/lib/utils";
+import parseWeb3Error from "@/web3/parseError";
 
 interface SignPetitionProps {
   petition?: IPetition;
@@ -153,7 +154,7 @@ function SignPetition(props: SignPetitionProps) {
                     hideModal(true);
                   } catch (err: any) {
                     handleLoading(false);
-                    storeNotif("Error", err?.message ? err.message : err, "danger");
+                    storeNotif("Error", parseWeb3Error(err?.message ? err.message : err ?? ""), "danger");
                   }
                 }}
               >
@@ -256,7 +257,7 @@ function SignPetition(props: SignPetitionProps) {
                   handleLoading(false);
                 } catch (err: any) {
                   handleLoading(false);
-                  storeNotif("Error", err?.message ? err.message : err, "danger");
+                  storeNotif("Error", parseWeb3Error(err?.message ? err.message : err ?? ""), "danger");
                 }
               } else if (e.verification_level === VerificationLevel.Device) {
                 try {
@@ -296,7 +297,7 @@ function SignPetition(props: SignPetitionProps) {
                   hideModal(true);
                 } catch (err: any) {
                   handleLoading(false);
-                  storeNotif("Error Signing Petition", err?.message ? err.message : err, "danger");
+                  storeNotif("Error", parseWeb3Error(err?.message ? err.message : err ?? ""), "danger");
                 }
               }
             }}
