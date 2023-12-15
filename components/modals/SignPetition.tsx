@@ -168,7 +168,7 @@ function SignPetition(props: SignPetitionProps) {
                 handleStep(1);
               }}
             >
-              Sign with WorldCoin
+              Sign with World ID
             </Button>
           </div>
         </div>

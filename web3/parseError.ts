@@ -12,7 +12,8 @@ const parseWeb3Error = (error_message: string) => {
       .split(", ")[3]
       .substring(6)
   );
-  const hexData = jsonStr.data.originalError.data;
+  console.log("JACK SEND ME THIS: ", jsonStr);
+  const hexData = jsonStr.data.data;
 
   if (hexData == "0x44ed284e") {
     return "Petition already exists.";
