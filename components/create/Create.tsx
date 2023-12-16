@@ -438,12 +438,12 @@ export function Create() {
                     const library = getLibrary(connector.provider);
                     const instance = contract.connect(library.getSigner() as any) as Contract;
                     try {
+                      const worldIdStruct = ethers.utils.AbiCoder.prototype.encode(
+                        ["uint256", "uint256", "uint256[8]"],
+                        [metadata.root, metadata.nullifierHash, metadata.proof]
+                      );
                       await instance
-                        .createPetition(hash, cid, {
-                          proof: metadata.proof,
-                          nullifierHash: metadata.nullifierHash,
-                          root: metadata.root
-                        })
+                        .createPetition(hash, cid, "World ID", worldIdStruct, true)
                         .then(
                           async (tx: any) =>
                             await tx.wait(1).then(() => {

@@ -27,7 +27,7 @@ function SignPetition(props: SignPetitionProps) {
   const [step, handleStep] = useState(0);
   const [loading, handleLoading] = useState(false);
   const [credentialType, handleCredentialType] = useState<VerificationLevel>();
-  const [appId, handleAppId] = useState<`app_${string}`>(WORLDCOIN_APP_ID(VerificationLevel.Orb));
+  const [appId, handleAppId] = useState<`app_${string}`>(WORLDCOIN_APP_ID(DEFAULT_CHAIN_ID, VerificationLevel.Orb));
   const [action, handleAction] = useState(`signPetition-${petition?.id ?? "0x00"}`);
   const { account, chainId, connector } = useWeb3React();
   const { hideModal } = useGlobalModalContext();
@@ -185,7 +185,7 @@ function SignPetition(props: SignPetitionProps) {
           <div
             className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
             onClick={() => {
-              handleAppId(WORLDCOIN_APP_ID(VerificationLevel.Orb));
+              handleAppId(WORLDCOIN_APP_ID(chainId ?? DEFAULT_CHAIN_ID, VerificationLevel.Orb));
               handleCredentialType(VerificationLevel.Orb);
             }}
           >
@@ -195,7 +195,7 @@ function SignPetition(props: SignPetitionProps) {
           <div
             className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
             onClick={() => {
-              handleAppId(WORLDCOIN_APP_ID(VerificationLevel.Device));
+              handleAppId(WORLDCOIN_APP_ID(chainId ?? DEFAULT_CHAIN_ID, VerificationLevel.Device));
               handleCredentialType(VerificationLevel.Device);
             }}
           >
@@ -216,7 +216,7 @@ function SignPetition(props: SignPetitionProps) {
               // Only perform backend check if the credential type is device. Orb performed on chain.
               if (
                 e.verification_level === VerificationLevel.Device &&
-                appId === WORLDCOIN_APP_ID(VerificationLevel.Orb)
+                appId === WORLDCOIN_APP_ID(chainId ?? DEFAULT_CHAIN_ID, VerificationLevel.Orb)
               ) {
                 throw new Error("Please use an Orb Verified account for on-chain petition signatures.");
               }
@@ -246,7 +246,11 @@ function SignPetition(props: SignPetitionProps) {
                 };
                 try {
                   handleLoading(true);
-                  await instance.signPetition(petition?.id ?? "", metadata).then(
+                  const worldIdStruct = ethers.utils.AbiCoder.prototype.encode(
+                    ["uint256", "uint256", "uint256[8]"],
+                    [metadata.root, metadata.nullifierHash, metadata.proof]
+                  );
+                  await instance.signPetition(petition?.id ?? "", "World ID", worldIdStruct).then(
                     async (tx: any) =>
                       await tx.wait(1).then(() => {
                         storeNotif("Success", "Petition signed.", "success");

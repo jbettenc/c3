@@ -7,7 +7,7 @@ import { IDKitWidget, VerificationLevel, useIDKit } from "@worldcoin/idkit";
 import { useWeb3React } from "@web3-react/core";
 import { WorldCoinIcon } from "../icons/WorldCoinLogo";
 import { PhoneIcon } from "../icons/PhoneIcon";
-import { WORLDCOIN_APP_ID } from "@/constants/constants";
+import { DEFAULT_CHAIN_ID, WORLDCOIN_APP_ID } from "@/constants/constants";
 
 interface WorldIdVerifyProps {
   hash: string;
@@ -24,10 +24,10 @@ function WorldIdVerify(props: WorldIdVerifyProps) {
 
   const [step, handleStep] = useState(0);
   const [credentialType, handleCredentialType] = useState<VerificationLevel>();
-  const [appId, handleAppId] = useState<`app_${string}`>(WORLDCOIN_APP_ID(VerificationLevel.Orb));
+  const [appId, handleAppId] = useState<`app_${string}`>(WORLDCOIN_APP_ID(DEFAULT_CHAIN_ID, VerificationLevel.Orb));
   const [action, handleAction] = useState(`createPetition-${hash}`);
 
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
 
   useEffect(() => {
     if (hash) {
@@ -86,7 +86,7 @@ function WorldIdVerify(props: WorldIdVerifyProps) {
           <div
             className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
             onClick={() => {
-              handleAppId(WORLDCOIN_APP_ID(VerificationLevel.Orb));
+              handleAppId(WORLDCOIN_APP_ID(chainId ?? DEFAULT_CHAIN_ID, VerificationLevel.Orb));
               handleCredentialType(VerificationLevel.Orb);
             }}
           >
@@ -96,7 +96,7 @@ function WorldIdVerify(props: WorldIdVerifyProps) {
           <div
             className="flex flex-col w-full rounded-lg border border-black bg-white text-black hover:border-primary-600 hover:bg-primary-50 hover:text-primary-800 text-center p-4 cursor-pointer gap-4"
             onClick={() => {
-              handleAppId(WORLDCOIN_APP_ID(VerificationLevel.Device));
+              handleAppId(WORLDCOIN_APP_ID(chainId ?? DEFAULT_CHAIN_ID, VerificationLevel.Device));
               handleCredentialType(VerificationLevel.Device);
             }}
           >
@@ -117,7 +117,7 @@ function WorldIdVerify(props: WorldIdVerifyProps) {
               // Only perform backend check if the credential type is device. Orb performed on chain.
               if (
                 e.verification_level === VerificationLevel.Device &&
-                appId === WORLDCOIN_APP_ID(VerificationLevel.Orb)
+                appId === WORLDCOIN_APP_ID(chainId ?? DEFAULT_CHAIN_ID, VerificationLevel.Orb)
               ) {
                 throw new Error("Please use an Orb Verified account for on-chain petition creation.");
               }

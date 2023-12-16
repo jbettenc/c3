@@ -27,6 +27,8 @@ const parseWeb3Error = (error_message: string) => {
       return "Invalid nullifier.";
     } else if (hexData == "0x82b42900") {
       return "Action is unauthorized.";
+    } else if (hexData == "0xbaa3de5f") {
+      return "Invalid verifier.";
     } else {
       return error_message;
     }
