@@ -108,7 +108,7 @@ function SignPetition(props: SignPetitionProps) {
                   };
 
                   // messages converted to string before sign with statement prefix
-                  const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
+                  const message = `C3 is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
                     messagePayload,
                     null,
                     2

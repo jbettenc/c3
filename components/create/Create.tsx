@@ -99,7 +99,7 @@ export function Create() {
     const cids: string[] = [];
     const payloads: StoragePayload[] = [];
     // prepare message to sign before upload
-    const tags = [{ name: "Application", value: "EthSignC3" }];
+    const tags = [{ name: "Application", value: "C3" }];
     for (let idx in images) {
       let payload = images[idx];
 
@@ -115,7 +115,7 @@ export function Create() {
       };
 
       // messages converted to string before sign with statement prefix
-      const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
+      const message = `C3 is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
         messagePayload,
         null,
         2
@@ -373,7 +373,7 @@ export function Create() {
                   }
 
                   handleCreating(true);
-                  const tags = [{ name: "Application", value: "EthSignC3" }];
+                  const tags = [{ name: "Application", value: "C3" }];
                   const images = (await Promise.all(importState.map(async (f) => await getBase64(f)))) as string[];
                   const cids = await uploadImagesToArweave(images);
 
@@ -397,7 +397,7 @@ export function Create() {
                   };
 
                   // messages converted to string before sign with statement prefix
-                  const message = `EthSign is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
+                  const message = `C3 is requesting your signature to validate the data being uploaded. This action does not incur any gas fees.\n\n~\n\n${JSON.stringify(
                     messagePayload,
                     null,
                     2

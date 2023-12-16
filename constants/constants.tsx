@@ -13,7 +13,7 @@ const GRAPHQL_URL_OPTIMISM =
 const GRAPHQL_URL_POLYGON_MUMBAI =
   "https://subgraph.satsuma-prod.com/746168fe5a7e/team-ethsign--23914/c3-mumbai/version/v0.0.9/api";
 
-export const ETHSIGN_API_URL = "https://arweave-gateway.ethsign.xyz";
+export const ETHSIGN_API_URL = "http://localhost:4000"; // "https://arweave-gateway.ethsign.xyz";
 export const PETITION_API_URL = "https://c3-backend-7yra2rrcpa-wn.a.run.app";
 
 export const DEFAULT_CHAIN_ID = 10;
