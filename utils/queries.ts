@@ -36,7 +36,8 @@ const loadPetitionOnChain = async (chainId: string | number, id: string) => {
           tier2Signatures: response.data.petition.signatures,
           timestamp: response.data.petition.timestamp,
           reportCount: 0,
-          reportMostFrequentCategory: { category: ReportCategory.OTHER, count: 0 }
+          reportMostFrequentCategory: { category: ReportCategory.OTHER, count: 0 },
+          localUpdate: false
         };
       }
     });
@@ -82,7 +83,8 @@ const loadPetitionOffChain = async (chainId: string | number, prefix: string, id
     tier2Signatures,
     timestamp: petitionData.data.createdAt,
     reportCount: petitionData.data.reportCount,
-    reportMostFrequentCategory: petitionData.data.reportMostFrequentCategory
+    reportMostFrequentCategory: petitionData.data.reportMostFrequentCategory,
+    localUpdate: false
   };
 
   return res ?? null;

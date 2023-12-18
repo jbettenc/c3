@@ -87,7 +87,8 @@ function Landing() {
                         reportCount: 0,
                         tier2Signatures: 0,
                         timestamp: "0",
-                        reportMostFrequentCategory: { category: ReportCategory.OTHER, count: 0 }
+                        reportMostFrequentCategory: { category: ReportCategory.OTHER, count: 0 },
+                        localUpdate: false
                       }}
                       key={`landing-petition-${idx}`}
                     />

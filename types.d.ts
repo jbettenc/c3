@@ -52,6 +52,7 @@ export interface IPetition {
   reportCount: number;
   reportMostFrequentCategory: { category: ReportCategory; count: number };
   timestamp: string;
+  localUpdate: boolean;
 }
 
 export interface IPetitionMetadata {
