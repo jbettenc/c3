@@ -5,8 +5,6 @@ import { ArweavePayload, IPetition, PetitionReport, ResponseObject, StoragePaylo
 import { ETHSIGN_API_URL, PETITION_API_URL } from "@/constants/constants";
 import { ReportCategory } from "@/components/modals/ReportPetition";
 import { getPetitions } from "./queries";
-import { VerificationLevel } from "@worldcoin/idkit";
-import { splitPetitionId } from "./misc";
 
 export function makeStorageClient() {
   return new Web3Storage({

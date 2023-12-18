@@ -35,13 +35,22 @@ function Petition(props: PetitionProps) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    handlePetition(petition);
+    handlePetition(initialPetition);
   }, [initialPetition]);
 
   useEffect(() => {
     (async () => {
       if (petition?.id) {
         const signers = await loadPetitionSigners(chainId ?? DEFAULT_CHAIN_ID, petition.id);
+        console.log("signers loaded", signers);
+        // We have loaded new signers that do not match up with the petition. Reload the petition.
+        if (
+          signers.length >
+          (petition.tier0Signatures ?? 0) + (petition.tier1Signatures ?? 0) + petition.tier2Signatures
+        ) {
+          // Reload petition
+          console.log("signers count is larger than petition's count");
+        }
         handleSigners(signers ?? undefined);
       } else {
         // storeNotif("Error", "Cannot locate petition.", "danger");
