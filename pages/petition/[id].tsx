@@ -53,9 +53,9 @@ function PetitionPage(props: PetitionPageProps) {
         <div className="w-full border-b border-gray-300 text-black">
           <div className="mx-6">
             <div className="flex flex-col max-w-7xl w-full mx-auto my-2">
-              <div className="font-semibold text-lg">Sign petition</div>
+              <div className="font-semibold text-lg">Sign Petition</div>
               <div>
-                Sign the petition initiated by{" "}
+                Initiated by{" "}
                 {creatorAlias
                   ? creatorAlias +
                     ` (${

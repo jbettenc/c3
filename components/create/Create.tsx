@@ -166,8 +166,8 @@ export function Create() {
           <div className="w-full border-b border-gray-300">
             <div className="mx-6">
               <div className="flex flex-col mx-auto max-w-7xl w-full my-2">
-                <div className="font-semibold text-lg">Start a petition</div>
-                <div>Start your petition</div>
+                <div className="font-semibold text-lg">Start a Petition</div>
+                <div>Add a title, description, and images (optional) to start a petition</div>
               </div>
             </div>
           </div>
