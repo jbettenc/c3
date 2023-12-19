@@ -5,6 +5,7 @@ import WorldIdVerify from "../modals/WorldIdVerify";
 import SignPetition from "../modals/SignPetition";
 import ReportPetition from "../modals/ReportPetition";
 import ErrorLoadingPetition from "../modals/ErrorLoadingPetition";
+import Loading from "../modals/Loading";
 
 export enum MODAL_TYPE {
   CONFIRM_VIEW = "CONFIRM_VIEW",
@@ -16,6 +17,7 @@ export enum MODAL_TYPE {
   SWITCH_NETWORK = "SWITCH_NETWORK",
   REPORT_PETITION = "REPORT_PETITION",
   ERROR_LOADING_PETITION = "ERROR_LOADING_PETITION",
+  LOADING = "LOADING",
   CUSTOM = "CUSTOM"
 }
 
@@ -29,6 +31,7 @@ const MODAL_COMPONENTS: any = {
   [MODAL_TYPE.SWITCH_NETWORK]: SwitchNetwork,
   [MODAL_TYPE.REPORT_PETITION]: ReportPetition,
   [MODAL_TYPE.ERROR_LOADING_PETITION]: ErrorLoadingPetition,
+  [MODAL_TYPE.LOADING]: Loading,
   [MODAL_TYPE.CUSTOM]: Custom
 };
 

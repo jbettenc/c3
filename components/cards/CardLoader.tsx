@@ -4,6 +4,7 @@ import { getFileForUser } from "@/utils/storage";
 import ImageCard from "./layouts/ImageCard";
 import { useRouter } from "next/router";
 import TitleCard from "./layouts/TitleCard";
+import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
 
 interface CardLoaderProps {
   petition: IPetition;
@@ -11,6 +12,8 @@ interface CardLoaderProps {
 
 function CardLoader(props: CardLoaderProps) {
   const [metadata, handleMetadata] = useState<IPetitionMetadata | null>(null);
+
+  const { showModal } = useGlobalModalContext();
 
   const router = useRouter();
 
@@ -39,7 +42,10 @@ function CardLoader(props: CardLoaderProps) {
         tier0Signatures={props.petition.tier0Signatures}
         tier1Signatures={props.petition.tier1Signatures}
         tier2Signatures={props.petition.tier2Signatures}
-        onClick={() => router.push(`/petition/${props.petition.id}`)}
+        onClick={() => {
+          showModal(MODAL_TYPE.LOADING, {}, { showHeader: false, preventModalClose: true }, true);
+          router.push(`/petition/${props.petition.id}`);
+        }}
       />
     );
   } else {
@@ -50,7 +56,10 @@ function CardLoader(props: CardLoaderProps) {
         tier0Signatures={props.petition.tier0Signatures}
         tier1Signatures={props.petition.tier1Signatures}
         tier2Signatures={props.petition.tier2Signatures}
-        onClick={() => router.push(`/petition/${props.petition.id}`)}
+        onClick={() => {
+          showModal(MODAL_TYPE.LOADING, {}, { showHeader: false, preventModalClose: true }, true);
+          router.push(`/petition/${props.petition.id}`);
+        }}
       />
     );
   }
