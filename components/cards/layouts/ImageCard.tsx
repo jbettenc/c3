@@ -3,6 +3,8 @@ import Card from "../Card";
 import SignatureProgressBar from "@/components/SignatureProgressBar";
 import Button from "@/ui/forms/Button";
 import { parseImage } from "@/utils/misc";
+import AutoScroll from "@/ui/scroll/AutoScroll";
+import { useDimensions } from "@/utils/hooks/useDimensions";
 
 interface ImageCardProps {
   loading?: boolean;
@@ -17,6 +19,8 @@ interface ImageCardProps {
 
 function ImageCard(props: ImageCardProps) {
   const { tier0Signatures, tier1Signatures, tier2Signatures } = props;
+
+  const [titleRef, height, width] = useDimensions();
 
   const { alias } = useENS(props.petitioner);
 
@@ -42,7 +46,7 @@ function ImageCard(props: ImageCardProps) {
 
   return (
     <Card>
-      <div className="w-full h-full bg-red-75 p-6 cursor-pointer" onClick={props.onClick}>
+      <div className="w-full h-full bg-red-75 p-6">
         <div className="w-full h-full flex flex-col overflow-hidden">
           <img
             src={parseImage(props.image)}
@@ -55,9 +59,17 @@ function ImageCard(props: ImageCardProps) {
               ? alias
               : `${props.petitioner.substring(0, 6)}...${props.petitioner.substring(props.petitioner.length - 6)}`}
           </div>
-          <div className="text-white text-center my-auto break-words font-anton min-h-[2rem] overflow-y-scroll hidden-scroll">
-            {props.title.toUpperCase()}
+          <div ref={titleRef} className="min-h-[2rem]">
+            <AutoScroll height={height} speed={1}>
+              <div
+                className="text-white text-center my-auto break-words font-anton min-h-[2rem] cursor-pointer"
+                onClick={props.onClick}
+              >
+                {props.title.toUpperCase()}
+              </div>
+            </AutoScroll>
           </div>
+
           <div className="shrink-0 flex flex-col mt-2">
             <SignatureProgressBar
               tier0Signatures={tier0Signatures ?? 0}
