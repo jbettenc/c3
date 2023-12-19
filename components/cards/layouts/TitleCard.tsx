@@ -27,7 +27,7 @@ function TitleCard(props: TitleCardProps) {
           verificationStatus === 2 ? "bg-[#FFD980] " : verificationStatus === 1 ? "bg-[#262D33] " : "bg-[#6D75E7] "
         } p-6`}
       >
-        <div className="w-full h-full flex flex-col max-h-full">
+        <div className="w-full h-full flex flex-col max-h-full cursor-pointer" onClick={props.onClick}>
           <div
             className={`shrink-0 font-semibold text-start mb-2 text-xs ${
               verificationStatus === 2 ? "text-primary-600" : "text-[#FFC4C9]"

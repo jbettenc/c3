@@ -9,7 +9,7 @@ const production = process.env.NEXT_PUBLIC_SENTRY_DSN ? true : false;
 const CONTRACT_ADDRESS_OPTIMISM = "0x72efA4093539A909C1f9bcCA1aE6bcDa435a3433";
 const CONTRACT_ADDRESS_POLYGON_MUMBAI = "0xc2b2e1175017114C0bAf4559362B81C2332f85fD";
 const GRAPHQL_URL_OPTIMISM =
-  "https://subgraph.satsuma-prod.com/746168fe5a7e/team-ethsign--23914/c3-op/version/v0.0.9/api";
+  "https://subgraph.satsuma-prod.com/746168fe5a7e/team-ethsign--23914/c3-op/version/v0.1.0/api";
 const GRAPHQL_URL_POLYGON_MUMBAI =
   "https://subgraph.satsuma-prod.com/746168fe5a7e/team-ethsign--23914/c3-mumbai/version/v0.0.9/api";
 

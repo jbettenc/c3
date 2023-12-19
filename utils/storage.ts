@@ -376,8 +376,20 @@ export const getRecommendedPetitions = async (
           const ids = response.petitions.map((petition: any) => petition.id);
           const petitionsData = (await getPetitions(chainId, ids)) ?? {};
 
+          // Iterate through backend-loaded recommended petitions
           for (const pet of response.petitions) {
-            if (pet.petition.cid !== "") {
+            if (pet.petition.cid === null) {
+              // Petition was not created on backend. Prioritize on-chain data.
+              petitionsData[pet.id] = {
+                ...pet.petition,
+                ...(petitionsData[pet.id] ?? { tier2Signatures: 0 }),
+                tier0Signatures: pet.tier0Count,
+                tier1Signatures: pet.tier1Count,
+                reportCount: pet.reportCount,
+                reportMostFrequentCategory: pet.reportMostFrequentCategory
+              };
+            } else if (pet.petition.cid !== "") {
+              // If backend object has a cid, it has real data. Prioritize off-chain data.
               petitionsData[pet.id] = {
                 ...(petitionsData[pet.id] ?? { tier2Signatures: 0 }),
                 ...pet.petition,
@@ -411,7 +423,7 @@ export const getRecommendedPetitions = async (
           });
           ret = {
             success: true,
-            data: petitions
+            data: petitions.filter((pet: IPetition) => pet.cid !== null)
           };
         } else {
           // Unknown error

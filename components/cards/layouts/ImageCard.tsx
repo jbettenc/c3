@@ -42,7 +42,7 @@ function ImageCard(props: ImageCardProps) {
 
   return (
     <Card>
-      <div className="w-full h-full bg-red-75 p-6">
+      <div className="w-full h-full bg-red-75 p-6 cursor-pointer" onClick={props.onClick}>
         <div className="w-full h-full flex flex-col overflow-hidden">
           <img
             src={parseImage(props.image)}

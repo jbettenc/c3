@@ -459,7 +459,10 @@ export function Create() {
                                   title: "Share Petition",
                                   headerSeparator: false,
                                   border: false,
-                                  onClose: () => router.push(`/petition/${hash}`)
+                                  onClose: () => {
+                                    handleCreating(true);
+                                    router.push(`/petition/${hash}`);
+                                  }
                                 }
                               );
                             })
