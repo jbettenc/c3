@@ -63,7 +63,7 @@ function ImageCard(props: ImageCardProps) {
               : `${props.petitioner.substring(0, 6)}...${props.petitioner.substring(props.petitioner.length - 6)}`}
           </div>
           <div ref={titleRef} className="min-h-[2rem]">
-            <AutoScroll height={height} speed={1}>
+            <AutoScroll height={height} speed={1} className="min-h-full">
               <div
                 className={`${
                   prefix === "" ? "text-white" : "text-white"
