@@ -526,7 +526,7 @@ export const reportPetition = async (
 export const logPageView = async (path: string, referer?: string): Promise<{ success: boolean; message?: string }> => {
   let ret: any = null;
   try {
-    await fetch(`${PETITION_API_URL}/metrics/page`, {
+    await fetch(`${PETITION_API_URL}/m/page`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
