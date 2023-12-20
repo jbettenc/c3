@@ -1,13 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { useDimensions } from "@/utils/hooks/useDimensions";
+import { useElementSize } from "@/utils/hooks/useElementSize";
 
 const AutoScroll = ({ children: child, className, height, speed = 5, fps = 120, holdDelay = 500 }: any) => {
-  const [ref, h, w] = useDimensions();
+  // const [ref, h, w] = useDimensions();
+  const [ref, setRef, { width, height: h }] = useElementSize();
   const delayRef = useRef(holdDelay);
 
   useEffect(() => {
     console.log("h changed", h);
-  }, [h]);
+  }, []);
 
   useEffect(() => {
     let globalOffsetY = 0;
@@ -47,7 +49,7 @@ const AutoScroll = ({ children: child, className, height, speed = 5, fps = 120, 
         }
 
         if (h) {
-          const node = ref.current as any;
+          const node = ref as any;
           if (node) {
             if (globalOffsetY + offsetY <= -h) {
               offsetY = childrenHeight;
@@ -56,8 +58,8 @@ const AutoScroll = ({ children: child, className, height, speed = 5, fps = 120, 
           }
         }
       }, 1000 / fps);
-    } else if (ref.current) {
-      ref.current.style.transform = `translateY(${0}px)`;
+    } else if (ref) {
+      ref.style.transform = `translateY(${0}px)`;
     }
 
     return () => {
@@ -73,7 +75,7 @@ const AutoScroll = ({ children: child, className, height, speed = 5, fps = 120, 
         overflowY: !speed ? "auto" : "hidden"
       }}
     >
-      <div ref={ref}>{child}</div>
+      <div ref={setRef}>{child}</div>
     </div>
   );
 };
