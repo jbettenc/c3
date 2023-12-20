@@ -6,6 +6,10 @@ const AutoScroll = ({ children: child, className, height, speed = 5, fps = 120, 
   const delayRef = useRef(holdDelay);
 
   useEffect(() => {
+    console.log("h changed", h);
+  }, [h]);
+
+  useEffect(() => {
     let globalOffsetY = 0;
     let offsetY = 0;
     const childrenHeight = h;

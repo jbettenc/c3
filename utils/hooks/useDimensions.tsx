@@ -29,7 +29,6 @@ export function useDimensions({ on = true } = {} as any) {
       ro.observe(ref.current, {});
     }
     return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [on, ref.current]);
 
   return [ref, height as any, width as any];
