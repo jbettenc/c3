@@ -4,7 +4,6 @@ import SignatureProgressBar from "@/components/SignatureProgressBar";
 import Button from "@/ui/forms/Button";
 import { parseImage } from "@/utils/misc";
 import AutoScroll from "@/ui/scroll/AutoScroll";
-import { useDimensions } from "@/utils/hooks/useDimensions";
 import { useElementSize } from "@/utils/hooks/useElementSize";
 
 interface ImageCardProps {
@@ -22,8 +21,7 @@ interface ImageCardProps {
 function ImageCard(props: ImageCardProps) {
   const { prefix, tier0Signatures, tier1Signatures, tier2Signatures } = props;
 
-  // const [titleRef, height, width] = useDimensions();
-  const [ref, setRef, { height, width }] = useElementSize();
+  const [, setRef, { height }] = useElementSize();
 
   const { alias } = useENS(props.petitioner);
 
@@ -65,7 +63,7 @@ function ImageCard(props: ImageCardProps) {
               : `${props.petitioner.substring(0, 6)}...${props.petitioner.substring(props.petitioner.length - 6)}`}
           </div>
           <div ref={setRef} className="min-h-[2rem]">
-            <AutoScroll height={height} speed={1} className="min-h-full">
+            <AutoScroll height={height} speed={1}>
               <div
                 className={`${
                   prefix === "" ? "text-white" : "text-white"

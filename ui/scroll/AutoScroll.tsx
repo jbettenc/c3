@@ -1,15 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import { useDimensions } from "@/utils/hooks/useDimensions";
 import { useElementSize } from "@/utils/hooks/useElementSize";
 
 const AutoScroll = ({ children: child, className, height, speed = 5, fps = 120, holdDelay = 500 }: any) => {
-  // const [ref, h, w] = useDimensions();
-  const [ref, setRef, { width, height: h }] = useElementSize();
+  const [ref, setRef, { height: h }] = useElementSize();
   const delayRef = useRef(holdDelay);
-
-  useEffect(() => {
-    console.log("h changed", h);
-  }, []);
 
   useEffect(() => {
     let globalOffsetY = 0;
