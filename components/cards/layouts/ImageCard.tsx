@@ -8,6 +8,7 @@ import { useDimensions } from "@/utils/hooks/useDimensions";
 
 interface ImageCardProps {
   loading?: boolean;
+  prefix: string;
   image: any;
   title: string;
   petitioner: string;
@@ -18,7 +19,7 @@ interface ImageCardProps {
 }
 
 function ImageCard(props: ImageCardProps) {
-  const { tier0Signatures, tier1Signatures, tier2Signatures } = props;
+  const { prefix, tier0Signatures, tier1Signatures, tier2Signatures } = props;
 
   const [titleRef, height, width] = useDimensions();
 
@@ -46,7 +47,7 @@ function ImageCard(props: ImageCardProps) {
 
   return (
     <Card>
-      <div className="w-full h-full bg-red-75 p-6">
+      <div className={`w-full h-full ${prefix === "" ? "bg-red-75" : "bg-[#262D33]"} p-6`}>
         <div className="w-full h-full flex flex-col overflow-hidden">
           <img
             src={parseImage(props.image)}
@@ -54,7 +55,9 @@ function ImageCard(props: ImageCardProps) {
             className="rounded-lg mx-auto min-h-[4rem] h-full min-w-[9.75rem] max-w-full shrink object-contain"
             draggable={false}
           />
-          <div className="text-center my-2 font-semibold text-xs text-[#FFC4C9]">
+          <div
+            className={`text-center my-2 font-semibold text-xs ${prefix === "" ? "text-[#FFC4C9]" : "text-[#FFC4C9]"}`}
+          >
             {alias
               ? alias
               : `${props.petitioner.substring(0, 6)}...${props.petitioner.substring(props.petitioner.length - 6)}`}
@@ -62,7 +65,9 @@ function ImageCard(props: ImageCardProps) {
           <div ref={titleRef} className="min-h-[2rem]">
             <AutoScroll height={height} speed={1}>
               <div
-                className="text-white text-center my-auto break-words font-anton min-h-[2rem] cursor-pointer"
+                className={`${
+                  prefix === "" ? "text-white" : "text-white"
+                } text-center my-auto break-words font-anton min-h-[2rem] cursor-pointer`}
                 onClick={props.onClick}
               >
                 {props.title.toUpperCase()}

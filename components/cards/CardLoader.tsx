@@ -5,6 +5,7 @@ import ImageCard from "./layouts/ImageCard";
 import { useRouter } from "next/router";
 import TitleCard from "./layouts/TitleCard";
 import { MODAL_TYPE, useGlobalModalContext } from "../context/ModalContext";
+import { splitPetitionId } from "@/utils/misc";
 
 interface CardLoaderProps {
   petition: IPetition;
@@ -36,6 +37,7 @@ function CardLoader(props: CardLoaderProps) {
     return (
       <ImageCard
         loading={!metadata}
+        prefix={splitPetitionId(props.petition.id).prefix}
         image={metadata ? metadata.images[0] : undefined}
         title={metadata ? metadata.title : ""}
         petitioner={props.petition.petitioner}
@@ -52,6 +54,7 @@ function CardLoader(props: CardLoaderProps) {
     return (
       <TitleCard
         title={metadata.title}
+        prefix={splitPetitionId(props.petition.id).prefix}
         petitioner={props.petition.petitioner}
         tier0Signatures={props.petition.tier0Signatures}
         tier1Signatures={props.petition.tier1Signatures}
